@@ -1,0 +1,18 @@
+# Streamlit Pages Configuration
+# This file controls which pages appear in the sidebar navigation
+
+# Hide all default navigation
+# The app handles navigation internally through session state
+# We don't want users to see "app" or "reset_landing" in the sidebar
+
+[[pages]]
+path = "app.py"
+name = "BPC2 Dashboard"
+icon = "🏠"
+is_hidden = true
+
+[[pages]]
+path = "pages/reset_landing.py"
+name = "Password Reset"
+icon = "🔐"
+is_hidden = true
