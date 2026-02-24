@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Financial Glossary Page
-Atlas BPC 2 Financial Dashboard - Comprehensive financial terms, definitions, and formulas
+Atlas BPC 1 Financial Dashboard - Comprehensive financial terms, definitions, and formulas
 """
 
 import streamlit as st

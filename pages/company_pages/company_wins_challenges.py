@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Company Wins & Challenges Analysis Page
-Atlas BPC 2 Financial Dashboard - Wins & Challenges focused analysis
+Atlas BPC 1 Financial Dashboard - Wins & Challenges focused analysis
 """
 
 import streamlit as st

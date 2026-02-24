@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Company Actuals Analysis Page
-Atlas BPC 2 Financial Dashboard - Actuals focused analysis
+Atlas BPC 1 Financial Dashboard - Actuals focused analysis
 """
 
 import streamlit as st

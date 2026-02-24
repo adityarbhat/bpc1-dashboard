@@ -5,7 +5,7 @@ Create a test Excel template with sample data to verify upload functionality
 from openpyxl import load_workbook
 
 # Load the template
-wb = load_workbook('bpc_upload_template/BPC2_Upload_Template.xlsx')
+wb = load_workbook('bpc_upload_template/BPC1_Upload_Template.xlsx')
 
 # Add sample data to Income Statement sheet
 is_sheet = wb['Income Statement']
@@ -155,8 +155,8 @@ for row in bs_sheet.iter_rows(min_row=3, max_row=bs_sheet.max_row):
         data_idx += 1
 
 # Save test template
-wb.save('bpc_upload_template/BPC2_Upload_Template_TEST.xlsx')
-print("✅ Test template created: bpc_upload_template/BPC2_Upload_Template_TEST.xlsx")
+wb.save('bpc_upload_template/BPC1_Upload_Template_TEST.xlsx')
+print("✅ Test template created: bpc_upload_template/BPC1_Upload_Template_TEST.xlsx")
 print(f"   - Added {len(sample_is_data)} Income Statement values")
 print(f"   - Added {len(sample_bs_data)} Balance Sheet values")
 print("   - Ready for upload testing!")

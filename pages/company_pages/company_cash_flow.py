@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Company Cash Flow Analysis Page
-Atlas BPC 2 Financial Dashboard - Cash Flow focused analysis
+Atlas BPC 1 Financial Dashboard - Cash Flow focused analysis
 """
 
 import streamlit as st

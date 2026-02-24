@@ -13,7 +13,7 @@ def get_period_display_text():
     return "Year End"
 
 
-def create_page_header(page_title=None, subtitle=None, show_period_selector=True, banner_text="BPC 2 Financial Dashboard"):
+def create_page_header(page_title=None, subtitle=None, show_period_selector=True, banner_text="BPC 1 Financial Dashboard"):
     """
     Create standardized page header with consistent spacing
 
@@ -43,12 +43,12 @@ def create_page_header(page_title=None, subtitle=None, show_period_selector=True
         """, unsafe_allow_html=True)
 
 
-def create_red_banner(banner_text="BPC 2 Financial Dashboard"):
+def create_red_banner(banner_text="BPC 1 Financial Dashboard"):
     """
     Create the red banner with customizable title
 
     Args:
-        banner_text (str): Text to display in banner (default: "BPC 2 Financial Dashboard")
+        banner_text (str): Text to display in banner (default: "BPC 1 Financial Dashboard")
     """
     # Add CSS for the red banner
     st.markdown("""

@@ -23,16 +23,15 @@ COMMENT ON COLUMN public.companies.airtable_company_name IS 'Must match exactly 
 
 -- Seed all 10 companies from Airtable
 INSERT INTO public.companies (airtable_company_name, display_name) VALUES
-  ('A-1', 'A-1'),
-  ('ACE', 'ACE'),
-  ('Bisson', 'Bisson'),
-  ('Coastal', 'Coastal'),
-  ('Hopkins', 'Hopkins'),
-  ('Kaster', 'Kaster'),
-  ('Mabeys', 'Mabeys'),
-  ('RC Mason', 'RC Mason'),
-  ('Spirit', 'Spirit'),
-  ('Winter', 'Winter')
+  ('Ace Relo', 'Ace Relo'),
+  ('Ace Worldwide', 'Ace Worldwide'),
+  ('Alexanders', 'Alexanders'),
+  ('AMJ(Toronto)', 'AMJ(Toronto)'),
+  ('Apex', 'Apex'),
+  ('Guardian', 'Guardian'),
+  ('InterWest', 'InterWest'),
+  ('Smith Dray', 'Smith Dray'),
+  ('Weleski', 'Weleski')
 ON CONFLICT (airtable_company_name) DO NOTHING;
 
 -- ----------------------------------------------------------------------------

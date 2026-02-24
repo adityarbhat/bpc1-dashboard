@@ -1,5 +1,5 @@
 """
-BPC2 Dashboard - Password Reset Landing Page
+BPC1 Dashboard - Password Reset Landing Page
 =============================================
 Dedicated page for handling Supabase password reset redirects using PKCE flow.
 
@@ -39,7 +39,7 @@ def get_logo_base64():
 
 # Page configuration
 st.set_page_config(
-    page_title="Reset Password - BPC2 Dashboard",
+    page_title="Reset Password - BPC1 Dashboard",
     page_icon="🔐",
     layout="centered",
     initial_sidebar_state="collapsed"

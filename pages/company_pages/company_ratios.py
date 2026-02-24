@@ -640,7 +640,7 @@ def display_ratio_trends_table(balance_data, income_data):
                 trends_data['income_statement'][metric][year] = ''
     
     # Fetch group ratio data for current year to calculate group averages
-    from pages.group_pages.group_ratios import fetch_group_ratio_data, calculate_bpc2_average
+    from pages.group_pages.group_ratios import fetch_group_ratio_data, calculate_group_average
     from shared.year_config import CURRENT_YEAR
     group_ratio_data = fetch_group_ratio_data(f"{CURRENT_YEAR} Annual")
 
@@ -693,7 +693,7 @@ def display_ratio_trends_table(balance_data, income_data):
                 table_html += '<td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; font-size: 0.95rem;">-</td>'
         # Add Group Avg (2024) cell
         if group_ratio_data and metric_key:
-            group_avg = calculate_bpc2_average(group_ratio_data, metric_key)
+            group_avg = calculate_group_average(group_ratio_data, metric_key)
             if group_avg:
                 avg_bg_color = get_cell_color(group_avg, metric_key)
                 avg_formatted = format_metric_value(group_avg, metric_key)
@@ -731,7 +731,7 @@ def display_ratio_trends_table(balance_data, income_data):
                 table_html += '<td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; font-size: 0.95rem;">-</td>'
         # Add Group Avg (2024) cell
         if group_ratio_data and metric_key:
-            group_avg = calculate_bpc2_average(group_ratio_data, metric_key)
+            group_avg = calculate_group_average(group_ratio_data, metric_key)
             if group_avg:
                 avg_bg_color = get_cell_color(group_avg, metric_key)
                 avg_formatted = format_metric_value(group_avg, metric_key)
@@ -773,7 +773,7 @@ def display_ratio_trends_table(balance_data, income_data):
                 table_html += '<td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; font-size: 0.95rem;">-</td>'
         # Add Group Avg (2024) cell
         if group_ratio_data and metric_key:
-            group_avg = calculate_bpc2_average(group_ratio_data, metric_key)
+            group_avg = calculate_group_average(group_ratio_data, metric_key)
             if group_avg:
                 avg_bg_color = get_cell_color(group_avg, metric_key)
                 avg_formatted = format_metric_value(group_avg, metric_key)

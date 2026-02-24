@@ -39,7 +39,7 @@ def _build_email_html_success(user_name: str, ip_address: str, timestamp: str) -
                 <div class="header">Successful Login</div>
                 <div class="details">
                     <p>Hello {user_name},</p>
-                    <p>Your account was successfully logged into the BPC2 Dashboard.</p>
+                    <p>Your account was successfully logged into the BPC1 Dashboard.</p>
 
                     <div class="detail-item">
                         <span class="label">Time:</span> {timestamp}
@@ -57,7 +57,7 @@ def _build_email_html_success(user_name: str, ip_address: str, timestamp: str) -
                 </div>
 
                 <div class="footer">
-                    BPC2 Dashboard | Powered by IM AI Consultants<br>
+                    BPC1 Dashboard | Powered by IM AI Consultants<br>
                     <a href="https://www.imaiconsultants.com" style="color: #025a9a; text-decoration: none;">www.imaiconsultants.com</a>
                 </div>
             </div>
@@ -112,7 +112,7 @@ def _build_email_html_failed(ip_address: str, timestamp: str, error_reason: str)
                 </div>
 
                 <div class="footer">
-                    BPC2 Dashboard | Powered by IM AI Consultants<br>
+                    BPC1 Dashboard | Powered by IM AI Consultants<br>
                     <a href="https://www.imaiconsultants.com" style="color: #025a9a; text-decoration: none;">www.imaiconsultants.com</a>
                 </div>
             </div>
@@ -175,10 +175,10 @@ def send_login_notification_email(
 
         # Build email based on login status
         if login_status == 'success':
-            subject = "Successful Login to BPC2 Dashboard"
+            subject = "Successful Login to BPC1 Dashboard"
             html_body = _build_email_html_success(user_name, ip_address, timestamp_str)
         else:  # failed
-            subject = "Failed Login Attempt on BPC2 Dashboard"
+            subject = "Failed Login Attempt on BPC1 Dashboard"
             html_body = _build_email_html_failed(ip_address, timestamp_str, error_reason)
 
         # Debug logging
@@ -223,7 +223,7 @@ def send_login_notification_email(
             smtp_port = int(os.getenv('SMTP_PORT', '587'))
             smtp_user = os.getenv('SMTP_USER', '')
             smtp_password = os.getenv('SMTP_PASSWORD', '')
-            smtp_from = os.getenv('SMTP_FROM_EMAIL', 'noreply@bpc2dashboard.com')
+            smtp_from = os.getenv('SMTP_FROM_EMAIL', 'noreply@bpc1dashboard.com')
 
             # Create message
             msg = MIMEMultipart('alternative')

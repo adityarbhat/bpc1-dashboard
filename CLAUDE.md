@@ -2,7 +2,11 @@
 
 ## Project Overview
 
-Streamlit financial dashboard for Atlas BPC 2 (Business Performance Competition). Connects to Airtable for data, provides financial analysis tools for comparing 10 companies across various metrics.
+Streamlit financial dashboard for Atlas BPC 1 (Business Performance Competition). Copied from the BPC2 dashboard codebase. Connects to Airtable for data, provides financial analysis tools for comparing 10 companies across various metrics.
+
+**Setup Status:** See `docs/BPC1_INITIAL_SETUP_PLAN.md` for the detailed setup checklist. This is a new instance — Airtable base, Supabase project, and deployment are being configured separately from BPC2.
+
+**Key Difference from BPC2:** Same codebase, different set of 10 companies, separate Airtable base, separate Supabase project, separate deployment. All "BPC 2" text references need to be changed to "BPC 1".
 
 ## Commands
 

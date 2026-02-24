@@ -163,7 +163,7 @@ async def test_wc_upload_workflow():
 
             # Step 5: Try uploading the test template
             print("[5] Attempting file upload...")
-            template_path = os.path.abspath("bpc_upload_template/BPC2_WC_Upload_Template.xlsx")
+            template_path = os.path.abspath("bpc_upload_template/BPC1_WC_Upload_Template.xlsx")
 
             if os.path.exists(template_path):
                 file_input = page.locator('input[type="file"]')

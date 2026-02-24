@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Company Value Analysis Page
-Atlas BPC 2 Financial Dashboard - Value focused analysis
+Atlas BPC 1 Financial Dashboard - Value focused analysis
 """
 
 import streamlit as st

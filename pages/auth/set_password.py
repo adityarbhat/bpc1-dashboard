@@ -138,7 +138,7 @@ def show_set_password_page():
             st.markdown(f"""
                 <div class="password-header">
                     <div class="password-title">🔐 Set Your Password</div>
-                    <div class="password-subtitle">Welcome to BPC2 Dashboard</div>
+                    <div class="password-subtitle">Welcome to BPC1 Dashboard</div>
                     <a href="https://www.imaiconsultants.com" target="_blank" style="text-decoration: none; display: block; margin-top: 15px;">
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;">
                             <img src="data:image/png;base64,{logo_b64}" style="height: 60px; width: auto;" alt="IM AI" />
@@ -151,7 +151,7 @@ def show_set_password_page():
             st.markdown("""
                 <div class="password-header">
                     <div class="password-title">🔐 Set Your Password</div>
-                    <div class="password-subtitle">Welcome to BPC2 Dashboard</div>
+                    <div class="password-subtitle">Welcome to BPC1 Dashboard</div>
                     <div style="margin-top: 8px;">
                         <a href="https://www.imaiconsultants.com" target="_blank" style="text-decoration: none; color: #666; font-size: 12px; font-weight: 500;">
                             Powered by IM AI

@@ -187,8 +187,8 @@ def calculate_rankings(ratio_data, metric_name, reverse=False):
     return rankings
 
 
-def calculate_bpc2_average(ratio_data, metric_name):
-    """Calculate BPC2 average for a specific metric"""
+def calculate_group_average(ratio_data, metric_name):
+    """Calculate group average for a specific metric"""
     values = []
     for company, metrics in ratio_data.items():
         value = metrics.get(metric_name, 0)
@@ -684,7 +684,7 @@ def create_group_ratio_table(ratio_data):
     for metric in metrics:
         # Calculate rankings and average
         rankings = calculate_rankings(ratio_data, metric['key'], reverse=metric['reverse'])
-        bpc2_avg = calculate_bpc2_average(ratio_data, metric['key'])
+        group_avg = calculate_group_average(ratio_data, metric['key'])
 
         # Metric row
         table_html += f'<tr><td class="row-label">{metric["name"]}</td>'
@@ -697,7 +697,7 @@ def create_group_ratio_table(ratio_data):
 
         # Standard and Average columns
         table_html += f'<td class="standard-col">{metric["standard"]}</td>'
-        table_html += f'<td class="average-col">{format_metric_value(bpc2_avg, metric["key"])}</td>'
+        table_html += f'<td class="average-col">{format_metric_value(group_avg, metric["key"])}</td>'
         table_html += '</tr>'
 
         # Rank row
@@ -750,7 +750,7 @@ def create_group_ratio_table(ratio_data):
     for metric in income_metrics:
         # Calculate rankings and average
         rankings = calculate_rankings(ratio_data, metric['key'], reverse=metric['reverse'])
-        bpc2_avg = calculate_bpc2_average(ratio_data, metric['key'])
+        group_avg = calculate_group_average(ratio_data, metric['key'])
 
         # Metric row
         table_html += f'<tr><td class="row-label">{metric["name"]}</td>'
@@ -763,7 +763,7 @@ def create_group_ratio_table(ratio_data):
 
         # Standard and Average columns
         table_html += f'<td class="standard-col">{metric["standard"]}</td>'
-        table_html += f'<td class="average-col">{format_metric_value(bpc2_avg, metric["key"])}</td>'
+        table_html += f'<td class="average-col">{format_metric_value(group_avg, metric["key"])}</td>'
         table_html += '</tr>'
 
         # Rank row
@@ -816,7 +816,7 @@ def create_group_ratio_table(ratio_data):
     for metric in cash_flow_metrics:
         # Calculate rankings and average
         rankings = calculate_rankings(ratio_data, metric['key'], reverse=metric['reverse'])
-        bpc2_avg = calculate_bpc2_average(ratio_data, metric['key'])
+        group_avg = calculate_group_average(ratio_data, metric['key'])
 
         # Metric row
         table_html += f'<tr><td class="row-label">{metric["name"]}</td>'
@@ -829,7 +829,7 @@ def create_group_ratio_table(ratio_data):
 
         # Standard and Average columns
         table_html += f'<td class="standard-col">{metric["standard"]}</td>'
-        table_html += f'<td class="average-col">{format_metric_value(bpc2_avg, metric["key"])}</td>'
+        table_html += f'<td class="average-col">{format_metric_value(group_avg, metric["key"])}</td>'
         table_html += '</tr>'
 
         # Rank row

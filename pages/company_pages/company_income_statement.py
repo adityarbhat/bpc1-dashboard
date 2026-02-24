@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Company Income Statement Analysis Page
-Atlas BPC 2 Financial Dashboard - Income Statement focused analysis
+Atlas BPC 1 Financial Dashboard - Income Statement focused analysis
 """
 
 import streamlit as st

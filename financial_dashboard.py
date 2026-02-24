@@ -620,7 +620,7 @@ def create_top_navigation_header():
     # Create the red banner
     st.markdown("""
     <div class="header-banner">
-        <div class="banner-title">BPC 2 Financial Dashboard</div>
+        <div class="banner-title">BPC 1 Financial Dashboard</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -635,7 +635,7 @@ def create_group_overview_page(companies):
     # Use centralized page header with consistent spacing
     create_page_header(
         page_title="Group Overview",
-        subtitle="Welcome to the 2025 BPC 2 Financial Analysis!",
+        subtitle="Welcome to the 2025 BPC 1 Financial Analysis!",
         show_period_selector=True
     )
 
@@ -815,7 +815,7 @@ def create_comparison_page(comparison_type):
 def main():
     # Page configuration - MUST be first Streamlit command
     st.set_page_config(
-        page_title="BPC 2 - Financial Dashboard",
+        page_title="BPC 1 - Financial Dashboard",
         page_icon="🚚",
         layout="wide",
         initial_sidebar_state="expanded"

@@ -24,7 +24,7 @@ def create_wc_excel_template():
     create_action_items_sheet(wb)
 
     # Save the file
-    output_path = 'bpc_upload_template/BPC2_WC_Upload_Template.xlsx'
+    output_path = 'bpc_upload_template/BPC1_WC_Upload_Template.xlsx'
     wb.save(output_path)
     print(f"Template created successfully: {output_path}")
 
@@ -43,7 +43,7 @@ def create_instructions_sheet(wb):
     tip_fill = PatternFill(start_color="e6f7ff", end_color="e6f7ff", fill_type="solid")
 
     # Row 1: Title
-    ws['A1'] = "BPC2 Wins & Challenges Upload Template"
+    ws['A1'] = "BPC1 Wins & Challenges Upload Template"
     ws['A1'].font = title_font
     ws['A1'].fill = title_fill
     ws['A1'].alignment = Alignment(horizontal='center', vertical='center')

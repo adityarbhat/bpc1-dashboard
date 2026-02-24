@@ -195,7 +195,7 @@ def show_login_page():
             # With IM AI logo
             st.markdown(f"""
                 <div class="login-header">
-                    <div class="login-title">🔐 BPC2 Dashboard</div>
+                    <div class="login-title">🔐 BPC1 Dashboard</div>
                     <a href="https://www.imaiconsultants.com" target="_blank" style="text-decoration: none; display: block; margin-top: 15px;">
                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;">
                             <img src="data:image/png;base64,{logo_b64}" style="height: 60px; width: auto;" alt="IM AI" />
@@ -208,7 +208,7 @@ def show_login_page():
             # Fallback without logo
             st.markdown("""
                 <div class="login-header">
-                    <div class="login-title">🔐 BPC2 Dashboard</div>
+                    <div class="login-title">🔐 BPC1 Dashboard</div>
                     <div style="margin-top: 8px;">
                         <a href="https://www.imaiconsultants.com" target="_blank" style="text-decoration: none; color: #666; font-size: 12px; font-weight: 500;">
                             Powered by IM AI

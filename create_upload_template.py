@@ -28,7 +28,7 @@ def create_excel_template():
     create_balance_sheet_sheet(wb)
 
     # Save the file
-    output_path = 'bpc_upload_template/BPC2_Upload_Template.xlsx'
+    output_path = 'bpc_upload_template/BPC1_Upload_Template.xlsx'
     wb.save(output_path)
     print(f"✅ Template created successfully: {output_path}")
 

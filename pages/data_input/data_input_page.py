@@ -43,7 +43,7 @@ def create_data_input_page():
 
     # 2. Page header FIRST (creates banner at top)
     create_page_header(
-        banner_text="BPC 2 Financial Data",
+        banner_text="BPC 1 Financial Data",
         show_period_selector=False
     )
 
@@ -172,11 +172,11 @@ def create_data_input_sidebar():
         # Download Template Section
         st.markdown("#### 📥 Download Template")
         try:
-            with open('bpc_upload_template/BPC2_Upload_Template.xlsx', 'rb') as template_file:
+            with open('bpc_upload_template/BPC1_Upload_Template.xlsx', 'rb') as template_file:
                 st.download_button(
                     label="📥 Download Excel Template",
                     data=template_file,
-                    file_name="BPC2_Upload_Template.xlsx",
+                    file_name="BPC1_Upload_Template.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     help="Download the Excel template with both IS and BS sheets",
                     use_container_width=True

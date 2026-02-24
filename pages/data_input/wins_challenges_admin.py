@@ -123,7 +123,7 @@ def create_wins_challenges_admin_page():
     uploaded_file = st.file_uploader(
         "Choose your filled Excel template",
         type=['xlsx', 'xls'],
-        help="Upload the BPC2 W&C Upload Template with your Wins, Challenges, and Action Items filled in.",
+        help="Upload the BPC1 W&C Upload Template with your Wins, Challenges, and Action Items filled in.",
         key="wc_file_uploader"
     )
 
@@ -147,13 +147,13 @@ def create_admin_sidebar():
         st.markdown('<div style="border-bottom: 1px solid #e2e8f0; margin: 0.5rem 0;"></div>', unsafe_allow_html=True)
 
         # Download template button
-        template_path = "bpc_upload_template/BPC2_WC_Upload_Template.xlsx"
+        template_path = "bpc_upload_template/BPC1_WC_Upload_Template.xlsx"
         if os.path.exists(template_path):
             with open(template_path, "rb") as f:
                 st.download_button(
                     label="📥 Download W&C Template",
                     data=f,
-                    file_name="BPC2_WC_Upload_Template.xlsx",
+                    file_name="BPC1_WC_Upload_Template.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     use_container_width=True,
                     help="Download the Excel template for uploading Wins, Challenges, and Action Items"

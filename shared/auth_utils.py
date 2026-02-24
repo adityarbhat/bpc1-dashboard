@@ -1014,7 +1014,7 @@ def send_password_reset_email(email: str) -> Dict[str, Any]:
         supabase.auth.reset_password_for_email(
             email,
             options={
-                "redirect_to": "https://bpc2-dashboard.onrender.com/reset_landing"
+                "redirect_to": "https://bpc1-dashboard.onrender.com/reset_landing"
             }
         )
 
