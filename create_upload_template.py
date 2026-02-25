@@ -21,7 +21,10 @@ def create_excel_template():
     # Remove default sheet
     wb.remove(wb.active)
 
-    # Create Income Statement sheet first (as it's the primary input)
+    # Create Instructions sheet first
+    create_instructions_sheet(wb)
+
+    # Create Income Statement sheet
     create_income_statement_sheet(wb)
 
     # Create Balance Sheet sheet
@@ -33,10 +36,153 @@ def create_excel_template():
     print(f"✅ Template created successfully: {output_path}")
 
 
+def create_instructions_sheet(wb):
+    """Create Instructions sheet with user guidance"""
+
+    ws = wb.create_sheet("Instructions", 0)
+
+    atlas_blue = "025A9A"
+    light_blue = "E8F4FD"
+    dark_gray = "333333"
+
+    title_font = Font(name="Montserrat", size=22, bold=True, color="FFFFFF")
+    header_font = Font(name="Montserrat", size=16, bold=True, color=atlas_blue)
+    number_font = Font(name="Montserrat", size=14, bold=True, color=dark_gray)
+    body_font = Font(name="Montserrat", size=14, bold=True, color=dark_gray)
+    note_bullet = Font(name="Montserrat", size=13, bold=True, color=dark_gray)
+    note_font = Font(name="Montserrat", size=13, bold=True, italic=True, color="444444")
+
+    title_fill = PatternFill(start_color=atlas_blue, end_color=atlas_blue, fill_type="solid")
+    alt_fill = PatternFill(start_color=light_blue, end_color=light_blue, fill_type="solid")
+
+    wrap_top = Alignment(wrap_text=True, vertical="top")
+
+    # Column widths - A narrow for numbers, B-H wide for text
+    ws.column_dimensions['A'].width = 5
+    for col_letter in ['B', 'C', 'D', 'E', 'F', 'G', 'H']:
+        ws.column_dimensions[col_letter].width = 18
+
+    # Row 1: Title
+    ws.merge_cells('A1:H1')
+    cell = ws['A1']
+    cell.value = "BPC1 Upload Template \u2014 Instructions"
+    cell.font = title_font
+    cell.fill = title_fill
+    cell.alignment = Alignment(vertical="center", horizontal="center")
+    ws.row_dimensions[1].height = 55
+
+    # Row 2: Spacer
+    ws.row_dimensions[2].height = 10
+
+    # Row 3: Step 1 header
+    ws.merge_cells('A3:H3')
+    ws['A3'].value = "Step 1: Fill Out the Template"
+    ws['A3'].font = header_font
+    ws.row_dimensions[3].height = 40
+
+    # Step 1 instructions
+    step1_items = [
+        ("1.", 'Open the "Income Statement" and "Balance Sheet" tabs in this workbook.'),
+        ("2.", "Enter the dollar amounts for each line item in the Amount column (Column C). Each line item matches what you see on the dashboard's Income Statement and Balance Sheet pages."),
+        ("3.", 'Enter raw numbers only \u2014 no dollar signs ($), commas, or other formatting. For example, enter 150000 not $150,000.'),
+        ("4.", "Enter negative values with a minus sign (e.g., -5000 for accumulated depreciation)."),
+        ("5.", "Enter 0 for any line item that does not apply to your company. Do not leave cells blank."),
+        ("6.", "Do NOT modify the line item names in Column A or the descriptions in Column B. The system uses these names to match your data."),
+        ("7.", "Do NOT fill in any rows labeled as totals (e.g., Total Revenue, Total Assets). These are calculated automatically by the dashboard."),
+    ]
+
+    row = 4
+    for num, text in step1_items:
+        ws[f'A{row}'].value = num
+        ws[f'A{row}'].font = number_font
+        ws[f'A{row}'].alignment = Alignment(vertical="top", horizontal="right")
+        ws.merge_cells(f'B{row}:H{row}')
+        ws[f'B{row}'].value = text
+        ws[f'B{row}'].font = body_font
+        ws[f'B{row}'].alignment = wrap_top
+        ws.row_dimensions[row].height = 42
+        row += 1
+
+    # Spacer
+    ws.row_dimensions[row].height = 10
+    row += 1
+
+    # Step 2 header
+    ws.merge_cells(f'A{row}:H{row}')
+    ws[f'A{row}'].value = "Step 2: Upload Your Data"
+    ws[f'A{row}'].font = header_font
+    ws.row_dimensions[row].height = 40
+    row += 1
+
+    step2_items = [
+        ("1.", "Log in to the BPC1 Dashboard and navigate to the Upload page."),
+        ("2.", "At the top of the page, select your company name from the dropdown."),
+        ("3.", "Select the correct reporting period \u2014 choose whether this is a Full Year or Mid Year report, and select the correct year."),
+        ("4.", "On the sidebar of the upload page, you will find an option to upload this Excel file. Click it and select this file."),
+        ("5.", "The system will parse your data and show you a preview. Review it carefully before submitting."),
+        ("6.", 'Click the Submit button to upload your data. Once submitted, your data will be in "Submitted" status until an admin publishes it to the dashboard.'),
+    ]
+
+    for num, text in step2_items:
+        ws[f'A{row}'].value = num
+        ws[f'A{row}'].font = number_font
+        ws[f'A{row}'].alignment = Alignment(vertical="top", horizontal="right")
+        ws.merge_cells(f'B{row}:H{row}')
+        ws[f'B{row}'].value = text
+        ws[f'B{row}'].font = body_font
+        ws[f'B{row}'].alignment = wrap_top
+        ws.row_dimensions[row].height = 42
+        row += 1
+
+    # Spacer
+    ws.row_dimensions[row].height = 10
+    row += 1
+
+    # Important Notes header
+    ws.merge_cells(f'A{row}:H{row}')
+    ws[f'A{row}'].value = "Important Notes"
+    ws[f'A{row}'].font = header_font
+    ws.row_dimensions[row].height = 40
+    row += 1
+
+    notes = [
+        ("\u2022", "Make sure you select the correct company and period before uploading \u2014 the system will save data under whichever company and period you have selected."),
+        ("\u2022", "This Instructions sheet is ignored during upload. Only the Income Statement and Balance Sheet sheets are processed."),
+        ("\u2022", "If you see warnings after upload about unmatched line items, check that the line item names in your file have not been modified."),
+    ]
+
+    for bullet, text in notes:
+        ws[f'A{row}'].value = bullet
+        ws[f'A{row}'].font = note_bullet
+        ws[f'A{row}'].alignment = Alignment(vertical="top", horizontal="center")
+        ws.merge_cells(f'B{row}:H{row}')
+        ws[f'B{row}'].value = text
+        ws[f'B{row}'].font = note_font
+        ws[f'B{row}'].alignment = wrap_top
+        ws.row_dimensions[row].height = 45
+        row += 1
+
+    # Alternating row shading for readability
+    step1_rows = list(range(4, 11))
+    step2_rows = list(range(13, 19))
+    note_rows = list(range(21, 24))
+    all_content_rows = step1_rows + step2_rows + note_rows
+
+    for i, r in enumerate(all_content_rows):
+        if i % 2 == 0:
+            for col_letter in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+                ws[f'{col_letter}{r}'].fill = alt_fill
+
+    # Protect sheet so users don't accidentally edit instructions
+    ws.protection.sheet = True
+    ws.protection.enable()
+    ws.sheet_properties.tabColor = atlas_blue
+
+
 def create_income_statement_sheet(wb):
     """Create Income Statement sheet with all line items"""
 
-    ws = wb.create_sheet("Income Statement", 0)
+    ws = wb.create_sheet("Income Statement", 1)
 
     # Define all Income Statement line items in order
     is_line_items = [
@@ -123,7 +269,7 @@ def create_income_statement_sheet(wb):
 def create_balance_sheet_sheet(wb):
     """Create Balance Sheet sheet with all line items"""
 
-    ws = wb.create_sheet("Balance Sheet", 1)
+    ws = wb.create_sheet("Balance Sheet", 2)
 
     # Define all Balance Sheet line items in order
     bs_line_items = [

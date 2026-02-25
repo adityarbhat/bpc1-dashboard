@@ -167,9 +167,15 @@ def parse_income_statement_excel(uploaded_file) -> Tuple[Dict[str, float], int, 
             try:
                 df = pd.read_excel(uploaded_file, sheet_name='IS')
             except ValueError:
-                # Try first sheet
-                df = pd.read_excel(uploaded_file, sheet_name=0)
-                warnings.append("⚠️ Could not find 'Income Statement' sheet, using first sheet")
+                # Try first non-Instructions sheet
+                xls = pd.ExcelFile(uploaded_file)
+                data_sheets = [s for s in xls.sheet_names if s.lower() != 'instructions']
+                if data_sheets:
+                    df = pd.read_excel(uploaded_file, sheet_name=data_sheets[0])
+                    warnings.append(f"⚠️ Could not find 'Income Statement' sheet, using '{data_sheets[0]}'")
+                else:
+                    df = pd.read_excel(uploaded_file, sheet_name=0)
+                    warnings.append("⚠️ Could not find 'Income Statement' sheet, using first sheet")
 
         # Assume first column is Line Item, second column is Amount
         if len(df.columns) < 2:
@@ -272,11 +278,16 @@ def parse_balance_sheet_excel(uploaded_file) -> Tuple[Dict[str, float], int, Lis
                     df = pd.read_excel(uploaded_file, sheet_name='BS')
                 except ValueError:
                     # Try second sheet (assuming IS is first)
-                    try:
-                        df = pd.read_excel(uploaded_file, sheet_name=1)
-                        warnings.append("⚠️ Could not find 'Balance Sheet' sheet, using second sheet")
-                    except:
-                        # Fall back to first sheet
+                    # Try to find a non-Instructions sheet that isn't the first data sheet
+                    xls = pd.ExcelFile(uploaded_file)
+                    data_sheets = [s for s in xls.sheet_names if s.lower() != 'instructions']
+                    if len(data_sheets) >= 2:
+                        df = pd.read_excel(uploaded_file, sheet_name=data_sheets[1])
+                        warnings.append(f"⚠️ Could not find 'Balance Sheet' sheet, using '{data_sheets[1]}'")
+                    elif data_sheets:
+                        df = pd.read_excel(uploaded_file, sheet_name=data_sheets[0])
+                        warnings.append(f"⚠️ Could not find 'Balance Sheet' sheet, using '{data_sheets[0]}'")
+                    else:
                         df = pd.read_excel(uploaded_file, sheet_name=0)
                         warnings.append("⚠️ Could not find 'Balance Sheet' sheet, using first sheet")
 
