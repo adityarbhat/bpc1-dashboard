@@ -703,29 +703,14 @@ def create_group_overview_page(companies):
     </style>
     """, unsafe_allow_html=True)
 
-    # Static hardcoded rankings for instant loading (no API calls needed)
-    # Last updated: 2024 Annual (Year End) - Final Rankings
-    # Update this data manually if rankings change in future periods
-    static_rankings = [
-        {'rank': 1, 'company': 'Coastal', 'score': 30},
-        {'rank': 2, 'company': 'Winter', 'score': 45},
-        {'rank': 3, 'company': 'Spirit', 'score': 46},
-        {'rank': 4, 'company': 'Hopkins', 'score': 59},
-        {'rank': 5, 'company': 'A-1', 'score': 60},
-        {'rank': 6, 'company': 'Mabeys', 'score': 70},
-        {'rank': 7, 'company': 'Bisson', 'score': 72},
-        {'rank': 8, 'company': 'Ace', 'score': 82},
-        {'rank': 9, 'company': 'RC Mason', 'score': 93},
-        {'rank': 10, 'company': 'Kaster', 'score': 105}
-    ]
-
-    # Build the complete HTML table with static data
+    # Rankings will be populated once financial data is uploaded
+    # Show company list without scores for now
     table_html = '<div style="display: flex; justify-content: center; margin: 1rem auto; max-width: 600px;"><table style="width: 100%; border-collapse: collapse; font-family: Montserrat, sans-serif; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"><thead><tr style="background-color: #025a9a;"><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Rank</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Company</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Total Score</th></tr></thead><tbody>'
 
-    # Add data rows from static rankings
-    for item in static_rankings:
-        row_bg = "background-color: #f7fafc;" if item['rank'] % 2 == 1 else ""
-        table_html += f'<tr style="{row_bg}"><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>#{item["rank"]}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>{item["company"]}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 700;"><strong>{item["score"]}</strong></td></tr>'
+    for i, company in enumerate(companies):
+        row_bg = "background-color: #f7fafc;" if i % 2 == 1 else ""
+        company_name = str(company['name']).replace('<', '&lt;').replace('>', '&gt;')
+        table_html += f'<tr style="{row_bg}"><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>#{i+1}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center;">-</td></tr>'
 
     table_html += '</tbody></table></div>'
 
