@@ -1,6 +1,7 @@
 # Environment and secrets
 .env
 .streamlit/secrets.toml
+supabase_creds.rtf
 
 # Python virtual environment files
 venv/
