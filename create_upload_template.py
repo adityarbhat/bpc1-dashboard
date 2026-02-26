@@ -7,6 +7,7 @@ Each sheet has: Line Item, Description, and Date (12/31/25) columns
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side, Protection
 from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.datavalidation import DataValidation
 
 # Import descriptions
 from description_mappings import BALANCE_SHEET_DESCRIPTIONS, INCOME_STATEMENT_DESCRIPTIONS
@@ -337,16 +338,16 @@ def add_header_row(ws, sheet_title):
 
     # Row 1: Sheet title
     ws['A1'] = sheet_title
-    ws['A1'].font = Font(size=14, bold=True, color="FFFFFF")
+    ws['A1'].font = Font(name="Montserrat", size=16, bold=True, color="FFFFFF")
     ws['A1'].fill = PatternFill(start_color="025a9a", end_color="025a9a", fill_type="solid")
     ws['A1'].alignment = Alignment(horizontal='center', vertical='center')
     ws.merge_cells('A1:C1')
-    ws.row_dimensions[1].height = 25
+    ws.row_dimensions[1].height = 35
 
     # Row 2: Column headers
-    headers = ['Line Item', 'Description', '12/31/25']
+    headers = ['Line Item', 'Description', 'Amount']
     header_fill = PatternFill(start_color="0e9cd5", end_color="0e9cd5", fill_type="solid")
-    header_font = Font(bold=True, color="FFFFFF", size=11)
+    header_font = Font(name="Montserrat", bold=True, color="FFFFFF", size=13)
 
     for col_num, header in enumerate(headers, 1):
         cell = ws.cell(row=2, column=col_num)
@@ -361,11 +362,34 @@ def add_header_row(ws, sheet_title):
             bottom=Side(style='thin')
         )
 
-    ws.row_dimensions[2].height = 20
+    ws.row_dimensions[2].height = 28
 
 
 def add_data_rows(ws, line_items, description_dict):
     """Add data rows with line items, descriptions, and date column"""
+
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    # Data validation: only allow decimal numbers in column C
+    number_validation = DataValidation(
+        type="decimal",
+        operator="between",
+        formula1=-999999999999,
+        formula2=999999999999,
+        allow_blank=True
+    )
+    number_validation.error = "Please enter a number only. No dollar signs, commas, or text."
+    number_validation.errorTitle = "Invalid Entry"
+    number_validation.prompt = "Enter the dollar amount as a number (e.g., 150000 or -5000)"
+    number_validation.promptTitle = "Amount"
+    number_validation.showErrorMessage = True
+    number_validation.showInputMessage = True
+    ws.add_data_validation(number_validation)
 
     row_num = 3  # Start after header rows
 
@@ -374,13 +398,13 @@ def add_data_rows(ws, line_items, description_dict):
             # Category header row
             cell_a = ws.cell(row=row_num, column=1)
             cell_a.value = field_key
-            cell_a.font = Font(bold=True, size=11, color="FFFFFF")
+            cell_a.font = Font(name="Montserrat", bold=True, size=12, color="FFFFFF")
             cell_a.fill = PatternFill(start_color="4a5568", end_color="4a5568", fill_type="solid")
             cell_a.alignment = Alignment(horizontal='left', vertical='center')
 
             # Merge across all columns for category headers
             ws.merge_cells(f'A{row_num}:C{row_num}')
-            ws.row_dimensions[row_num].height = 18
+            ws.row_dimensions[row_num].height = 25
 
         elif field_key == '' and field_label == '':
             # Blank row for spacing
@@ -391,40 +415,28 @@ def add_data_rows(ws, line_items, description_dict):
             # Column A: Line Item
             cell_a = ws.cell(row=row_num, column=1)
             cell_a.value = field_label
+            cell_a.font = Font(name="Montserrat", size=12, bold=True, color="333333")
             cell_a.alignment = Alignment(horizontal='left', vertical='center')
-            cell_a.border = Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-            )
+            cell_a.border = thin_border
 
             # Column B: Description
             description = description_dict.get(field_key, '')
             cell_b = ws.cell(row=row_num, column=2)
             cell_b.value = description
             cell_b.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            cell_b.font = Font(italic=True, size=9, color="4a5568")
-            cell_b.border = Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-            )
+            cell_b.font = Font(name="Montserrat", size=11, color="4a5568")
+            cell_b.border = thin_border
 
-            # Column C: Date (editable by user)
+            # Column C: Amount (editable by user, numbers only)
             cell_c = ws.cell(row=row_num, column=3)
-            cell_c.value = None  # Leave blank for user to enter amount
+            cell_c.value = None
+            cell_c.font = Font(name="Montserrat", size=12)
             cell_c.alignment = Alignment(horizontal='right', vertical='center')
-            cell_c.border = Border(
-                left=Side(style='thin'),
-                right=Side(style='thin'),
-                top=Side(style='thin'),
-                bottom=Side(style='thin')
-            )
-            cell_c.number_format = '$#,##0.00'  # Currency format
+            cell_c.border = thin_border
+            cell_c.number_format = '#,##0.0000'
+            number_validation.add(cell_c)
 
-            ws.row_dimensions[row_num].height = 30  # Taller rows for wrapped descriptions
+            ws.row_dimensions[row_num].height = 32
 
         row_num += 1
 
