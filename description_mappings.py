@@ -108,5 +108,5 @@ INCOME_STATEMENT_DESCRIPTIONS = {
     'interest_expense': 'All interest paid on interest bearing debt (enter as negative)',
 
     # Labor Analysis
-    'administrative_employees': 'Total number of admin employees (FTE). Include CEO, dispatch, office, managers, salaried sales. Exclude commissioned and hourly warehouse.',
+    'administrative_employees': 'Admin employee headcount (FTE): CEO, dispatch, office, managers, salaried sales',
 }
