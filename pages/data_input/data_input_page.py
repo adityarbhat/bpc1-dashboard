@@ -455,19 +455,45 @@ def create_income_statement_input(company_name, period_name, year):
     # Labor Analysis - Administrative Employees (headcount, not dollars)
     st.markdown("---")
     st.markdown("### Labor Analysis")
-    admin_emp_value = int(st.session_state.is_input_data.get('administrative_employees', existing_values.get('administrative_employees', 0)))
-    admin_employees = st.number_input(
-        "Administrative Employees (Count)",
-        min_value=0,
-        value=admin_emp_value,
-        step=1,
-        help=INCOME_STATEMENT_DESCRIPTIONS.get('administrative_employees', ''),
-        key=f"admin_employees_{year}"
+    labor_fields = [
+        ('administrative_employees', 'Administrative Employees (Count)'),
+    ]
+    labor_data = []
+    for field_key, field_label in labor_fields:
+        current_value = st.session_state.is_input_data.get(field_key, existing_values.get(field_key, 0.0))
+        description = INCOME_STATEMENT_DESCRIPTIONS.get(field_key, '')
+        labor_data.append({
+            'Line Item': field_label,
+            'Description': description,
+            'Field Key': field_key,
+            f'{year} Value': float(current_value) if current_value else 0.0
+        })
+    labor_df = pd.DataFrame(labor_data)
+    edited_labor_df = st.data_editor(
+        labor_df,
+        hide_index=True,
+        column_config={
+            'Line Item': st.column_config.TextColumn('Line Item', disabled=True, width='medium'),
+            'Description': st.column_config.TextColumn('Description', disabled=True, width='large'),
+            'Field Key': None,
+            f'{year} Value': st.column_config.NumberColumn(
+                f'{year} Value',
+                min_value=0,
+                step=1,
+                format="%d",
+                width='medium'
+            )
+        },
+        use_container_width=True,
+        key=f"is_labor_{year}"
     )
-    old_admin = st.session_state.is_input_data.get('administrative_employees', 0)
-    if admin_employees != old_admin:
-        st.session_state.is_submitted = False
-    st.session_state.is_input_data['administrative_employees'] = admin_employees
+    for idx, row in edited_labor_df.iterrows():
+        field_key = row['Field Key']
+        new_val = row[f'{year} Value']
+        old_val = st.session_state.is_input_data.get(field_key, 0.0)
+        if new_val != old_val:
+            st.session_state.is_submitted = False
+        st.session_state.is_input_data[field_key] = new_val
 
     # Submit button
     st.markdown("---")
