@@ -704,14 +704,6 @@ def submit_income_statement_data(company_name, period_name, year):
         # Get user email from session state
         user_email = st.session_state.user.email if st.session_state.get('user') else 'unknown@user.com'
 
-        # Calculate rev_admin_employee before upload
-        admin_emp = st.session_state.is_input_data.get('administrative_employees', 0)
-        if admin_emp and admin_emp > 0:
-            total_rev = st.session_state.is_input_data.get('total_revenue', 0)
-            st.session_state.is_input_data['rev_admin_employee'] = total_rev / admin_emp
-        else:
-            st.session_state.is_input_data['rev_admin_employee'] = 0
-
         with st.spinner("Uploading Income Statement data to Airtable..."):
             success, message = upload_income_statement_to_airtable(
                 company_name,
