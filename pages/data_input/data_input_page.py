@@ -700,6 +700,9 @@ def submit_income_statement_data(company_name, period_name, year):
                 st.success(f"✅ {message}")
                 st.balloons()
                 st.session_state.is_submitted = True
+                # Clear form data so user can upload another company
+                st.session_state.is_input_data = {}
+                st.cache_data.clear()
             else:
                 st.error(f"❌ {message}")
     except Exception as e:
@@ -727,6 +730,9 @@ def submit_balance_sheet_data(company_name, period_name, year):
                 st.success(f"✅ {message}")
                 st.balloons()
                 st.session_state.bs_submitted = True
+                # Clear form data so user can upload another company
+                st.session_state.bs_input_data = {}
+                st.cache_data.clear()
             else:
                 st.error(f"❌ {message}")
     except Exception as e:
