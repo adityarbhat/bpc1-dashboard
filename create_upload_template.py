@@ -255,6 +255,11 @@ def create_income_statement_sheet(wb):
         ('ceo_comp', 'CEO Comp', False),
         ('other_expense', 'Other Expense', False),
         ('interest_expense', 'Interest Expense', False),
+
+        # Labor Analysis
+        ('', '', False),  # Blank row
+        ('LABOR ANALYSIS', '', True),  # Header row
+        ('administrative_employees', 'Administrative Employees', False),
     ]
 
     # Add header row

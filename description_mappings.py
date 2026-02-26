@@ -106,4 +106,7 @@ INCOME_STATEMENT_DESCRIPTIONS = {
     'ceo_comp': 'All salaries, bonuses or perks paid to CEO (enter as negative)',
     'other_expense': 'Loss on sale of asset, research of new business lines (enter as negative)',
     'interest_expense': 'All interest paid on interest bearing debt (enter as negative)',
+
+    # Labor Analysis
+    'administrative_employees': 'Total number of admin employees (FTE). Include CEO, dispatch, office, managers, salaried sales. Exclude commissioned and hourly warehouse.',
 }

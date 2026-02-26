@@ -69,6 +69,10 @@ IS_LABEL_MAPPING = {
     'CEO Comp': 'ceo_comp',
     'Other Expense': 'other_expense',
     'Interest Expense': 'interest_expense',
+    # Labor Analysis
+    'Administrative Employees': 'administrative_employees',
+    'Admin Employees': 'administrative_employees',
+    'Admin employees': 'administrative_employees',
 }
 
 BS_LABEL_MAPPING = {

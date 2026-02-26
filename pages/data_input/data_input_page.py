@@ -452,6 +452,23 @@ def create_income_statement_input(company_name, period_name, year):
     """, unsafe_allow_html=True)
     st.session_state.is_input_data['profit_before_tax_with_ppp'] = profit_before_tax
 
+    # Labor Analysis - Administrative Employees (headcount, not dollars)
+    st.markdown("---")
+    st.markdown("### Labor Analysis")
+    admin_emp_value = int(st.session_state.is_input_data.get('administrative_employees', existing_values.get('administrative_employees', 0)))
+    admin_employees = st.number_input(
+        "Administrative Employees (Count)",
+        min_value=0,
+        value=admin_emp_value,
+        step=1,
+        help=INCOME_STATEMENT_DESCRIPTIONS.get('administrative_employees', ''),
+        key=f"admin_employees_{year}"
+    )
+    old_admin = st.session_state.is_input_data.get('administrative_employees', 0)
+    if admin_employees != old_admin:
+        st.session_state.is_submitted = False
+    st.session_state.is_input_data['administrative_employees'] = admin_employees
+
     # Submit button
     st.markdown("---")
     col1, col2, col3 = st.columns([1, 1, 1])
@@ -686,6 +703,14 @@ def submit_income_statement_data(company_name, period_name, year):
     try:
         # Get user email from session state
         user_email = st.session_state.user.email if st.session_state.get('user') else 'unknown@user.com'
+
+        # Calculate rev_admin_employee before upload
+        admin_emp = st.session_state.is_input_data.get('administrative_employees', 0)
+        if admin_emp and admin_emp > 0:
+            total_rev = st.session_state.is_input_data.get('total_revenue', 0)
+            st.session_state.is_input_data['rev_admin_employee'] = total_rev / admin_emp
+        else:
+            st.session_state.is_input_data['rev_admin_employee'] = 0
 
         with st.spinner("Uploading Income Statement data to Airtable..."):
             success, message = upload_income_statement_to_airtable(
