@@ -322,7 +322,7 @@ def create_income_statement_input(company_name, period_name, year):
         st.session_state.is_input_data = {}
 
     # Create input section for each category
-    def create_input_section(section_title, fields, category_key):
+    def create_input_section(section_title, fields, category_key, allow_negative=False):
         st.markdown(f"### {section_title}")
 
         # Create DataFrame for this section
@@ -339,6 +339,14 @@ def create_income_statement_input(company_name, period_name, year):
 
         df = pd.DataFrame(data)
 
+        # Build NumberColumn config - only enforce min_value=0 for non-negative sections
+        number_col_kwargs = {
+            'format': "$%.2f",
+            'width': 'medium'
+        }
+        if not allow_negative:
+            number_col_kwargs['min_value'] = 0.0
+
         # Use data_editor for editable table
         edited_df = st.data_editor(
             df,
@@ -349,9 +357,7 @@ def create_income_statement_input(company_name, period_name, year):
                 'Field Key': None,  # Hide this column
                 f'{year} Amount': st.column_config.NumberColumn(
                     f'{year} Amount ($)',
-                    min_value=0.0,
-                    format="$%.2f",
-                    width='medium'
+                    **number_col_kwargs
                 )
             },
             use_container_width=True,
@@ -427,7 +433,7 @@ def create_income_statement_input(company_name, period_name, year):
 
     st.markdown("---")
 
-    other_df = create_input_section("Non-Operating Income/Expenses", other_fields, "other")
+    other_df = create_input_section("Non-Operating Income/Expenses", other_fields, "other", allow_negative=True)
 
     # Calculate total non-operating (values are entered with correct sign, e.g. expenses as negative)
     total_nonoperating = (
