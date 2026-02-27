@@ -366,7 +366,8 @@ class AirtableConnection:
                         'total_nonoperating_income': _parse_percentage_or_float(fields.get('total_nonoperating_income', 0)),
                         
                         # Other fields from INCOME_STATEMENT_MAPPING
-                        'administrative_employees': _parse_percentage_or_float(fields.get('administrative_employees', 0))
+                        'administrative_employees': _parse_percentage_or_float(fields.get('administrative_employees', 0)),
+                        'number_of_branches': _parse_percentage_or_float(fields.get('number_of_branches', 0))
                     })
                 return income_data
             else:

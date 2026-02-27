@@ -702,7 +702,8 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
         # Administrative Employees header section
         ('Useful Data Points', 'header_admin_employees', True, True),  # Header row with dark grey
         ('# Administrative Employees', 'administrative_employees', False, False),
-        
+        ('# of Branches', 'number_of_branches', False, False),
+
         # Revenue Section
         ('Revenue', 'header_revenue', True, True),  # Header row with dark grey
         ('Intra State HHG', 'intra_state_hhg', False, False),
@@ -900,7 +901,7 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
                 if field_name.startswith('header_'):
                     table_html += '<td></td>'
                 # Special formatting for Administrative Employees (number field)
-                elif field_name == 'administrative_employees':
+                elif field_name in ['administrative_employees', 'number_of_branches']:
                     table_html += f'<td>{format_employees(value)}</td>'
                 # Special formatting for percentage fields (round to nearest whole number)
                 elif field_name in ['gpm', 'opm', 'npm']:

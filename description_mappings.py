@@ -109,4 +109,5 @@ INCOME_STATEMENT_DESCRIPTIONS = {
 
     # Labor Analysis
     'administrative_employees': 'Admin employee headcount (FTE): CEO, dispatch, office, managers, salaried sales',
+    'number_of_branches': 'Total number of branch locations operating under your company',
 }

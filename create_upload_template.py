@@ -260,6 +260,7 @@ def create_income_statement_sheet(wb):
         ('', '', False),  # Blank row
         ('LABOR ANALYSIS', '', True),  # Header row
         ('administrative_employees', 'Administrative Employees', False),
+        ('number_of_branches', 'Number of Branches', False),
     ]
 
     # Add header row

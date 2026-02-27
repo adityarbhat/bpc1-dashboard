@@ -84,6 +84,7 @@ INCOME_STATEMENT_MAPPING = {
     
     # === OTHER FIELDS ===
     'administrative_employees': 'administrative_employees',  # Number field, not currency
+    'number_of_branches': 'number_of_branches',  # Number field, not currency
 }
 
 def convert_to_json_serializable(obj):

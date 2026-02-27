@@ -463,6 +463,7 @@ def create_income_statement_input(company_name, period_name, year):
     st.markdown("### Labor Analysis")
     labor_fields = [
         ('administrative_employees', 'Administrative Employees (Count)'),
+        ('number_of_branches', 'Number of Branches'),
     ]
     labor_data = []
     for field_key, field_label in labor_fields:

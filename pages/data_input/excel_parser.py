@@ -73,6 +73,9 @@ IS_LABEL_MAPPING = {
     'Administrative Employees': 'administrative_employees',
     'Admin Employees': 'administrative_employees',
     'Admin employees': 'administrative_employees',
+    'Number of Branches': 'number_of_branches',
+    'Num Branches': 'number_of_branches',
+    'Branches': 'number_of_branches',
 }
 
 BS_LABEL_MAPPING = {
