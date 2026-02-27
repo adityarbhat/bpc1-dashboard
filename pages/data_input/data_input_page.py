@@ -209,7 +209,6 @@ def create_data_input_sidebar():
                     st.session_state.is_input_data = {}
                 st.session_state.is_input_data.update(results['is_data'])
                 st.session_state.is_submitted = False  # Re-enable submit button
-                st.session_state.pop('is_submit_message', None)
                 st.success(f"✅ Income Statement: {results['is_matched']} items loaded")
 
             # Update Balance Sheet data
@@ -218,7 +217,6 @@ def create_data_input_sidebar():
                     st.session_state.bs_input_data = {}
                 st.session_state.bs_input_data.update(results['bs_data'])
                 st.session_state.bs_submitted = False  # Re-enable submit button
-                st.session_state.pop('bs_submit_message', None)
                 st.success(f"✅ Balance Sheet: {results['bs_matched']} items loaded")
 
                 # Check balance
@@ -367,7 +365,6 @@ def create_income_statement_input(company_name, period_name, year):
             old_val = st.session_state.is_input_data.get(field_key, 0.0)
             if new_val != old_val:
                 st.session_state.is_submitted = False  # Re-enable submit on edit
-                st.session_state.pop('is_submit_message', None)
             st.session_state.is_input_data[field_key] = new_val
 
         return edited_df
@@ -496,7 +493,6 @@ def create_income_statement_input(company_name, period_name, year):
         old_val = st.session_state.is_input_data.get(field_key, 0.0)
         if new_val != old_val:
             st.session_state.is_submitted = False
-            st.session_state.pop('is_submit_message', None)
         st.session_state.is_input_data[field_key] = new_val
 
     # Submit button
@@ -507,10 +503,7 @@ def create_income_statement_input(company_name, period_name, year):
     with col2:
         if is_submitted:
             st.button("✅ Income Statement Submitted", use_container_width=True, type="primary", disabled=True)
-            # Show the success message from the submission
-            if st.session_state.get('is_submit_message'):
-                st.success(st.session_state.is_submit_message)
-            st.info("Edit values or upload a new file to re-enable submission.")
+            st.success("Data has been submitted. Edit values or upload a new file to re-enable.")
         else:
             if st.button("✅ Submit Income Statement to Airtable", use_container_width=True, type="primary"):
                 submit_income_statement_data(company_name, period_name, year)
@@ -614,7 +607,6 @@ def create_balance_sheet_input(company_name, period_name, year):
             old_val = st.session_state.bs_input_data.get(field_key, 0.0)
             if new_val != old_val:
                 st.session_state.bs_submitted = False  # Re-enable submit on edit
-                st.session_state.pop('bs_submit_message', None)
             st.session_state.bs_input_data[field_key] = new_val
 
         return edited_df
@@ -724,10 +716,7 @@ def create_balance_sheet_input(company_name, period_name, year):
     with col2:
         if bs_submitted:
             st.button("✅ Balance Sheet Submitted", use_container_width=True, type="primary", disabled=True)
-            # Show the success message from the submission
-            if st.session_state.get('bs_submit_message'):
-                st.success(st.session_state.bs_submit_message)
-            st.info("Edit values or upload a new file to re-enable submission.")
+            st.success("Data has been submitted. Edit values or upload a new file to re-enable.")
         else:
             if st.button("✅ Submit Balance Sheet to Airtable", use_container_width=True, type="primary", disabled=not is_balanced):
                 submit_balance_sheet_data(company_name, period_name, year)
@@ -751,12 +740,12 @@ def submit_income_statement_data(company_name, period_name, year):
             )
 
             if success:
+                st.success(f"✅ {message}")
+                st.balloons()
                 st.session_state.is_submitted = True
-                st.session_state.is_submit_message = f"✅ {message}"
                 # Clear form data so user can upload another company
                 st.session_state.is_input_data = {}
                 st.cache_data.clear()
-                st.rerun()
             else:
                 st.error(f"❌ {message}")
     except Exception as e:
@@ -781,12 +770,12 @@ def submit_balance_sheet_data(company_name, period_name, year):
             )
 
             if success:
+                st.success(f"✅ {message}")
+                st.balloons()
                 st.session_state.bs_submitted = True
-                st.session_state.bs_submit_message = f"✅ {message}"
                 # Clear form data so user can upload another company
                 st.session_state.bs_input_data = {}
                 st.cache_data.clear()
-                st.rerun()
             else:
                 st.error(f"❌ {message}")
     except Exception as e:
