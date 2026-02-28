@@ -287,11 +287,12 @@ def calculate_group_rankings(period):
         total_scores[company] = al_points + prof_points + cf_weighted
 
     # Calculate overall rankings (lowest score = rank 1)
-    sorted_total_scores = sorted(total_scores.items(), key=lambda x: x[1])
+    # Filter out companies with no score before ranking so ranks start at 1
+    scored_companies = [(c, s) for c, s in total_scores.items() if s > 0]
+    sorted_total_scores = sorted(scored_companies, key=lambda x: x[1])
     overall_rankings = {}
     for rank, (company, score) in enumerate(sorted_total_scores, start=1):
-        if score > 0:
-            overall_rankings[company] = rank
+        overall_rankings[company] = rank
 
     return {
         'rankings': overall_rankings,
