@@ -3,6 +3,7 @@ Financial Data Input Page
 Allows users to input Balance Sheet and Income Statement data directly via interactive tables
 """
 
+import textwrap
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -18,6 +19,13 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from data_transformation_bs import BALANCE_SHEET_MAPPING
 from data_transformation_is import INCOME_STATEMENT_MAPPING
 from description_mappings import BALANCE_SHEET_DESCRIPTIONS, INCOME_STATEMENT_DESCRIPTIONS
+
+
+def _wrap_description(text, width=55):
+    """Wrap long descriptions with newlines so they display on multiple lines in the data editor."""
+    if not text or len(text) <= width:
+        return text
+    return '\n'.join(textwrap.wrap(text, width=width))
 
 
 def create_data_input_page():
@@ -329,7 +337,7 @@ def create_income_statement_input(company_name, period_name, year):
         data = []
         for field_key, field_label in fields:
             current_value = st.session_state.is_input_data.get(field_key, existing_values.get(field_key, 0.0))
-            description = INCOME_STATEMENT_DESCRIPTIONS.get(field_key, '')
+            description = _wrap_description(INCOME_STATEMENT_DESCRIPTIONS.get(field_key, ''))
             data.append({
                 'Line Item': field_label,
                 'Description': description,
@@ -468,7 +476,7 @@ def create_income_statement_input(company_name, period_name, year):
     labor_data = []
     for field_key, field_label in labor_fields:
         current_value = st.session_state.is_input_data.get(field_key, existing_values.get(field_key, 0.0))
-        description = INCOME_STATEMENT_DESCRIPTIONS.get(field_key, '')
+        description = _wrap_description(INCOME_STATEMENT_DESCRIPTIONS.get(field_key, ''))
         labor_data.append({
             'Line Item': field_label,
             'Description': description,
@@ -581,7 +589,7 @@ def create_balance_sheet_input(company_name, period_name, year):
         data = []
         for field_key, field_label in fields:
             current_value = st.session_state.bs_input_data.get(field_key, existing_values.get(field_key, 0.0))
-            description = BALANCE_SHEET_DESCRIPTIONS.get(field_key, '')
+            description = _wrap_description(BALANCE_SHEET_DESCRIPTIONS.get(field_key, ''))
             data.append({
                 'Line Item': field_label,
                 'Description': description,
