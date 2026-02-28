@@ -715,11 +715,11 @@ def create_group_overview_page(companies):
         (8, 'InterWest', 72.0),
     ]
 
-    table_html = '<div class="homepage-table-container"><table class="rankings-table"><thead><tr><th style="text-align: center;">Rank</th><th style="text-align: center;">Company</th><th style="text-align: center;">Total Score</th></tr></thead><tbody>'
+    table_html = '<div style="display: flex; justify-content: center; margin: 1rem auto; max-width: 600px;"><table style="width: 100%; border-collapse: collapse; font-family: Montserrat, sans-serif; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"><thead><tr style="background-color: #025a9a;"><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Rank</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Company</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Total Score</th></tr></thead><tbody>'
 
     for rank, company_name, score in hardcoded_rankings:
-        row_bg = "background-color: #f7fafc;" if rank % 2 == 0 else ""
-        table_html += f'<tr style="{row_bg}"><td style="text-align: center; font-weight: 600;"><strong>#{rank}</strong></td><td style="text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="text-align: center;">{score:.1f}</td></tr>'
+        row_bg = "background-color: #f7fafc;" if rank % 2 == 1 else ""
+        table_html += f'<tr style="{row_bg}"><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>#{rank}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 700;"><strong>{score:.1f}</strong></td></tr>'
 
     table_html += '</tbody></table></div>'
     st.markdown(table_html, unsafe_allow_html=True)
