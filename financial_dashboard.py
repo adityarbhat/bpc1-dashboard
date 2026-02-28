@@ -660,7 +660,7 @@ def create_group_overview_page(companies):
             display: flex;
             justify-content: center;
             margin: 1rem auto;
-            max-width: 600px;
+            width: 100%;
         }
 
         .homepage-table-container .rankings-table {
