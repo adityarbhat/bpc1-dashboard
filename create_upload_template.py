@@ -430,7 +430,7 @@ def add_data_rows(ws, line_items, description_dict):
             cell_b = ws.cell(row=row_num, column=2)
             cell_b.value = description
             cell_b.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-            cell_b.font = Font(name="Montserrat", size=11, color="4a5568")
+            cell_b.font = Font(name="Montserrat", size=11.5, color="4a5568")
             cell_b.border = thin_border
 
             # Column C: Amount (editable by user, numbers only)
@@ -442,7 +442,15 @@ def add_data_rows(ws, line_items, description_dict):
             cell_c.number_format = '#,##0.0000'
             number_validation.add(cell_c)
 
-            ws.row_dimensions[row_num].height = 32
+            # Dynamic row height based on description length
+            # ~70 chars per line at column width 70, each line ~16px
+            desc_len = len(description) if description else 0
+            if desc_len > 140:
+                ws.row_dimensions[row_num].height = 56
+            elif desc_len > 70:
+                ws.row_dimensions[row_num].height = 40
+            else:
+                ws.row_dimensions[row_num].height = 28
 
         row_num += 1
 
@@ -452,7 +460,7 @@ def format_sheet(ws):
 
     # Set column widths
     ws.column_dimensions['A'].width = 35  # Line Item
-    ws.column_dimensions['B'].width = 65  # Description (wider for full text)
+    ws.column_dimensions['B'].width = 75  # Description (wider for full text)
     ws.column_dimensions['C'].width = 15  # Date/Amount
 
     # Freeze top two rows (title and headers) AND first two columns (Line Item and Description)
