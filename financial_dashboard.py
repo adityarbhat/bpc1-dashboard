@@ -703,34 +703,26 @@ def create_group_overview_page(companies):
     </style>
     """, unsafe_allow_html=True)
 
-    # Dynamic rankings from 2024 Annual data
-    try:
-        ranking_results = calculate_group_rankings("2024 Annual")
+    # Hardcoded rankings from 2024 Annual data (avoids slow API calls on homepage load)
+    hardcoded_rankings = [
+        (1, 'Ace Worldwide', 34.0),
+        (2, 'Smith Dray', 35.0),
+        (3, 'Apex', 48.5),
+        (4, 'Guardian', 51.0),
+        (5, 'Ace Relo', 56.0),
+        (6, "Alexander's", 58.0),
+        (7, 'Weleski', 65.5),
+        (8, 'InterWest', 72.0),
+    ]
 
-        if ranking_results and ranking_results['scores']:
-            # Sort by total score (lowest = best)
-            sorted_companies = sorted(
-                ranking_results['scores'].items(),
-                key=lambda x: x[1] if x[1] > 0 else float('inf')
-            )
+    table_html = '<div class="homepage-table-container"><table class="rankings-table"><thead><tr><th style="text-align: center;">Rank</th><th style="text-align: center;">Company</th><th style="text-align: center;">Total Score</th></tr></thead><tbody>'
 
-            table_html = '<div class="homepage-table-container"><table class="rankings-table"><thead><tr><th style="text-align: center;">Rank</th><th style="text-align: center;">Company</th><th style="text-align: center;">Total Score</th></tr></thead><tbody>'
+    for rank, company_name, score in hardcoded_rankings:
+        row_bg = "background-color: #f7fafc;" if rank % 2 == 0 else ""
+        table_html += f'<tr style="{row_bg}"><td style="text-align: center; font-weight: 600;"><strong>#{rank}</strong></td><td style="text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="text-align: center;">{score:.1f}</td></tr>'
 
-            rank = 1
-            for company_name, score in sorted_companies:
-                if score > 0:
-                    row_bg = "background-color: #f7fafc;" if rank % 2 == 0 else ""
-                    safe_name = str(company_name).replace('<', '&lt;').replace('>', '&gt;')
-                    table_html += f'<tr style="{row_bg}"><td style="text-align: center; font-weight: 600;"><strong>#{rank}</strong></td><td style="text-align: center; font-weight: 600;"><strong>{safe_name}</strong></td><td style="text-align: center;">{score:.1f}</td></tr>'
-                    rank += 1
-
-            table_html += '</tbody></table></div>'
-            st.markdown(table_html, unsafe_allow_html=True)
-        else:
-            st.info("Rankings will appear once financial data is available for the selected period.")
-
-    except Exception as e:
-        st.error(f"Error loading rankings: {str(e)}")
+    table_html += '</tbody></table></div>'
+    st.markdown(table_html, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)  # Close rankings-section
 
