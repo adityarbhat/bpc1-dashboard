@@ -703,54 +703,34 @@ def create_group_overview_page(companies):
     </style>
     """, unsafe_allow_html=True)
 
-    # Rankings will be populated once financial data is uploaded
-    # Show company list without scores for now
-    table_html = '<div style="display: flex; justify-content: center; margin: 1rem auto; max-width: 600px;"><table style="width: 100%; border-collapse: collapse; font-family: Montserrat, sans-serif; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"><thead><tr style="background-color: #025a9a;"><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Rank</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Company</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Total Score</th></tr></thead><tbody>'
-
-    for i, company in enumerate(companies):
-        row_bg = "background-color: #f7fafc;" if i % 2 == 1 else ""
-        company_name = str(company['name']).replace('<', '&lt;').replace('>', '&gt;')
-        table_html += f'<tr style="{row_bg}"><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>#{i+1}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center;">-</td></tr>'
-
-    table_html += '</tbody></table></div>'
-
-    st.markdown(table_html, unsafe_allow_html=True)
-
-    # Old dynamic code removed for performance - kept dynamic calculation available in Group Ratios page
-    # To re-enable dynamic rankings, see pages/group_pages/group_ratios.py calculate_group_rankings()
-
+    # Dynamic rankings from 2024 Annual data
     try:
-        if False:  # Placeholder to maintain structure
-            if companies:
-                table_html = '<div style="display: flex; justify-content: center; margin: 1rem auto; max-width: 600px;"><table style="width: 100%; border-collapse: collapse; font-family: Montserrat, sans-serif; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"><thead><tr style="background-color: #025a9a;"><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Rank</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Company</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Total Score</th></tr></thead><tbody>'
+        ranking_results = calculate_group_rankings("2024 Annual")
 
-                for i, company in enumerate(companies):
-                    row_bg = "background-color: #f7fafc;" if i % 2 == 1 else ""
-                    company_name = str(company['name']).replace('<', '&lt;').replace('>', '&gt;')
-                    table_html += f'<tr style="{row_bg}"><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>#{i+1}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center;">-</td></tr>'
+        if ranking_results and ranking_results['scores']:
+            # Sort by total score (lowest = best)
+            sorted_companies = sorted(
+                ranking_results['scores'].items(),
+                key=lambda x: x[1] if x[1] > 0 else float('inf')
+            )
 
-                table_html += '</tbody></table></div>'
-                st.markdown(table_html, unsafe_allow_html=True)
-            else:
-                st.markdown("""
-                <div style="text-align: center; padding: 1rem; color: #e53e3e; font-weight: 600;">
-                    ⚠️ No companies found. Please check your Airtable connection and data.
-                </div>
-                """, unsafe_allow_html=True)
+            table_html = '<div class="homepage-table-container"><table class="rankings-table"><thead><tr><th style="text-align: center;">Rank</th><th style="text-align: center;">Company</th><th style="text-align: center;">Total Score</th></tr></thead><tbody>'
 
-    except Exception as e:
-        st.error(f"Error loading rankings: {str(e)}")
-        # Fallback to basic display
-        if companies:
-            table_html = '<div style="display: flex; justify-content: center; margin: 1rem auto; max-width: 600px;"><table style="width: 100%; border-collapse: collapse; font-family: Montserrat, sans-serif; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"><thead><tr style="background-color: #025a9a;"><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Rank</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Company</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Total Score</th></tr></thead><tbody>'
-
-            for i, company in enumerate(companies):
-                row_bg = "background-color: #f7fafc;" if i % 2 == 1 else ""
-                company_name = str(company['name']).replace('<', '&lt;').replace('>', '&gt;')
-                table_html += f'<tr style="{row_bg}"><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>#{i+1}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center; font-weight: 600;"><strong>{company_name}</strong></td><td style="padding: 0.5rem 0.8rem; color: #4a5568; text-align: center;">-</td></tr>'
+            rank = 1
+            for company_name, score in sorted_companies:
+                if score > 0:
+                    row_bg = "background-color: #f7fafc;" if rank % 2 == 0 else ""
+                    safe_name = str(company_name).replace('<', '&lt;').replace('>', '&gt;')
+                    table_html += f'<tr style="{row_bg}"><td style="text-align: center; font-weight: 600;"><strong>#{rank}</strong></td><td style="text-align: center; font-weight: 600;"><strong>{safe_name}</strong></td><td style="text-align: center;">{score:.1f}</td></tr>'
+                    rank += 1
 
             table_html += '</tbody></table></div>'
             st.markdown(table_html, unsafe_allow_html=True)
+        else:
+            st.info("Rankings will appear once financial data is available for the selected period.")
+
+    except Exception as e:
+        st.error(f"Error loading rankings: {str(e)}")
 
     st.markdown('</div>', unsafe_allow_html=True)  # Close rankings-section
 
