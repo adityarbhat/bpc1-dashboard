@@ -381,12 +381,9 @@ def add_data_rows(ws, line_items, description_dict):
         bottom=Side(style='thin')
     )
 
-    # Data validation: only allow decimal numbers in column C
+    # Data validation: only allow numbers in column C (no text or special characters)
     number_validation = DataValidation(
         type="decimal",
-        operator="between",
-        formula1=-999999999999,
-        formula2=999999999999,
         allow_blank=True
     )
     number_validation.error = "Please enter a number only. No dollar signs, commas, or text."
@@ -439,7 +436,7 @@ def add_data_rows(ws, line_items, description_dict):
             cell_c.font = Font(name="Montserrat", size=12)
             cell_c.alignment = Alignment(horizontal='right', vertical='center')
             cell_c.border = thin_border
-            cell_c.number_format = '#,##0.0000'
+            cell_c.number_format = '#,##0'
             number_validation.add(cell_c)
 
             # Dynamic row height based on description length
@@ -461,7 +458,7 @@ def format_sheet(ws):
     # Set column widths
     ws.column_dimensions['A'].width = 35  # Line Item
     ws.column_dimensions['B'].width = 75  # Description (wider for full text)
-    ws.column_dimensions['C'].width = 15  # Date/Amount
+    ws.column_dimensions['C'].width = 22  # Amount (fits 9-digit numbers with commas)
 
     # Freeze top two rows (title and headers) AND first two columns (Line Item and Description)
     # This allows users to scroll horizontally while keeping the line item labels visible
