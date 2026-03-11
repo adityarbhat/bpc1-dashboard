@@ -237,12 +237,11 @@ def attempt_session_recovery():
             # Log successful session recovery
             profile_name = st.session_state.user_profile.get('full_name', 'Unknown')
             profile_role = st.session_state.user_profile.get('role', 'Unknown')
-            logger.info(f"Session recovered successfully - User: {response.user.email}, ID: {response.user.id}, Name: {profile_name}, Role: {profile_role}")
+            logger.info(f"Session recovered successfully - ID: ...{str(response.user.id)[-8:]}, Role: {profile_role}")
 
             # Send login notification email for FIRST-TIME session recovery only
             # Check if we've already sent email this session
             if not st.session_state.get('session_recovery_email_sent', False):
-                print(f"[AUTH DEBUG] First-time session recovery - sending email for {response.user.email}", flush=True)
                 try:
                     from shared.email_notifications import send_login_notification_email
                     send_login_notification_email(
@@ -254,9 +253,8 @@ def attempt_session_recovery():
                     )
                     # Mark that we've sent the email for this session
                     st.session_state.session_recovery_email_sent = True
-                    print(f"[AUTH DEBUG] Session recovery email sent successfully", flush=True)
                 except Exception as email_error:
-                    print(f"[AUTH DEBUG] Session recovery email error: {email_error}", flush=True)
+                    logger.warning(f"Session recovery email failed: {type(email_error).__name__}")
 
             # Log successful recovery with company context
             try:
@@ -365,7 +363,7 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
         if st.session_state.get('authenticated') and st.session_state.get('user'):
             existing_email = st.session_state.user.email if st.session_state.user else None
             if existing_email and existing_email != email:
-                logger.info(f"Different user logging in (was: {existing_email}, now: {email}) - Clearing session/cookies")
+                logger.info("Different user logging in - Clearing session/cookies")
                 clear_session()
                 clear_cookies()
 
@@ -415,7 +413,7 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
 
         # Verify profile belongs to correct user (critical security check)
         if st.session_state.user_profile.get('id') != response.user.id:
-            logger.error(f"CRITICAL: Profile ID mismatch - Expected: {response.user.id}, Got: {st.session_state.user_profile.get('id')}")
+            logger.error(f"CRITICAL: Profile ID mismatch - Expected: ...{str(response.user.id)[-8:]}, Got: ...{str(st.session_state.user_profile.get('id', ''))[-8:]}")
             clear_session()
             clear_cookies()
             return {
@@ -424,31 +422,20 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
             }
 
         # Log successful authentication and profile load
-        logger.info(f"Login successful - User: {response.user.email}, ID: {response.user.id}, Name: {st.session_state.user_profile.get('full_name')}, Role: {st.session_state.user_profile.get('role')}")
+        logger.info(f"Login successful - ID: ...{str(response.user.id)[-8:]}, Role: {st.session_state.user_profile.get('role')}")
 
         # Send successful login notification email
-        import sys
-        print(f"[AUTH DEBUG] About to send success email for {response.user.email}", flush=True)
-        sys.stdout.flush()
         try:
             from shared.email_notifications import send_login_notification_email
-            print(f"[AUTH DEBUG] Calling send_login_notification_email...", flush=True)
-            sys.stdout.flush()
-            result = send_login_notification_email(
+            send_login_notification_email(
                 user_email=response.user.email,
                 user_name=st.session_state.user_profile.get('full_name', 'User'),
                 login_status='success',
                 ip_address=get_client_ip(),
                 timestamp=datetime.now()
             )
-            print(f"[AUTH DEBUG] Email result: {result}", flush=True)
-            sys.stdout.flush()
         except Exception as email_error:
-            # Log error but don't interrupt login
-            print(f"[AUTH DEBUG] Success login email error: {email_error}", flush=True)
-            sys.stdout.flush()
-            import traceback
-            traceback.print_exc()
+            logger.warning(f"Login notification email failed: {type(email_error).__name__}")
 
         # Log successful login with company context
         log_audit_event(
@@ -470,7 +457,7 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
         final_check_email = st.session_state.user.email if st.session_state.user else None
 
         if final_check_user_id != response.user.id or final_check_email != response.user.email:
-            logger.error(f"CRITICAL POST-LOGIN: Session state corruption - Expected: {response.user.email}/{response.user.id}, Got: {final_check_email}/{final_check_user_id}")
+            logger.error(f"CRITICAL POST-LOGIN: Session state corruption - Expected ID: ...{str(response.user.id)[-8:]}, Got ID: ...{str(final_check_user_id or '')[-8:]}")
             clear_session()
             clear_cookies()
             return {
@@ -478,7 +465,7 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
                 'message': "Session validation failed. Please try logging in again."
             }
 
-        logger.info(f"Final verification passed - Session state correctly set for {response.user.email}")
+        logger.info(f"Final verification passed - Session state correctly set for ID: ...{str(response.user.id)[-8:]}")
 
         return {
             'success': True,
@@ -654,7 +641,7 @@ def load_user_profile(user_id: str, show_error: bool = True) -> bool:
         st.session_state.user_profile = response.data
 
         # Log successful profile load
-        logger.info(f"Profile loaded - User ID: {user_id}, Name: {response.data.get('full_name')}, Role: {response.data.get('role')}")
+        logger.info(f"Profile loaded - ID: ...{str(user_id)[-8:]}, Role: {response.data.get('role')}")
 
         return True
 
