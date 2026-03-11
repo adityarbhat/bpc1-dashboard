@@ -162,8 +162,6 @@ def show_login_page():
             show_set_password_page()
             st.stop()
     except Exception as e:
-        # Log the error for debugging
-        st.write(f"Debug - Query params: {dict(st.query_params)}")
         pass  # Continue to normal login if query params fail
 
     # Add JavaScript to handle hash-based URL parameters from Supabase

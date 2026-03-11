@@ -207,6 +207,13 @@ def create_data_input_sidebar():
         )
 
         if uploaded_file:
+            # Validate file size (10MB limit — template is ~15KB, generous buffer for large values)
+            max_file_size_mb = 10
+            if uploaded_file.size > max_file_size_mb * 1024 * 1024:
+                st.error(f"File too large ({uploaded_file.size / (1024*1024):.1f} MB). Maximum allowed: {max_file_size_mb} MB.")
+                uploaded_file = None
+
+        if uploaded_file:
             from pages.data_input.excel_parser import parse_consolidated_excel
             with st.spinner("Parsing both Income Statement and Balance Sheet..."):
                 results, warnings = parse_consolidated_excel(uploaded_file)

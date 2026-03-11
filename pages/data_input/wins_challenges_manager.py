@@ -8,6 +8,13 @@ import streamlit as st
 from datetime import datetime
 
 
+def _escape_airtable_value(value):
+    """Escape a value for safe use in Airtable filterByFormula strings."""
+    if not isinstance(value, str):
+        value = str(value)
+    return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
 class WinsChallengesActionItemsManager:
     """Manager class for wins, challenges, and action items CRUD operations"""
 
@@ -31,7 +38,9 @@ class WinsChallengesActionItemsManager:
         try:
             url = f"{self.base_url}/financial_periods"
             # Use FIND to search for company name within linked field
-            filter_formula = f"AND(FIND('{company_name}', ARRAYJOIN({{company}})), {{period_name}}='{period_name}')"
+            safe_name = _escape_airtable_value(company_name)
+            safe_period = _escape_airtable_value(period_name)
+            filter_formula = f"AND(FIND('{safe_name}', ARRAYJOIN({{company}})), {{period_name}}='{safe_period}')"
             params = {'filterByFormula': filter_formula}
 
             response = requests.get(url, headers=self.headers, params=params)
@@ -377,7 +386,8 @@ class WinsChallengesActionItemsManager:
         try:
             # Fetch all draft records for this period
             url = f"{self.base_url}/{table_name}"
-            filter_formula = f"AND(FIND('{period_id}', ARRAYJOIN({{period}})), {{status}}='draft', {{is_active}}=TRUE())"
+            safe_period_id = _escape_airtable_value(period_id)
+            filter_formula = f"AND(FIND('{safe_period_id}', ARRAYJOIN({{period}})), {{status}}='draft', {{is_active}}=TRUE())"
             params = {'filterByFormula': filter_formula}
 
             response = requests.get(url, headers=self.headers, params=params)
@@ -424,10 +434,12 @@ class WinsChallengesActionItemsManager:
         try:
             url = f"{self.base_url}/{table_name}"
 
+            safe_period_id = _escape_airtable_value(period_id)
             if status:
-                filter_formula = f"AND(FIND('{period_id}', ARRAYJOIN({{period}})), {{status}}='{status}', {{is_active}}=TRUE())"
+                safe_status = _escape_airtable_value(status)
+                filter_formula = f"AND(FIND('{safe_period_id}', ARRAYJOIN({{period}})), {{status}}='{safe_status}', {{is_active}}=TRUE())"
             else:
-                filter_formula = f"AND(FIND('{period_id}', ARRAYJOIN({{period}})), {{is_active}}=TRUE())"
+                filter_formula = f"AND(FIND('{safe_period_id}', ARRAYJOIN({{period}})), {{is_active}}=TRUE())"
 
             params = {
                 'filterByFormula': filter_formula,

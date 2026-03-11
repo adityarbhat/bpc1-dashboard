@@ -11,6 +11,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from shared.auth_utils import require_auth, is_super_admin
 from shared.supabase_connection import get_supabase_admin_client
+from shared.airtable_connection import _escape_airtable_value
 
 
 # ============================================================================
@@ -802,7 +803,7 @@ def publish_all_wc_for_period(period_name, admin_email):
         periods_response = requests.get(
             f"{base_url}/financial_periods",
             headers=headers,
-            params={'filterByFormula': f"{{period_name}}='{period_name}'"}
+            params={'filterByFormula': f"{{period_name}}='{_escape_airtable_value(period_name)}'"}
         )
         if periods_response.status_code != 200:
             return {

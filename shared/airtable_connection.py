@@ -6,6 +6,18 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+def _escape_airtable_value(value):
+    """Escape a value for safe use in Airtable filterByFormula strings.
+
+    Prevents formula injection by escaping single quotes and backslashes
+    in user-supplied values before they are interpolated into filter formulas.
+    """
+    if not isinstance(value, str):
+        value = str(value)
+    # Escape backslashes first, then single quotes
+    return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
 def _parse_percentage_or_float(value):
     """Parse a value that might be a percentage string or a float"""
     if value is None:
@@ -83,9 +95,10 @@ class AirtableConnection:
         try:
             url = f"{_self.base_url}/balance_sheet_data"
             if company_name:
-                filter_formula = f"AND({{company}}='{company_name}',{{period}}='2024 Annual')"
+                safe_name = _escape_airtable_value(company_name)
+                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual')"
                 url += f"?filterByFormula={filter_formula}"
-            
+
             response = requests.get(url, headers=_self.headers)
             if response.status_code == 200:
                 data = response.json()
@@ -122,9 +135,10 @@ class AirtableConnection:
         try:
             url = f"{_self.base_url}/income_statement_data"
             if company_name:
-                filter_formula = f"AND({{company}}='{company_name}',{{period}}='2024 Annual')"
+                safe_name = _escape_airtable_value(company_name)
+                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual')"
                 url += f"?filterByFormula={filter_formula}"
-            
+
             response = requests.get(url, headers=_self.headers)
             if response.status_code == 200:
                 data = response.json()
@@ -177,9 +191,11 @@ class AirtableConnection:
         """Fetch balance sheet data from Airtable for a specific period"""
         try:
             url = f"{_self.base_url}/balance_sheet_data"
-            filter_formula = f"AND({{company}}='{company_name}',{{period}}='{period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            safe_name = _escape_airtable_value(company_name)
+            safe_period = _escape_airtable_value(period)
+            filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
             url += f"?filterByFormula={filter_formula}"
-            
+
             response = requests.get(url, headers=_self.headers)
             if response.status_code == 200:
                 data = response.json()
@@ -264,9 +280,11 @@ class AirtableConnection:
         """Fetch income statement data from Airtable for a specific period"""
         try:
             url = f"{_self.base_url}/income_statement_data"
-            filter_formula = f"AND({{company}}='{company_name}',{{period}}='{period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            safe_name = _escape_airtable_value(company_name)
+            safe_period = _escape_airtable_value(period)
+            filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
             url += f"?filterByFormula={filter_formula}"
-            
+
             response = requests.get(url, headers=_self.headers)
             if response.status_code == 200:
                 data = response.json()
@@ -380,7 +398,8 @@ class AirtableConnection:
         """Fetch balance sheet data from Airtable for all companies for a specific period"""
         try:
             url = f"{_self.base_url}/balance_sheet_data"
-            filter_formula = f"AND({{period}}='{period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            safe_period = _escape_airtable_value(period)
+            filter_formula = f"AND({{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -416,7 +435,8 @@ class AirtableConnection:
         """Fetch income statement data from Airtable for all companies for a specific period"""
         try:
             url = f"{_self.base_url}/income_statement_data"
-            filter_formula = f"AND({{period}}='{period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            safe_period = _escape_airtable_value(period)
+            filter_formula = f"AND({{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -651,7 +671,9 @@ class AirtableConnection:
         try:
             url = f"{self.base_url}/financial_periods"
             # Use FIND to search for company name within the linked field
-            filter_formula = f"AND(FIND('{company_name}', ARRAYJOIN({{company}})), {{period_name}}='{period_name}')"
+            safe_name = _escape_airtable_value(company_name)
+            safe_period = _escape_airtable_value(period_name)
+            filter_formula = f"AND(FIND('{safe_name}', ARRAYJOIN({{company}})), {{period_name}}='{safe_period}')"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=self.headers)

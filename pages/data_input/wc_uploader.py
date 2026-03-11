@@ -8,7 +8,7 @@ import requests
 import streamlit as st
 from typing import Dict, List, Tuple, Any
 from datetime import datetime
-from pages.data_input.wins_challenges_manager import WinsChallengesActionItemsManager
+from pages.data_input.wins_challenges_manager import WinsChallengesActionItemsManager, _escape_airtable_value
 
 
 def get_airtable_credentials():
@@ -156,7 +156,8 @@ def _delete_existing_drafts(manager: WinsChallengesActionItemsManager, period_id
         try:
             # Fetch all draft records for this period
             url = f"{manager.base_url}/{table_name}"
-            filter_formula = f"AND(FIND('{period_id}', ARRAYJOIN({{period}})), {{status}}='draft', {{is_active}}=TRUE())"
+            safe_period_id = _escape_airtable_value(period_id)
+            filter_formula = f"AND(FIND('{safe_period_id}', ARRAYJOIN({{period}})), {{status}}='draft', {{is_active}}=TRUE())"
             params = {'filterByFormula': filter_formula}
 
             response = requests.get(url, headers=manager.headers, params=params)
