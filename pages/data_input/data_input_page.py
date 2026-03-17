@@ -4,6 +4,7 @@ Allows users to input Balance Sheet and Income Statement data directly via inter
 """
 
 import textwrap
+import base64
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -61,7 +62,21 @@ def create_data_input_page():
     # 4. Apply global styles LAST
     apply_all_styles()
 
-    # Instructions (with reduced top margin to minimize space after banner)
+    # Upload guide download
+    upload_guide_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "docs", "BPC_Upload_Instructions.docx")
+    if os.path.exists(upload_guide_path):
+        with open(upload_guide_path, "rb") as f:
+            guide_b64 = base64.b64encode(f.read()).decode()
+        download_href = f'<a href="data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,{guide_b64}" download="BPC_Upload_Instructions.docx" style="color: #b8860b; font-weight: 600; text-decoration: underline;">here</a>'
+        st.markdown(f"""
+        <div style="background: #fff8e1; padding: 0.75rem 1rem; border-radius: 8px; border-left: 4px solid #f9a825; margin-top: -1rem; margin-bottom: 1.5rem;">
+            <p style="margin: 0; font-size: 1.05rem; color: #5d4e00; line-height: 1.6;">
+                📄 <strong>First time uploading?</strong> Please download and read the upload guide {download_href} before your first upload to ensure everything goes smoothly.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Instructions
     st.markdown("""
     <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; border-left: 4px solid #025a9a; margin-top: -1rem; margin-bottom: 1.5rem;">
         <p style="margin: 0; font-size: 1rem; color: #4a5568; line-height: 1.6;">
@@ -174,6 +189,22 @@ def create_data_input_sidebar():
             st.session_state.current_page = "overview"
             st.session_state.nav_tab = "group"  # Ensure we're on group tab for overview
             st.rerun()
+
+        st.markdown('<div style="border-bottom: 1px solid #e2e8f0; margin: 1rem 0;"></div>', unsafe_allow_html=True)
+
+        # Download Upload Guide Section
+        st.markdown("#### 📥 Download Upload Guide")
+        upload_guide_sidebar_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "docs", "BPC_Upload_Instructions.docx")
+        if os.path.exists(upload_guide_sidebar_path):
+            with open(upload_guide_sidebar_path, "rb") as gf:
+                st.download_button(
+                    label="📥 Download Upload Guide",
+                    data=gf,
+                    file_name="BPC_Upload_Instructions.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    help="Step-by-step guide for uploading financial data",
+                    use_container_width=True
+                )
 
         st.markdown('<div style="border-bottom: 1px solid #e2e8f0; margin: 1rem 0;"></div>', unsafe_allow_html=True)
 
