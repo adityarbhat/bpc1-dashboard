@@ -779,6 +779,9 @@ def submit_income_statement_data(company_name, period_name, year):
     """Submit Income Statement data to Airtable"""
     from pages.data_input.data_uploader import upload_income_statement_to_airtable
 
+    # Disable submit button immediately to prevent double-click duplicates
+    st.session_state.is_submitted = True
+
     try:
         # Get user email from session state
         user_email = st.session_state.user.email if st.session_state.get('user') else 'unknown@user.com'
@@ -795,19 +798,23 @@ def submit_income_statement_data(company_name, period_name, year):
             if success:
                 st.success(f"✅ {message}")
                 st.balloons()
-                st.session_state.is_submitted = True
                 # Clear form data so user can upload another company
                 st.session_state.is_input_data = {}
                 st.cache_data.clear()
             else:
                 st.error(f"❌ {message}")
+                st.session_state.is_submitted = False  # Re-enable on failure
     except Exception as e:
         st.error(f"Error uploading data: {str(e)}")
+        st.session_state.is_submitted = False  # Re-enable on error
 
 
 def submit_balance_sheet_data(company_name, period_name, year):
     """Submit Balance Sheet data to Airtable"""
     from pages.data_input.data_uploader import upload_balance_sheet_to_airtable
+
+    # Disable submit button immediately to prevent double-click duplicates
+    st.session_state.bs_submitted = True
 
     try:
         # Get user email from session state
@@ -825,11 +832,12 @@ def submit_balance_sheet_data(company_name, period_name, year):
             if success:
                 st.success(f"✅ {message}")
                 st.balloons()
-                st.session_state.bs_submitted = True
                 # Clear form data so user can upload another company
                 st.session_state.bs_input_data = {}
                 st.cache_data.clear()
             else:
                 st.error(f"❌ {message}")
+                st.session_state.bs_submitted = False  # Re-enable on failure
     except Exception as e:
         st.error(f"Error uploading data: {str(e)}")
+        st.session_state.bs_submitted = False  # Re-enable on error
