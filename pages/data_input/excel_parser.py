@@ -113,6 +113,26 @@ BS_LABEL_MAPPING = {
 }
 
 
+def clean_numeric_value(value) -> float:
+    """
+    Clean a value from Excel and convert to float.
+    Handles commas, dollar signs, spaces, and other common formatting.
+
+    Examples:
+        1234567 → 1234567.0
+        "1,234,567" → 1234567.0
+        "$1,234.67" → 1234.67
+        "1234,67" → 123467.0
+    """
+    if isinstance(value, (int, float)):
+        return float(value)
+    # Convert to string and strip whitespace
+    s = str(value).strip()
+    # Remove dollar signs, spaces, and commas
+    s = s.replace('$', '').replace(',', '').replace(' ', '')
+    return float(s)
+
+
 def normalize_field_name(name: str) -> str:
     """
     Normalize a field name for matching by removing spaces, special characters, and converting to lowercase.
@@ -218,7 +238,7 @@ def parse_income_statement_excel(uploaded_file) -> Tuple[Dict[str, float], int, 
 
                 # Convert amount to float
                 try:
-                    numeric_amount = float(amount)
+                    numeric_amount = clean_numeric_value(amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -228,7 +248,7 @@ def parse_income_statement_excel(uploaded_file) -> Tuple[Dict[str, float], int, 
                 if str(line_item) in INCOME_STATEMENT_MAPPING:
                     field_key = INCOME_STATEMENT_MAPPING[str(line_item)]
                     try:
-                        numeric_amount = float(amount)
+                        numeric_amount = clean_numeric_value(amount)
                         data_dict[field_key] = numeric_amount
                         matched_count += 1
                     except (ValueError, TypeError):
@@ -332,7 +352,7 @@ def parse_balance_sheet_excel(uploaded_file) -> Tuple[Dict[str, float], int, Lis
 
                 # Convert amount to float
                 try:
-                    numeric_amount = float(amount)
+                    numeric_amount = clean_numeric_value(amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -342,7 +362,7 @@ def parse_balance_sheet_excel(uploaded_file) -> Tuple[Dict[str, float], int, Lis
                 if str(line_item) in BALANCE_SHEET_MAPPING:
                     field_key = BALANCE_SHEET_MAPPING[str(line_item)]
                     try:
-                        numeric_amount = float(amount)
+                        numeric_amount = clean_numeric_value(amount)
                         data_dict[field_key] = numeric_amount
                         matched_count += 1
                     except (ValueError, TypeError):
@@ -499,7 +519,7 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
 
                 # Convert amount to float
                 try:
-                    numeric_amount = float(amount)
+                    numeric_amount = clean_numeric_value(amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -515,7 +535,7 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
 
                 # Convert amount to float
                 try:
-                    numeric_amount = float(amount)
+                    numeric_amount = clean_numeric_value(amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -525,7 +545,7 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
                 if str(line_item) in mapping:
                     field_key = mapping[str(line_item)]
                     try:
-                        numeric_amount = float(amount)
+                        numeric_amount = clean_numeric_value(amount)
                         data_dict[field_key] = numeric_amount
                         matched_count += 1
                     except (ValueError, TypeError):
