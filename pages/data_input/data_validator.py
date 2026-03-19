@@ -1,68 +1,115 @@
 """
 Data Validation Module
-Validates financial data before uploading to Airtable
+Validates financial data before uploading to Airtable.
+Focuses on data cleanliness (numeric types, no stray text) and structural
+integrity (balance sheet equation, IS calculation checks).
+Negative values are allowed — data quality is the user's responsibility.
 """
+
+
+def clean_numeric_value(value):
+    """
+    Clean and convert a value to float.
+    Strips commas, whitespace, dollar signs, and converts to float.
+    Returns: (cleaned_float, error_string_or_None)
+    """
+    if value is None:
+        return 0.0, None
+    if isinstance(value, (int, float)):
+        return float(value), None
+    if isinstance(value, str):
+        cleaned = value.strip().replace(',', '').replace('$', '').replace(' ', '')
+        if cleaned == '' or cleaned == '-':
+            return 0.0, None
+        try:
+            return float(cleaned), None
+        except ValueError:
+            return None, f"Not a valid number: '{value}'"
+    return None, f"Unexpected type {type(value).__name__} for value: '{value}'"
+
+
+def clean_financial_data(data):
+    """
+    Clean all numeric fields in a financial data dict.
+    Strips commas, whitespace, dollar signs and converts to floats.
+    Returns: (cleaned_data, errors_list)
+    """
+    cleaned = {}
+    errors = []
+    for field, value in data.items():
+        clean_val, error = clean_numeric_value(value)
+        if error:
+            errors.append(f"{field}: {error}")
+        else:
+            cleaned[field] = clean_val
+    return cleaned, errors
 
 
 def validate_balance_sheet(data):
     """
-    Validate balance sheet data
+    Validate balance sheet data.
+    Cleans inputs, checks required fields exist and are numeric,
+    and verifies the balance sheet equation.
     Returns: (is_valid, errors_list)
     """
     errors = []
 
+    # Clean all values — strip commas, whitespace, enforce floats
+    cleaned, clean_errors = clean_financial_data(data)
+    if clean_errors:
+        return False, clean_errors
+
     # Check if required fields are present
     required_fields = ['total_assets', 'total_liabilities', 'owners_equity', 'total_liabilities_equity']
     for field in required_fields:
-        if field not in data:
+        if field not in cleaned:
             errors.append(f"Missing required field: {field}")
 
     if errors:
         return False, errors
 
     # Validate balance sheet equation: Assets = Liabilities + Equity
-    total_assets = data.get('total_assets', 0)
-    total_liab_equity = data.get('total_liabilities_equity', 0)
+    total_assets = cleaned.get('total_assets', 0)
+    total_liab_equity = cleaned.get('total_liabilities_equity', 0)
 
     if abs(total_assets - total_liab_equity) > 0.01:
-        errors.append(f"Balance sheet equation not balanced: Assets (${total_assets:,.2f}) ≠ Liabilities + Equity (${total_liab_equity:,.2f})")
-
-    # Check for negative values in key totals (excluding accumulated depreciation which should be negative)
-    check_non_negative = ['total_assets', 'total_current_assets', 'total_current_liabilities', 'owners_equity']
-    for field in check_non_negative:
-        if data.get(field, 0) < 0:
-            errors.append(f"{field} should not be negative: ${data.get(field, 0):,.2f}")
-
-    # Validate accumulated depreciation should be negative or zero
-    if data.get('accumulated_depreciation', 0) > 0:
-        errors.append("Accumulated depreciation should be negative or zero (it reduces assets)")
+        errors.append(f"Balance sheet not balanced: Assets (${total_assets:,.2f}) ≠ Liabilities + Equity (${total_liab_equity:,.2f})")
 
     if errors:
         return False, errors
 
+    # Update original data with cleaned values
+    data.update(cleaned)
     return True, []
 
 
 def validate_income_statement(data):
     """
-    Validate income statement data
+    Validate income statement data.
+    Cleans inputs, checks required fields exist and are numeric,
+    and verifies key calculations.
     Returns: (is_valid, errors_list)
     """
     errors = []
 
+    # Clean all values — strip commas, whitespace, enforce floats
+    cleaned, clean_errors = clean_financial_data(data)
+    if clean_errors:
+        return False, clean_errors
+
     # Check if required fields are present
     required_fields = ['total_revenue', 'total_cost_of_revenue', 'gross_profit', 'total_operating_expenses', 'operating_profit']
     for field in required_fields:
-        if field not in data:
+        if field not in cleaned:
             errors.append(f"Missing required field: {field}")
 
     if errors:
         return False, errors
 
     # Validate calculations
-    total_revenue = data.get('total_revenue', 0)
-    total_cost = data.get('total_cost_of_revenue', 0)
-    gross_profit = data.get('gross_profit', 0)
+    total_revenue = cleaned.get('total_revenue', 0)
+    total_cost = cleaned.get('total_cost_of_revenue', 0)
+    gross_profit = cleaned.get('gross_profit', 0)
 
     # Check: Gross Profit = Revenue - Cost of Revenue
     expected_gross_profit = total_revenue - total_cost
@@ -70,19 +117,17 @@ def validate_income_statement(data):
         errors.append(f"Gross Profit calculation incorrect: Expected ${expected_gross_profit:,.2f}, got ${gross_profit:,.2f}")
 
     # Check: Operating Profit = Gross Profit - Operating Expenses
-    total_operating = data.get('total_operating_expenses', 0)
-    operating_profit = data.get('operating_profit', 0)
+    total_operating = cleaned.get('total_operating_expenses', 0)
+    operating_profit = cleaned.get('operating_profit', 0)
     expected_operating_profit = gross_profit - total_operating
     if abs(operating_profit - expected_operating_profit) > 0.01:
         errors.append(f"Operating Profit calculation incorrect: Expected ${expected_operating_profit:,.2f}, got ${operating_profit:,.2f}")
 
-    # Warn if revenue is zero (might be valid for some periods)
-    if total_revenue == 0:
-        errors.append("Warning: Total Revenue is zero")
-
     if errors:
         return False, errors
 
+    # Update original data with cleaned values
+    data.update(cleaned)
     return True, []
 
 
