@@ -478,8 +478,13 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
             if str(line_item).strip().lower() in ['line item', 'line_item', '']:
                 continue
 
-            # Skip category header rows (all caps rows like "REVENUE", "CURRENT ASSETS")
-            if str(line_item).strip().isupper() and len(str(line_item).split()) <= 4:
+            # Skip category header rows (section headers in the template)
+            category_headers = {
+                'revenue', 'direct expenses (cost of revenue)', 'operating expenses',
+                'other income/expenses', 'labor analysis', 'current assets', 'fixed assets',
+                'other assets', 'current liabilities', 'long-term liabilities', 'equity'
+            }
+            if str(line_item).strip().lower() in category_headers:
                 continue
 
             # Skip total/calculated rows
