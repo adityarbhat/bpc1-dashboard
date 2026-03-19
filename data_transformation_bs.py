@@ -351,17 +351,21 @@ class AirtableBalanceSheetUploader:
         self.base_url = f"https://api.airtable.com/v0/{base_id}"
     
     def get_existing_period(self, period_name, company_id):
-        """Check if a period already exists for this company."""
+        """Check if a period already exists for this company.
+        Filters by period_name via Airtable formula, then matches company_id
+        in Python (ARRAYJOIN on linked fields returns display names, not record IDs)."""
         url = f"{self.base_url}/financial_periods"
         params = {
-            'filterByFormula': f'AND({{period_name}} = "{period_name}", {{company}} = "{company_id}")'
+            'filterByFormula': f'{{period_name}} = "{period_name}"'
         }
-        
+
         response = requests.get(url, headers=self.headers, params=params)
         if response.status_code == 200:
             records = response.json().get('records', [])
-            if records:
-                return records[0]['id']
+            for record in records:
+                linked_companies = record.get('fields', {}).get('company', [])
+                if company_id in linked_companies:
+                    return record['id']
         return None
     
     def create_period_if_not_exists(self, period_data, company_id):
@@ -399,25 +403,37 @@ class AirtableBalanceSheetUploader:
             print(f"Error creating period: {response.text}")
             return None
 
-    def get_existing_balance_sheet_record(self, period_id, company_id):
-        """Check if balance sheet record already exists for this company and period."""
+    def get_existing_balance_sheet_record(self, period_id, company_id, company_name=None, period_name=None):
+        """Check if balance sheet record already exists for this company and period.
+        Uses display names for Airtable formula filter (linked fields return display names, not IDs).
+        Falls back to Python-side matching by record IDs if display names not provided."""
         url = f"{self.base_url}/balance_sheet_data"
-        params = {
-            'filterByFormula': f'AND(FIND("{period_id}", ARRAYJOIN({{period}})), FIND("{company_id}", ARRAYJOIN({{company}})))'
-        }
+
+        if company_name and period_name:
+            params = {
+                'filterByFormula': f'AND({{company}} = "{company_name}", {{period}} = "{period_name}")'
+            }
+        else:
+            params = {}
 
         try:
             response = requests.get(url, headers=self.headers, params=params)
             if response.status_code == 200:
                 records = response.json().get('records', [])
-                if records:
-                    return records[0]
+                if company_name and period_name:
+                    if records:
+                        return records[0]
+                else:
+                    for record in records:
+                        fields = record.get('fields', {})
+                        if period_id in fields.get('period', []) and company_id in fields.get('company', []):
+                            return record
             return None
         except Exception as e:
             print(f"Error checking for existing record: {str(e)}")
             return None
 
-    def upload_balance_sheet(self, period_id, financial_data, data_source, company_id, user_email=None, publication_status='submitted'):
+    def upload_balance_sheet(self, period_id, financial_data, data_source, company_id, user_email=None, publication_status='submitted', company_name=None, period_name=None):
         """
         Upload or update balance sheet data for a specific period.
 
@@ -428,9 +444,11 @@ class AirtableBalanceSheetUploader:
         Args:
             publication_status: 'submitted' for user uploads (requires admin approval),
                               'published' for admin/migration scripts (immediately visible)
+            company_name: display name for Airtable linked field lookup
+            period_name: display name for Airtable linked field lookup
         """
         # Check for existing record
-        existing_record = self.get_existing_balance_sheet_record(period_id, company_id)
+        existing_record = self.get_existing_balance_sheet_record(period_id, company_id, company_name=company_name, period_name=period_name)
 
         # Prepare record data
         record_data = {
