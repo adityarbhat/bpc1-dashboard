@@ -735,7 +735,7 @@ def create_labor_cost_table(table_data, years, group_averages=None, avg_year=Non
         elif row_name == 'Revenue Producing Labor and Expenses (% of Revenue)':
             table_html += f'<tr><td colspan="{total_cols}" style="border: none; padding: 0;"></td></tr>'
             # Add explanatory text for Labor Ratio
-            table_html += f'<tr><td class="sub-label">(Sum of Direct Wages & all O/O Exp divided by All Revenue Categories except Warehouse, Booking/Royalties, & Other Revenue)</td><td colspan="{total_cols - 1}" style="border: none;"></td></tr>'
+            table_html += f'<tr><td class="sub-label" colspan="{total_cols}" style="border: none;">(Sum of Direct Wages & all O/O Exp divided by All Revenue Categories except Warehouse, Booking/Royalties, & Other Revenue)</td></tr>'
         elif row_name == 'Labor Ratio: Labor costs as a percentage of revenue':
             table_html += f'<tr><td colspan="{total_cols}" style="border: none; padding: 0;"></td></tr>'
 
