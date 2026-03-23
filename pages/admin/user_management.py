@@ -530,6 +530,333 @@ def get_pending_data_submissions():
         return {'has_pending': False, 'by_period': {}, 'error': str(e)}
 
 
+def generate_submitted_data_excel(period_name):
+    """
+    Fetch all submitted IS and BS records for a period and generate
+    a single Excel file with two sheets per company:
+      - "{Company} - Income Statement"
+      - "{Company} - Balance Sheet"
+
+    Returns:
+        bytes (Excel file) or None on error
+    """
+    import io
+    from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+
+    # --- Field definitions with human-readable labels ---
+    IS_FIELDS = [
+        # Revenue
+        ('', 'REVENUE', True),
+        ('intra_state_hhg', 'Intra State HHG'),
+        ('local_hhg', 'Local HHG'),
+        ('inter_state_hhg', 'Inter State HHG'),
+        ('office_industrial', 'Office & Industrial'),
+        ('warehouse', 'Warehouse (Non-commercial)'),
+        ('warehouse_handling', 'Warehouse Handling (Non-commercial)'),
+        ('international', 'International'),
+        ('packing_unpacking', 'Packing & Unpacking'),
+        ('booking_royalties', 'Booking & Royalties'),
+        ('special_products', 'Special Products'),
+        ('records_storage', 'Records Storage'),
+        ('military_dpm_contracts', 'Military DPM Contracts'),
+        ('distribution', 'Distribution'),
+        ('hotel_deliveries', 'Hotel Deliveries'),
+        ('other_revenue', 'Other Revenue'),
+        ('total_revenue', 'Total Revenue'),
+        # Cost of Revenue
+        ('', 'COST OF REVENUE', True),
+        ('direct_wages', 'Direct Wages'),
+        ('vehicle_operating_expenses', 'Vehicle Operating Expense'),
+        ('packing_warehouse_supplies', 'Packing/Warehouse Supplies'),
+        ('oo_exp_intra_state', 'OO Exp Intra State'),
+        ('oo_inter_state', 'OO Inter State'),
+        ('oo_oi', 'OO O&I'),
+        ('oo_packing', 'OO Packing'),
+        ('oo_other', 'OO Other'),
+        ('claims', 'Claims'),
+        ('other_trans_exp', 'Other Trans Exp'),
+        ('depreciation', 'Depreciation'),
+        ('lease_expense_rev_equip', 'Lease Expense Rev Equip'),
+        ('rent', 'Rent'),
+        ('other_direct_expenses', 'Other Direct Expenses'),
+        ('total_cost_of_revenue', 'Total Cost of Revenue'),
+        ('gross_profit', 'Gross Profit'),
+        # Operating Expenses
+        ('', 'OPERATING EXPENSES', True),
+        ('advertising_marketing', 'Advertising/Marketing'),
+        ('bad_debts', 'Bad Debts'),
+        ('sales_commissions', 'Sales Commissions'),
+        ('contributions', 'Contributions'),
+        ('computer_support', 'Computer Support'),
+        ('dues_sub', 'Dues & Subscriptions'),
+        ('pr_taxes_benefits', 'PR Taxes & Benefits'),
+        ('equipment_leases_office_equip', 'Equipment Leases Office Equip'),
+        ('workmans_comp_insurance', "Workman's Comp Insurance"),
+        ('insurance', 'Insurance'),
+        ('legal_accounting', 'Legal & Accounting'),
+        ('office_expense', 'Office Expense'),
+        ('other_admin', 'Other Admin'),
+        ('pension_profit_sharing_401k', 'Pension/Profit Sharing/401k'),
+        ('prof_fees', 'Professional Fees'),
+        ('repairs_maint', 'Repairs & Maintenance'),
+        ('salaries_admin', 'Salaries Admin'),
+        ('taxes_licenses', 'Taxes & Licenses'),
+        ('tel_fax_utilities_internet', 'Tel/Fax/Utilities/Internet'),
+        ('travel_ent', 'Travel & Entertainment'),
+        ('vehicle_expense_admin', 'Vehicle Expense Admin'),
+        ('total_operating_expenses', 'Total Operating Expenses'),
+        ('operating_profit', 'Operating Profit'),
+        # Non-Operating
+        ('', 'NON-OPERATING', True),
+        ('other_income', 'Other Income'),
+        ('ceo_comp', 'CEO Comp'),
+        ('other_expense', 'Other Expense'),
+        ('interest_expense', 'Interest Expense'),
+        ('total_nonoperating_income', 'Total Non-Operating Income'),
+        ('profit_before_tax_with_ppp', 'Profit Before Tax'),
+        # Other
+        ('', 'OTHER', True),
+        ('administrative_employees', 'Administrative Employees'),
+        ('number_of_branches', 'Number of Branches'),
+    ]
+
+    BS_FIELDS = [
+        # Current Assets
+        ('', 'CURRENT ASSETS', True),
+        ('cash_and_cash_equivalents', 'Cash and Cash Equivalents'),
+        ('trade_accounts_receivable', 'Trade Accounts Receivable'),
+        ('receivables', 'Receivables'),
+        ('other_receivables', 'Other Receivables'),
+        ('prepaid_expenses', 'Prepaid Expenses'),
+        ('related_company_receivables', 'Related Company Receivables'),
+        ('owner_receivables', 'Owner Receivables'),
+        ('other_current_assets', 'Other Current Assets'),
+        ('total_current_assets', 'Total Current Assets'),
+        # Fixed Assets
+        ('', 'FIXED ASSETS', True),
+        ('gross_fixed_assets', 'Gross Fixed Assets'),
+        ('accumulated_depreciation', 'Accumulated Depreciation'),
+        ('net_fixed_assets', 'Net Fixed Assets'),
+        # Other Assets
+        ('', 'OTHER ASSETS', True),
+        ('inter_company_receivable', 'Inter Company Receivable'),
+        ('other_assets', 'Other Assets'),
+        ('total_assets', 'Total Assets'),
+        # Current Liabilities
+        ('', 'CURRENT LIABILITIES', True),
+        ('notes_payable_bank', 'Notes Payable/Bank'),
+        ('notes_payable_owners', 'Notes Payable/Owners'),
+        ('trade_accounts_payable', 'Trade Accounts Payable'),
+        ('accrued_expenses', 'Accrued Expenses'),
+        ('current_portion_ltd', 'Current Portion LTD'),
+        ('inter_company_payable', 'Inter Company Payable'),
+        ('other_current_liabilities', 'Other Current Liabilities'),
+        ('total_current_liabilities', 'Total Current Liabilities'),
+        # Long-term Liabilities
+        ('', 'LONG-TERM LIABILITIES', True),
+        ('eid_loan', 'EID Loan'),
+        ('long_term_debt', 'Long-term Debt'),
+        ('notes_payable_owners_lt', 'Notes Payable Owners (LT)'),
+        ('inter_company_debt', 'Inter Company Debt'),
+        ('other_lt_liabilities', 'Other LT Liabilities'),
+        ('total_long_term_liabilities', 'Total Long-term Liabilities'),
+        ('total_liabilities', 'Total Liabilities'),
+        # Equity
+        ('', 'EQUITY', True),
+        ('owners_equity', "Owner's Equity"),
+        ('total_liabilities_equity', 'Total Liabilities & Equity'),
+    ]
+
+    # --- Fetch submitted records from Airtable ---
+    base_id, pat = get_airtable_credentials()
+    headers = {'Authorization': f'Bearer {pat}', 'Content-Type': 'application/json'}
+    base_url = f"https://api.airtable.com/v0/{base_id}"
+
+    try:
+        # Fetch ALL submitted BS records (filter by period in Python after resolving names)
+        bs_response = requests.get(
+            f"{base_url}/balance_sheet_data",
+            headers=headers,
+            params={'filterByFormula': "{publication_status}='submitted'"}
+        )
+        all_bs_records = bs_response.json().get('records', []) if bs_response.status_code == 200 else []
+
+        # Fetch ALL submitted IS records
+        is_response = requests.get(
+            f"{base_url}/income_statement_data",
+            headers=headers,
+            params={'filterByFormula': "{publication_status}='submitted'"}
+        )
+        all_is_records = is_response.json().get('records', []) if is_response.status_code == 200 else []
+
+        if not all_bs_records and not all_is_records:
+            return None
+
+        # Resolve period and company names from linked record IDs
+        period_ids = set()
+        company_ids = set()
+        for record in all_bs_records + all_is_records:
+            period_list = record['fields'].get('period', [])
+            if period_list:
+                period_ids.add(period_list[0])
+            company_list = record['fields'].get('company', [])
+            if company_list:
+                company_ids.add(company_list[0])
+
+        period_id_to_name = {}
+        for pid in period_ids:
+            try:
+                resp = requests.get(f"{base_url}/financial_periods/{pid}", headers=headers)
+                if resp.status_code == 200:
+                    period_id_to_name[pid] = resp.json()['fields'].get('period_name', 'Unknown')
+            except:
+                period_id_to_name[pid] = 'Unknown'
+
+        company_id_to_name = {}
+        for cid in company_ids:
+            try:
+                resp = requests.get(f"{base_url}/companies/{cid}", headers=headers)
+                if resp.status_code == 200:
+                    company_id_to_name[cid] = resp.json()['fields'].get('company_name', 'Unknown')
+            except:
+                company_id_to_name[cid] = 'Unknown'
+
+        def get_period_name(record):
+            period_list = record['fields'].get('period', [])
+            if period_list:
+                return period_id_to_name.get(period_list[0], 'Unknown')
+            return 'Unknown'
+
+        def get_company_name(record):
+            name = record['fields'].get('company_name', None)
+            if name:
+                if isinstance(name, list):
+                    return name[0] if name else 'Unknown'
+                return name
+            company_list = record['fields'].get('company', [])
+            if company_list:
+                return company_id_to_name.get(company_list[0], 'Unknown')
+            return 'Unknown'
+
+        # Filter records for the requested period
+        bs_records = [r for r in all_bs_records if get_period_name(r) == period_name]
+        is_records = [r for r in all_is_records if get_period_name(r) == period_name]
+
+        if not bs_records and not is_records:
+            return None
+
+        # Group records by company
+        is_by_company = {}
+        for record in is_records:
+            name = get_company_name(record)
+            is_by_company[name] = record['fields']
+
+        bs_by_company = {}
+        for record in bs_records:
+            name = get_company_name(record)
+            bs_by_company[name] = record['fields']
+
+        # Get sorted list of all companies
+        all_companies = sorted(set(list(is_by_company.keys()) + list(bs_by_company.keys())))
+
+        # --- Styling constants ---
+        atlas_blue_fill = PatternFill(start_color="025a9a", end_color="025a9a", fill_type="solid")
+        header_font = Font(name='Montserrat', bold=True, color="FFFFFF", size=11)
+        section_fill = PatternFill(start_color="E8F4FD", end_color="E8F4FD", fill_type="solid")
+        section_font = Font(name='Montserrat', bold=True, size=10, color="025a9a")
+        total_font = Font(name='Montserrat', bold=True, size=10)
+        normal_font = Font(name='Montserrat', size=10)
+        currency_format = '#,##0.00'
+        thin_border = Border(
+            bottom=Side(style='thin', color='D0D0D0')
+        )
+
+        def build_sheet(ws, field_defs, data_fields, company_name, sheet_type, period):
+            """Build a formatted sheet for one company's IS or BS data."""
+            # Title row
+            ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=2)
+            title_cell = ws.cell(row=1, column=1, value=f"{company_name} - {sheet_type}")
+            title_cell.font = Font(name='Montserrat', bold=True, size=14, color="025a9a")
+            ws.cell(row=2, column=1, value=f"Period: {period}")
+            ws.cell(row=2, column=1).font = Font(name='Montserrat', size=10, italic=True)
+
+            # Headers
+            ws.cell(row=4, column=1, value="Line Item").font = header_font
+            ws.cell(row=4, column=1).fill = atlas_blue_fill
+            ws.cell(row=4, column=2, value="Amount").font = header_font
+            ws.cell(row=4, column=2).fill = atlas_blue_fill
+            ws.cell(row=4, column=2).alignment = Alignment(horizontal='right')
+
+            row = 5
+            for item in field_defs:
+                is_section = len(item) == 3 and item[2] is True
+                if is_section:
+                    # Section header row
+                    ws.cell(row=row, column=1, value=item[1]).font = section_font
+                    ws.cell(row=row, column=1).fill = section_fill
+                    ws.cell(row=row, column=2).fill = section_fill
+                    row += 1
+                else:
+                    field_key, label = item[0], item[1]
+                    value = data_fields.get(field_key, 0) or 0
+                    # Handle list values from Airtable linked fields
+                    if isinstance(value, list):
+                        value = value[0] if value else 0
+                    try:
+                        value = float(value)
+                    except (ValueError, TypeError):
+                        value = 0.0
+
+                    is_total = label.startswith('Total') or label in ('Gross Profit', 'Operating Profit', 'Profit Before Tax', 'Net Fixed Assets')
+                    ws.cell(row=row, column=1, value=label).font = total_font if is_total else normal_font
+                    ws.cell(row=row, column=1).border = thin_border
+                    amount_cell = ws.cell(row=row, column=2, value=value)
+                    amount_cell.number_format = currency_format
+                    amount_cell.alignment = Alignment(horizontal='right')
+                    amount_cell.font = total_font if is_total else normal_font
+                    amount_cell.border = thin_border
+                    row += 1
+
+            # Auto-width columns
+            ws.column_dimensions['A'].width = 35
+            ws.column_dimensions['B'].width = 20
+            ws.freeze_panes = 'A5'
+
+        # --- Generate the workbook ---
+        output = io.BytesIO()
+        wb = None
+
+        try:
+            from openpyxl import Workbook
+            wb = Workbook()
+            # Remove the default sheet
+            wb.remove(wb.active)
+
+            for company in all_companies:
+                # Income Statement sheet
+                if company in is_by_company:
+                    sheet_name = f"{company} - IS"[:31]  # Excel sheet name max 31 chars
+                    ws = wb.create_sheet(title=sheet_name)
+                    build_sheet(ws, IS_FIELDS, is_by_company[company], company, "Income Statement", period_name)
+
+                # Balance Sheet sheet
+                if company in bs_by_company:
+                    sheet_name = f"{company} - BS"[:31]
+                    ws = wb.create_sheet(title=sheet_name)
+                    build_sheet(ws, BS_FIELDS, bs_by_company[company], company, "Balance Sheet", period_name)
+
+            wb.save(output)
+            return output.getvalue()
+
+        except Exception as e:
+            print(f"Error generating review Excel: {e}")
+            return None
+
+    except Exception as e:
+        print(f"Error fetching submitted data: {e}")
+        return None
+
+
 def publish_all_data_for_period(period_name, admin_email):
     """
     Bulk publish all submitted data for a period.
@@ -1529,6 +1856,35 @@ They'll be able to access: **{company_access}**
 
             if incomplete_count > 0:
                 st.warning(f"⚠️ {incomplete_count} compan{'y' if incomplete_count == 1 else 'ies'} with incomplete submissions (missing IS or BS)")
+
+            st.markdown("---")
+
+            # Review submitted data section
+            st.markdown("#### 📥 Review Submitted Data")
+            st.info("💡 Download an Excel file to review all submitted financial data before publishing.")
+
+            col_dl1, col_dl2, col_dl3 = st.columns([1, 2, 1])
+            with col_dl2:
+                if st.button("📥 Generate Review File", key="gen_review_excel", use_container_width=True):
+                    with st.spinner("Fetching submitted data from Airtable..."):
+                        excel_bytes = generate_submitted_data_excel(selected_period)
+                    if excel_bytes:
+                        st.session_state['review_excel_data'] = excel_bytes
+                        st.session_state['review_excel_period'] = selected_period
+                        st.rerun()
+                    else:
+                        st.error("❌ Could not generate the review file. No submitted data found.")
+
+                if st.session_state.get('review_excel_period') == selected_period and st.session_state.get('review_excel_data'):
+                    st.download_button(
+                        label=f"💾 Download Submitted Data - {selected_period}",
+                        data=st.session_state['review_excel_data'],
+                        file_name=f"Submitted_Data_Review_{selected_period.replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        key="download_review_excel",
+                        use_container_width=True,
+                        type="primary"
+                    )
 
             st.markdown("---")
 
