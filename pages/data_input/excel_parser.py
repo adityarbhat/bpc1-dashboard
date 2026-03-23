@@ -502,7 +502,7 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
             category_headers = {
                 'revenue', 'direct expenses (cost of revenue)', 'operating expenses',
                 'other income/expenses', 'labor analysis', 'current assets', 'fixed assets',
-                'other assets', 'current liabilities', 'long-term liabilities', 'equity'
+                'current liabilities', 'long-term liabilities', 'equity'
             }
             if str(line_item).strip().lower() in category_headers:
                 continue
