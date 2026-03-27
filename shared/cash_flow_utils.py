@@ -47,16 +47,53 @@ def _calculate_cash_flow_for_year(current_balance, prior_balance, current_income
     if not prior_balance or not current_balance or not current_income:
         return result
 
-    # Get total revenue for ratio calculations
+    # Get total revenue for ratio calculations.
+    # NOTE: Excel uploads skip aggregate rows (any row containing 'total'), so total_revenue
+    # is 0 in Airtable for Excel-uploaded records. Fall back to summing individual line items.
     revenue = current_income.get('total_revenue', 0)
+    if not revenue or revenue == 0:
+        _revenue_line_items = [
+            'intra_state_hhg', 'local_hhg', 'inter_state_hhg', 'office_industrial',
+            'warehouse', 'warehouse_handling', 'international', 'packing_unpacking',
+            'booking_royalties', 'special_products', 'records_storage',
+            'military_dpm_contracts', 'distribution', 'hotel_deliveries', 'other_revenue'
+        ]
+        revenue = sum(current_income.get(f, 0) or 0 for f in _revenue_line_items)
     if not revenue or revenue == 0:
         return result
 
     # --- Calculate Operating Cash Flow (OCF) ---
     # OCF = Net Profit + Δ Current Assets + Δ Current Liabilities + Δ Net Fixed Assets + Δ Non-Current Assets
 
-    # Current Net Profit
+    # Current Net Profit.
+    # NOTE: profit_before_tax_with_ppp is also skipped by Excel upload parser.
+    # Fall back to computing from components if the stored value is 0.
     net_profit = current_income.get('profit_before_tax_with_ppp', 0) or 0
+    if net_profit == 0:
+        _direct_fields = [
+            'direct_wages', 'vehicle_operating_expenses', 'packing_warehouse_supplies',
+            'oo_exp_intra_state', 'oo_inter_state', 'oo_oi', 'oo_packing', 'oo_other',
+            'claims', 'other_trans_exp', 'depreciation', 'lease_expense_rev_equip',
+            'rent', 'other_direct_expenses'
+        ]
+        _operating_fields = [
+            'advertising_marketing', 'bad_debts', 'sales_commissions', 'contributions',
+            'computer_support', 'dues_sub', 'pr_taxes_benefits',
+            'equipment_leases_office_equip', 'workmans_comp_insurance', 'insurance',
+            'legal_accounting', 'office_expense', 'other_admin',
+            'pension_profit_sharing_401k', 'prof_fees', 'repairs_maint', 'salaries_admin',
+            'taxes_licenses', 'tel_fax_utilities_internet', 'travel_ent',
+            'vehicle_expense_admin'
+        ]
+        _total_direct = sum(current_income.get(f, 0) or 0 for f in _direct_fields)
+        _total_operating = sum(current_income.get(f, 0) or 0 for f in _operating_fields)
+        _gross_profit = revenue - _total_direct
+        _operating_profit = _gross_profit - _total_operating
+        _total_nonoperating = sum(
+            current_income.get(f, 0) or 0
+            for f in ['other_income', 'ceo_comp', 'other_expense', 'interest_expense']
+        )
+        net_profit = _operating_profit + _total_nonoperating
 
     # Change in Current Assets (excluding cash)
     prior_ca = (prior_balance.get('total_current_assets', 0) or 0) - (prior_balance.get('cash_and_cash_equivalents', 0) or 0)
