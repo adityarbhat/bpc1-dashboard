@@ -219,8 +219,11 @@ def _setup_data_sheet(ws, sheet_title, col_a_header, instruction_text):
     # Freeze header rows
     ws.freeze_panes = 'A4'
 
-    # Protect header rows but allow data entry
+    # Protect header rows but allow data entry and free formatting/resizing
     ws.protection.sheet = True
+    ws.protection.formatCells = False    # Allow users to format cells
+    ws.protection.formatRows = False     # Allow users to resize rows
+    ws.protection.formatColumns = False  # Allow users to resize columns
     ws.protection.enable()
 
 
