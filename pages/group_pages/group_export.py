@@ -8,6 +8,7 @@ Uses lazy loading to avoid performance impact on other pages.
 import streamlit as st
 from shared.page_components import create_page_header, get_period_display_text
 from shared.auth_utils import require_auth
+from shared.year_config import CURRENT_YEAR
 
 
 def create_group_export_page():
@@ -78,7 +79,7 @@ def create_group_export_page():
     </h3>
     """, unsafe_allow_html=True)
 
-    available_years = [2024, 2023, 2022, 2021, 2020]
+    available_years = list(range(CURRENT_YEAR, CURRENT_YEAR - 5, -1))
 
     # Create 5 columns for year buttons
     cols = st.columns(5)
@@ -88,7 +89,7 @@ def create_group_export_page():
             export_key = f"export_{year}_{current_period}"
 
             # Button styling based on whether it's the current year
-            button_type = "primary" if year == 2024 else "secondary"
+            button_type = "primary" if year == CURRENT_YEAR else "secondary"
 
             if st.button(
                 f"📅 {year}",
@@ -126,7 +127,7 @@ def create_group_export_page():
         </h3>
         """, unsafe_allow_html=True)
 
-        export_year = st.session_state.get('export_year', 2024)
+        export_year = st.session_state.get('export_year', CURRENT_YEAR)
 
         col1, col2, col3 = st.columns([1, 2, 1])
 

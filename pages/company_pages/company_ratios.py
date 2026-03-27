@@ -337,8 +337,8 @@ def create_company_ratios_page():
 
         # Get data for selected company for the selected period
         with st.spinner(f"Loading {st.session_state.selected_company_name} ratios..."):
-            balance_data = airtable.get_balance_sheet_data_by_period(st.session_state.selected_company_name, period_filter)
-            income_data = airtable.get_income_statement_data_by_period(st.session_state.selected_company_name, period_filter)
+            balance_data = airtable.get_balance_sheet_data_by_period(st.session_state.selected_company_name, period_filter, is_admin=is_super_admin())
+            income_data = airtable.get_income_statement_data_by_period(st.session_state.selected_company_name, period_filter, is_admin=is_super_admin())
         
         # Check if we have any data to display
         if not balance_data and not income_data:
@@ -582,10 +582,10 @@ def display_ratio_trends_table(balance_data, income_data):
         
         # Get balance sheet data for this year
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(st.session_state.selected_company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(st.session_state.selected_company_name, period_filter, is_admin=is_super_admin())
             if balance_historical:
                 record = balance_historical[0]  # Get first record for this period
-                
+
                 # Balance Sheet metrics
                 trends_data['balance_sheet']['Current Ratio (Liquidity)'][year] = record.get('current_ratio', '')
                 trends_data['balance_sheet']['Debt to Equity (Safety)'][year] = record.get('debt_to_equity', '')
@@ -616,7 +616,7 @@ def display_ratio_trends_table(balance_data, income_data):
         
         # Get income statement data for this year
         try:
-            income_historical = airtable.get_income_statement_data_by_period(st.session_state.selected_company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(st.session_state.selected_company_name, period_filter, is_admin=is_super_admin())
             if income_historical:
                 record = income_historical[0]  # Get first record for this period
 

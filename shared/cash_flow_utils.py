@@ -117,7 +117,7 @@ def _calculate_cash_flow_for_year(current_balance, prior_balance, current_income
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
-def get_cash_flow_ratios(_airtable, company_name: str, year: str) -> dict:
+def get_cash_flow_ratios(_airtable, company_name: str, year: str, is_admin: bool = False) -> dict:
     """
     Calculate ocf_rev, fcf_rev, ncf_rev for a specific company and year.
 
@@ -136,11 +136,11 @@ def get_cash_flow_ratios(_airtable, company_name: str, year: str) -> dict:
     prior_period = f"{prior_year} Annual"
 
     # Fetch current year data
-    current_bs_list = _airtable.get_balance_sheet_data_by_period(company_name, period)
-    current_is_list = _airtable.get_income_statement_data_by_period(company_name, period)
+    current_bs_list = _airtable.get_balance_sheet_data_by_period(company_name, period, is_admin=is_admin)
+    current_is_list = _airtable.get_income_statement_data_by_period(company_name, period, is_admin=is_admin)
 
     # Fetch prior year data
-    prior_bs_list = _airtable.get_balance_sheet_data_by_period(company_name, prior_period)
+    prior_bs_list = _airtable.get_balance_sheet_data_by_period(company_name, prior_period, is_admin=is_admin)
 
     # Extract first record from each list
     current_balance = current_bs_list[0] if current_bs_list else {}
@@ -157,7 +157,7 @@ def get_cash_flow_ratios(_airtable, company_name: str, year: str) -> dict:
 
 
 @st.cache_data(ttl=1800, show_spinner=False)
-def get_all_companies_cash_flow_ratios(_airtable, year: str, companies: list) -> dict:
+def get_all_companies_cash_flow_ratios(_airtable, year: str, companies: list, is_admin: bool = False) -> dict:
     """
     Bulk calculate cash flow ratios for all companies for a given year.
 
@@ -179,9 +179,9 @@ def get_all_companies_cash_flow_ratios(_airtable, year: str, companies: list) ->
     result = {}
 
     # Fetch bulk data for all companies
-    all_current_bs = _airtable.get_all_companies_balance_sheet_by_period(period)
-    all_prior_bs = _airtable.get_all_companies_balance_sheet_by_period(prior_period)
-    all_current_is = _airtable.get_all_companies_income_statement_by_period(period)
+    all_current_bs = _airtable.get_all_companies_balance_sheet_by_period(period, is_admin=is_admin)
+    all_prior_bs = _airtable.get_all_companies_balance_sheet_by_period(prior_period, is_admin=is_admin)
+    all_current_is = _airtable.get_all_companies_income_statement_by_period(period, is_admin=is_admin)
 
     # Index by company name for quick lookup
     current_bs_by_company = {r.get('company_name'): r for r in all_current_bs}
@@ -205,23 +205,25 @@ def get_all_companies_cash_flow_ratios(_airtable, year: str, companies: list) ->
     return result
 
 
-def get_cash_flow_ratios_for_trends(_airtable, company_name: str, years: list = None) -> dict:
+def get_cash_flow_ratios_for_trends(_airtable, company_name: str, years: list = None, is_admin: bool = False) -> dict:
     """
     Get cash flow ratios for multiple years (for trend tables).
 
     Args:
         _airtable: AirtableConnection instance
         company_name: Company name
-        years: List of year strings, defaults to ['2020', '2021', '2022', '2023', '2024']
+        years: List of year strings, defaults to last 5 years from year_config
+        is_admin: Whether the current user is an admin (sees submitted records too)
 
     Returns:
         dict mapping year to {'ocf_rev', 'fcf_rev', 'ncf_rev'}
     """
     if years is None:
-        years = ['2020', '2021', '2022', '2023', '2024']
+        from shared.year_config import get_default_years
+        years = get_default_years()
 
     result = {}
     for year in years:
-        result[year] = get_cash_flow_ratios(_airtable, company_name, year)
+        result[year] = get_cash_flow_ratios(_airtable, company_name, year, is_admin=is_admin)
 
     return result

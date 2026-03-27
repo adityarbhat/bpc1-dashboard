@@ -26,7 +26,7 @@ def get_group_averages_for_debt(years_with_data):
         period_filter = f"{year} Annual"
 
         # Use bulk fetch instead of individual company calls
-        all_balance_data = airtable.get_all_companies_balance_sheet_by_period(period_filter)
+        all_balance_data = airtable.get_all_companies_balance_sheet_by_period(period_filter, is_admin=is_super_admin())
 
         year_debt_values = []
         for company_data in all_balance_data:
@@ -53,7 +53,7 @@ def get_group_averages_for_ebitda(years_with_data):
         period_filter = f"{year} Annual"
 
         # Use bulk fetch instead of individual company calls
-        all_income_data = airtable.get_all_companies_income_statement_by_period(period_filter)
+        all_income_data = airtable.get_all_companies_income_statement_by_period(period_filter, is_admin=is_super_admin())
 
         year_ebitda_values = []
         for income_item in all_income_data:
@@ -524,7 +524,7 @@ def display_value_trend_table(company_name):
             period_filter = f"{year} Annual"
 
             # Get income statement data for EBITDA
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
 
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]  # Get the first record for this period
@@ -562,7 +562,7 @@ def display_value_trend_table(company_name):
                         continue
 
             # Get balance sheet data for Interest Bearing Debt and Equity
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
 
             if balance_historical and len(balance_historical) > 0:
                 balance_record = balance_historical[0]  # Get the first record for this period

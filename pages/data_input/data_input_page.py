@@ -12,6 +12,7 @@ from shared.airtable_connection import get_airtable_connection, get_companies_ca
 from shared.page_components import create_page_header
 from shared.css_styles import apply_all_styles
 from shared.auth_utils import require_auth, is_super_admin, get_user_company_name, can_upload_data
+from shared.year_config import CURRENT_YEAR, EARLIEST_YEAR
 
 # Import field mappings from transformation scripts
 import sys
@@ -126,11 +127,11 @@ def create_data_input_page():
 
     with col2:
         # Period selection
-        years = [str(y) for y in range(2011, 2026)]
+        years = [str(y) for y in range(EARLIEST_YEAR, CURRENT_YEAR + 1)]
         period_types = ['Annual', 'Mid Year']
 
         if 'selected_year_input' not in st.session_state:
-            st.session_state.selected_year_input = '2025'
+            st.session_state.selected_year_input = str(CURRENT_YEAR)
         if 'selected_period_type_input' not in st.session_state:
             st.session_state.selected_period_type_input = 'Annual'
 
@@ -360,7 +361,7 @@ def create_income_statement_input(company_name, period_name, year):
 
     # Fetch existing data from Airtable if available
     airtable = get_airtable_connection()
-    existing_data = airtable.get_income_statement_data_by_period(company_name, period_name)
+    existing_data = airtable.get_income_statement_data_by_period(company_name, period_name, is_admin=True)
     existing_values = existing_data[0] if existing_data else {}
 
     # Store input data in session state
@@ -613,7 +614,7 @@ def create_balance_sheet_input(company_name, period_name, year):
 
     # Fetch existing data
     airtable = get_airtable_connection()
-    existing_data = airtable.get_balance_sheet_data_by_period(company_name, period_name)
+    existing_data = airtable.get_balance_sheet_data_by_period(company_name, period_name, is_admin=True)
     existing_values = existing_data[0] if existing_data else {}
 
     # Store input data in session state

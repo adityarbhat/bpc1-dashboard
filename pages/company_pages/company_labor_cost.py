@@ -29,7 +29,7 @@ def get_group_averages_for_admin_labor_pct(years_with_data):
         period_filter = f"{year} Annual"
 
         # Get all companies' income statement data for this year using bulk fetch
-        all_companies_data = airtable.get_all_companies_income_statement_by_period(period_filter)
+        all_companies_data = airtable.get_all_companies_income_statement_by_period(period_filter, is_admin=is_super_admin())
 
         # Calculate admin labor percentage for each company in this year
         year_admin_labor_percentages = []
@@ -67,7 +67,7 @@ def get_group_averages_for_revenue_producing_labor_pct(years_with_data):
         period_filter = f"{year} Annual"
 
         # Get all companies' income statement data for this year using bulk fetch
-        all_companies_data = airtable.get_all_companies_income_statement_by_period(period_filter)
+        all_companies_data = airtable.get_all_companies_income_statement_by_period(period_filter, is_admin=is_super_admin())
 
         # Calculate revenue producing labor percentage for each company in this year
         year_revenue_labor_percentages = []
@@ -551,7 +551,7 @@ def display_labor_cost_trend_table(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 

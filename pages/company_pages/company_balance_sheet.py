@@ -38,14 +38,14 @@ def get_all_balance_sheet_data_cached(company_name, years_tuple=None):
         period_filter = f"{year} Annual"
         try:
             # Get balance sheet data
-            balance_data = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_data = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_data and len(balance_data) > 0:
                 balance_historical_data[year] = balance_data[0]  # Take first record
             else:
                 balance_historical_data[year] = None
 
             # Get income statement data (needed for some balance sheet ratios)
-            income_data = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_data = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_data and len(income_data) > 0:
                 income_historical_data[year] = income_data[0]  # Take first record
             else:
@@ -591,7 +591,7 @@ def display_current_assets_liabilities_chart(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 
@@ -716,7 +716,7 @@ def display_liabilities_equity_chart(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 
@@ -834,7 +834,7 @@ def display_current_ratio_trend_chart(company_name, years, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 current_ratio = record.get('current_ratio', 0) or 0
@@ -946,7 +946,7 @@ def display_debt_to_equity_trend_chart(company_name, years, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 debt_to_equity = record.get('debt_to_equity', 0) or 0
@@ -1159,8 +1159,7 @@ def display_survival_score_chart(company_name):
     
     # Fetch data for multiple years
     selected_years = get_selected_years()
-    standard_score_years = ['2021', '2022', '2023', '2024']
-    years = [y for y in selected_years if y in standard_score_years]
+    years = selected_years
     chart_data = {
         'Year': [],
         'Survival Score': [],
@@ -1174,7 +1173,7 @@ def display_survival_score_chart(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 
@@ -1184,7 +1183,7 @@ def display_survival_score_chart(company_name):
                 # Only add data if we have real survival score values
                 if survival_score:
                     # Calculate industry average for this year
-                    all_companies_data = airtable.get_all_companies_balance_sheet_by_period(period_filter)
+                    all_companies_data = airtable.get_all_companies_balance_sheet_by_period(period_filter, is_admin=is_super_admin())
                     valid_scores = [company['survival_score'] for company in all_companies_data if company.get('survival_score', 0) > 0]
                     industry_avg = sum(valid_scores) / len(valid_scores) if valid_scores else 0
                     
@@ -1229,15 +1228,13 @@ def display_survival_score_trend_chart(company_name, years, airtable):
         'Standard Survival Score': []
     }
     
-    # Use only years that have standard scores
+    # Use all selected years
     selected_years = get_selected_years()
-    standard_score_years = ['2021', '2022', '2023', '2024']
-    available_years = [y for y in selected_years if y in standard_score_years]
-    
-    for year in available_years:
+
+    for year in selected_years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 survival_score = record.get('survival_score', 0) or 0
@@ -1384,7 +1381,7 @@ def display_revenue_per_admin_trend(company_name, years, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 revenue = record.get('rev_admin_employee', 0)
@@ -1501,7 +1498,7 @@ def display_working_capital_trend(company_name, years, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 working_capital_pct = record.get('working_capital_pct_asset', 0)
@@ -1671,7 +1668,7 @@ def display_balance_sheet_trend_table(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+            balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
                 

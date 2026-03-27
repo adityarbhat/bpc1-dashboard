@@ -32,14 +32,14 @@ def get_all_actuals_data_cached(company_name, years_tuple=None):
         period_filter = f"{year} Annual"
 
         # Fetch balance sheet data for this year
-        balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter)
+        balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
         if balance_historical and len(balance_historical) > 0:
             balance_data[year] = balance_historical[0]
         else:
             balance_data[year] = {}
 
         # Fetch income statement data for this year
-        income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+        income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
         if income_historical and len(income_historical) > 0:
             income_data[year] = income_historical[0]
         else:

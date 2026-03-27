@@ -12,8 +12,9 @@ from dotenv import load_dotenv
 # Import from shared modules
 from shared.airtable_connection import get_airtable_connection
 from shared.page_components import create_page_header, get_period_display_text
-from shared.auth_utils import require_auth
+from shared.auth_utils import require_auth, is_super_admin
 from shared.cash_flow_utils import get_cash_flow_ratios
+from shared.year_config import CURRENT_YEAR
 
 # Load environment variables from .env file for local development
 load_dotenv()
@@ -45,8 +46,8 @@ def fetch_group_ratio_data(period):
             continue
 
         # Get balance sheet and income statement data for this company
-        balance_data = airtable.get_balance_sheet_data_by_period(company_name, period)
-        income_data = airtable.get_income_statement_data_by_period(company_name, period)
+        balance_data = airtable.get_balance_sheet_data_by_period(company_name, period, is_admin=is_super_admin())
+        income_data = airtable.get_income_statement_data_by_period(company_name, period, is_admin=is_super_admin())
 
         # Initialize company entry
         if company_name not in ratio_data:
@@ -1036,7 +1037,7 @@ def create_group_ratios_page():
 
     # Initialize year selection in session state (default to most recent year)
     if 'group_ratios_selected_year' not in st.session_state:
-        st.session_state.group_ratios_selected_year = 2024
+        st.session_state.group_ratios_selected_year = CURRENT_YEAR
 
     # Get current period for data fetching
     current_period = st.session_state.get('period', 'year_end')
@@ -1082,7 +1083,7 @@ def create_group_ratios_page():
 
     with col_filter:
         # Year filter - same default size as homepage selectboxes
-        year_options = [2024, 2023, 2022, 2021, 2020]
+        year_options = list(range(CURRENT_YEAR, CURRENT_YEAR - 5, -1))
         selected_year = st.selectbox(
             "**Select Year**",
             options=year_options,

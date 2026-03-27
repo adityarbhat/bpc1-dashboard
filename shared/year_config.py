@@ -4,12 +4,12 @@ Provides a single source of truth for available years, default year ranges,
 and the sidebar year selector widget. Group pages are not affected.
 """
 
-CURRENT_YEAR = 2024
+CURRENT_YEAR = 2025
 EARLIEST_YEAR = 2011
 
 
 def get_default_years():
-    """Returns last 5 years as strings: ['2020','2021','2022','2023','2024']"""
+    """Returns last 5 years as strings: ['2021','2022','2023','2024','2025']"""
     return [str(CURRENT_YEAR - i) for i in range(4, -1, -1)]
 
 

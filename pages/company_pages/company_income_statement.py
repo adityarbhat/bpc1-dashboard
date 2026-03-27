@@ -35,7 +35,7 @@ def get_all_income_statement_data_cached(company_name, years_tuple=None):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            data = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            data = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if data and len(data) > 0:
                 historical_data[year] = data[0]  # Take first record
             else:
@@ -787,7 +787,7 @@ def display_revenue_diversification_chart(company_name, income_historical_data):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
@@ -961,7 +961,7 @@ def display_income_statement_dollars_chart(company_name, income_historical_data)
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
@@ -1145,7 +1145,7 @@ def display_income_statement_percentage_chart(company_name, income_historical_da
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
@@ -1408,7 +1408,7 @@ def display_income_statement_trend_table(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 table_data[year] = record
@@ -1764,7 +1764,7 @@ def display_revenue_trends_section(company_name):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
@@ -1934,7 +1934,7 @@ def display_operating_profit_margin_trend(company_name, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
@@ -2054,7 +2054,7 @@ def display_gross_profit_margin_trend(company_name, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
@@ -2174,7 +2174,7 @@ def display_net_profit_margin_trend(company_name, airtable):
     for year in years:
         period_filter = f"{year} Annual"
         try:
-            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter)
+            income_historical = airtable.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 

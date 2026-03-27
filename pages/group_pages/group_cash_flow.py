@@ -12,7 +12,8 @@ from dotenv import load_dotenv
 # Import from shared modules
 from shared.airtable_connection import get_airtable_connection
 from shared.page_components import create_page_header, get_period_display_text, sort_companies_by_rank
-from shared.auth_utils import require_auth
+from shared.auth_utils import require_auth, is_super_admin
+from shared.year_config import CURRENT_YEAR
 
 # Load environment variables from .env file for local development
 load_dotenv()
@@ -348,7 +349,8 @@ def create_cash_flow_comparison_table(company_data, period):
 
 def calculate_cash_flow_changes(balance_data, income_data, company_name=None):
     """Calculate year-over-year changes for cash flow items - copied from company_cash_flow.py"""
-    years = ['2020', '2021', '2022', '2023', '2024']
+    from shared.year_config import get_default_years
+    years = get_default_years()
     calculated_data = {}
 
     # Special handling for Bisson and Hopkins - hardcoded 2024 values
@@ -552,21 +554,21 @@ def fetch_all_companies_cash_flow(period):
         income_data = {}
 
         # Current year
-        balance_current = airtable.get_balance_sheet_data_by_period(company_name, period)
+        balance_current = airtable.get_balance_sheet_data_by_period(company_name, period, is_admin=is_super_admin())
         if balance_current and len(balance_current) > 0:
             balance_data[year] = balance_current[0]
 
-        income_current = airtable.get_income_statement_data_by_period(company_name, period)
+        income_current = airtable.get_income_statement_data_by_period(company_name, period, is_admin=is_super_admin())
         if income_current and len(income_current) > 0:
             income_data[year] = income_current[0]
 
         # Prior year
         prior_period = f"{prior_year} Annual" if "Annual" in period else f"June {prior_year}"
-        balance_prior = airtable.get_balance_sheet_data_by_period(company_name, prior_period)
+        balance_prior = airtable.get_balance_sheet_data_by_period(company_name, prior_period, is_admin=is_super_admin())
         if balance_prior and len(balance_prior) > 0:
             balance_data[prior_year] = balance_prior[0]
 
-        income_prior = airtable.get_income_statement_data_by_period(company_name, prior_period)
+        income_prior = airtable.get_income_statement_data_by_period(company_name, prior_period, is_admin=is_super_admin())
         if income_prior and len(income_prior) > 0:
             income_data[prior_year] = income_prior[0]
 
@@ -667,7 +669,7 @@ def create_group_cash_flow_page():
 
     # Initialize year selection in session state (default to most recent year)
     if 'group_cash_flow_selected_year' not in st.session_state:
-        st.session_state.group_cash_flow_selected_year = 2024
+        st.session_state.group_cash_flow_selected_year = CURRENT_YEAR
 
     # Get current period for data fetching
     current_period = st.session_state.get('period', 'year_end')
@@ -713,7 +715,7 @@ def create_group_cash_flow_page():
 
     with col_filter:
         # Year filter - same default size as homepage selectboxes
-        year_options = [2024, 2023, 2022, 2021, 2020]
+        year_options = list(range(CURRENT_YEAR, CURRENT_YEAR - 5, -1))
         selected_year = st.selectbox(
             "**Select Year**",
             options=year_options,

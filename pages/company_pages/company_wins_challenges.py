@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 from shared.airtable_connection import get_airtable_connection
 from shared.page_components import get_period_display_text
 from shared.auth_utils import require_auth, logout_user, get_current_user_name, get_current_user_email, is_super_admin
-from shared.year_config import get_selected_years
+from shared.year_config import get_selected_years, CURRENT_YEAR
 
 # Import ranking calculation function from group ratios
 from pages.group_pages.group_ratios import calculate_group_rankings
@@ -185,8 +185,8 @@ def calculate_yoy_percentages(company_name, current_year='2024'):
     previous_year = str(int(current_year) - 1)
 
     # Fetch current and previous year data
-    data_current = airtable.get_income_statement_data_by_period(company_name, f"{current_year} Annual")
-    data_previous = airtable.get_income_statement_data_by_period(company_name, f"{previous_year} Annual")
+    data_current = airtable.get_income_statement_data_by_period(company_name, f"{current_year} Annual", is_admin=is_super_admin())
+    data_previous = airtable.get_income_statement_data_by_period(company_name, f"{previous_year} Annual", is_admin=is_super_admin())
 
     if not data_current or not data_previous:
         return None
@@ -258,7 +258,7 @@ def calculate_multi_year_yoy(company_name):
     # Fetch data for all years
     for year in years:
         period = f"{year} Annual"
-        data = airtable.get_income_statement_data_by_period(company_name, period)
+        data = airtable.get_income_statement_data_by_period(company_name, period, is_admin=is_super_admin())
         if data and len(data) > 0:
             annual_data[year] = data[0]
 
@@ -902,7 +902,7 @@ def display_wins_challenges_sections(balance_data, income_data):
     company_name = st.session_state.selected_company_name
 
     # Get selected year and period from selectors
-    selected_year = st.session_state.get('wins_challenges_year', '2024')
+    selected_year = st.session_state.get('wins_challenges_year', str(CURRENT_YEAR))
     period = st.session_state.get('period', 'year_end')
 
     # Convert to period_name format for Airtable query

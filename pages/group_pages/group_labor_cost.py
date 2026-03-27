@@ -12,7 +12,8 @@ from dotenv import load_dotenv
 # Import from shared modules
 from shared.airtable_connection import get_airtable_connection
 from shared.page_components import create_page_header, get_period_display_text, sort_companies_by_rank
-from shared.auth_utils import require_auth
+from shared.auth_utils import require_auth, is_super_admin
+from shared.year_config import CURRENT_YEAR
 
 # Load environment variables from .env file for local development
 load_dotenv()
@@ -359,7 +360,7 @@ def fetch_all_companies_labor_cost(period):
             continue
 
         # Fetch income statement data for labor cost fields
-        income_data = airtable.get_income_statement_data_by_period(company_name, period)
+        income_data = airtable.get_income_statement_data_by_period(company_name, period, is_admin=is_super_admin())
 
         if income_data and len(income_data) > 0:
             company_data[company_name] = income_data[0]
@@ -444,7 +445,7 @@ def create_group_labor_cost_page():
 
     # Initialize year selection in session state (default to most recent year)
     if 'group_labor_cost_selected_year' not in st.session_state:
-        st.session_state.group_labor_cost_selected_year = 2024
+        st.session_state.group_labor_cost_selected_year = CURRENT_YEAR
 
     # Get current period for data fetching
     current_period = st.session_state.get('period', 'year_end')
@@ -490,7 +491,7 @@ def create_group_labor_cost_page():
 
     with col_filter:
         # Year filter - same default size as homepage selectboxes
-        year_options = [2024, 2023, 2022, 2021, 2020]
+        year_options = list(range(CURRENT_YEAR, CURRENT_YEAR - 5, -1))
         selected_year = st.selectbox(
             "**Select Year**",
             options=year_options,

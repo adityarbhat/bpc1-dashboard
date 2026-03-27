@@ -42,6 +42,17 @@ def _parse_percentage_or_float(value):
     except (ValueError, TypeError):
         return 0.0
 
+
+def _build_publication_filter(is_admin):
+    """Return Airtable publication_status filter clause based on role."""
+    if is_admin:
+        # Admin sees submitted + published + legacy records (BLANK = no status set)
+        return "OR({publication_status}='submitted',{publication_status}='published',{publication_status}=BLANK())"
+    else:
+        # Company user sees only published + legacy records
+        return "OR({publication_status}='published',{publication_status}=BLANK())"
+
+
 class AirtableConnection:
     def __init__(self):
         # Try to get from Streamlit secrets first, then fall back to .env
@@ -187,13 +198,14 @@ class AirtableConnection:
             return []
     
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_balance_sheet_data_by_period(_self, company_name, period):
+    def get_balance_sheet_data_by_period(_self, company_name, period, is_admin=False):
         """Fetch balance sheet data from Airtable for a specific period"""
         try:
             url = f"{_self.base_url}/balance_sheet_data"
             safe_name = _escape_airtable_value(company_name)
             safe_period = _escape_airtable_value(period)
-            filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            pub_filter = _build_publication_filter(is_admin)
+            filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{safe_period}',{pub_filter})"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -276,13 +288,14 @@ class AirtableConnection:
             return []
     
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_income_statement_data_by_period(_self, company_name, period):
+    def get_income_statement_data_by_period(_self, company_name, period, is_admin=False):
         """Fetch income statement data from Airtable for a specific period"""
         try:
             url = f"{_self.base_url}/income_statement_data"
             safe_name = _escape_airtable_value(company_name)
             safe_period = _escape_airtable_value(period)
-            filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            pub_filter = _build_publication_filter(is_admin)
+            filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{safe_period}',{pub_filter})"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -394,12 +407,13 @@ class AirtableConnection:
             return []
 
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_all_companies_balance_sheet_by_period(_self, period):
+    def get_all_companies_balance_sheet_by_period(_self, period, is_admin=False):
         """Fetch balance sheet data from Airtable for all companies for a specific period"""
         try:
             url = f"{_self.base_url}/balance_sheet_data"
             safe_period = _escape_airtable_value(period)
-            filter_formula = f"AND({{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            pub_filter = _build_publication_filter(is_admin)
+            filter_formula = f"AND({{period}}='{safe_period}',{pub_filter})"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -431,12 +445,13 @@ class AirtableConnection:
             return []
 
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_all_companies_income_statement_by_period(_self, period):
+    def get_all_companies_income_statement_by_period(_self, period, is_admin=False):
         """Fetch income statement data from Airtable for all companies for a specific period"""
         try:
             url = f"{_self.base_url}/income_statement_data"
             safe_period = _escape_airtable_value(period)
-            filter_formula = f"AND({{period}}='{safe_period}',OR({{publication_status}}='published',{{publication_status}}=BLANK()))"
+            pub_filter = _build_publication_filter(is_admin)
+            filter_formula = f"AND({{period}}='{safe_period}',{pub_filter})"
             url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -486,23 +501,24 @@ class AirtableConnection:
             return []
 
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_all_data_for_company(_self, company_name, years=None):
+    def get_all_data_for_company(_self, company_name, years=None, is_admin=False):
         """Fetch all balance sheet and income statement data for a company across multiple years"""
         if years is None:
-            years = ['2020', '2021', '2022', '2023', '2024']
-            
+            from shared.year_config import get_default_years
+            years = get_default_years()
+
         result = {
             'balance_sheet': {},
             'income_statement': {}
         }
-        
+
         # Fetch data for all years
         for year in years:
             period_filter = f"{year} Annual"
             try:
                 # Get both balance sheet and income statement data
-                balance_data = _self.get_balance_sheet_data_by_period(company_name, period_filter)
-                income_data = _self.get_income_statement_data_by_period(company_name, period_filter)
+                balance_data = _self.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_admin)
+                income_data = _self.get_income_statement_data_by_period(company_name, period_filter, is_admin=is_admin)
                 
                 if balance_data:
                     result['balance_sheet'][year] = balance_data[0]

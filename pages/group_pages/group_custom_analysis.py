@@ -3,7 +3,8 @@ import pandas as pd
 import plotly.graph_objects as go
 from shared.airtable_connection import get_airtable_connection, get_companies_cached
 from shared.page_components import create_page_header, get_period_display_text
-from shared.auth_utils import require_auth
+from shared.auth_utils import require_auth, is_super_admin
+from shared.year_config import CURRENT_YEAR
 
 # ============================================================================
 # CUSTOM ANALYSIS - METRIC COMPARISON FUNCTIONALITY
@@ -276,10 +277,10 @@ def fetch_metric_data(metric_name, company_list, period):
 
     for company_name in company_list:
         # Fetch income statement data
-        income_data = airtable.get_income_statement_data_by_period(company_name, period)
+        income_data = airtable.get_income_statement_data_by_period(company_name, period, is_admin=is_super_admin())
 
         # Also fetch balance sheet data for ratios
-        balance_data = airtable.get_balance_sheet_data_by_period(company_name, period)
+        balance_data = airtable.get_balance_sheet_data_by_period(company_name, period, is_admin=is_super_admin())
 
         if not income_data or len(income_data) == 0:
             continue
@@ -651,7 +652,7 @@ def create_group_custom_analysis_page():
         st.markdown('<p style="font-size: 1.3rem; font-weight: 600; margin-bottom: 0.5rem;">📅 Year</p>', unsafe_allow_html=True)
         selected_year = st.selectbox(
             "Year",
-            options=[2024, 2023, 2022, 2021, 2020],
+            options=list(range(CURRENT_YEAR, CURRENT_YEAR - 5, -1)),
             index=0,
             key="custom_analysis_year_select",
             help="Select year for comparison",
