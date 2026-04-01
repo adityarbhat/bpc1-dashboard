@@ -27,9 +27,13 @@ def _sanitize_text(text: str) -> str:
     text = text.replace('**', '')
     # Strip inline code backticks: `text` → text
     text = re.sub(r'`([^`]*)`', r'\1', text)
-    # Collapse multiple spaces/newlines into single space
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
+    # Normalize line endings
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    # Collapse multiple spaces/tabs on a single line (preserve newlines)
+    text = re.sub(r'[ \t]+', ' ', text)
+    # Normalize 3+ consecutive newlines down to 2 (keep paragraph breaks)
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    return text.strip()
 
 
 def parse_wc_excel(uploaded_file) -> Tuple[Dict[str, Any], List[str]]:
