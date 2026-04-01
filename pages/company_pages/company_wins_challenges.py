@@ -5,6 +5,7 @@ Atlas BPC 1 Financial Dashboard - Wins & Challenges focused analysis
 """
 
 import html
+import re
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -1057,12 +1058,22 @@ def display_wins_challenges_sections(balance_data, income_data):
     # Display wins and challenges in two columns
     col1, col2 = st.columns(2)
 
+    def _render_wc_text(text):
+        """Render W&C text with proper formatting for existing stored data."""
+        t = html.escape(text)
+        # Paragraph breaks
+        t = t.replace('\n\n', '<br><br>').replace('\n', '<br>')
+        # Inline sub-bullets: " -Capital" → line break before the dash
+        t = re.sub(r' -([A-Z])', r'<br>-\1', t)
+        # Single *emphasis* → italic
+        t = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', t)
+        return t
+
     with col1:
         if wins:
             wins_html = '<div class="wins-list"><h3>Wins</h3><ul>'
             for win in wins:
-                escaped = html.escape(win).replace('\n\n', '<br><br>').replace('\n', '<br>')
-                wins_html += f'<li>{escaped}</li>'
+                wins_html += f'<li>{_render_wc_text(win)}</li>'
             wins_html += '</ul></div>'
             st.markdown(wins_html, unsafe_allow_html=True)
         else:
@@ -1072,8 +1083,7 @@ def display_wins_challenges_sections(balance_data, income_data):
         if challenges:
             challenges_html = '<div class="challenges-list"><h3>Challenges</h3><ul>'
             for challenge in challenges:
-                escaped = html.escape(challenge).replace('\n\n', '<br><br>').replace('\n', '<br>')
-                challenges_html += f'<li>{escaped}</li>'
+                challenges_html += f'<li>{_render_wc_text(challenge)}</li>'
             challenges_html += '</ul></div>'
             st.markdown(challenges_html, unsafe_allow_html=True)
         else:
@@ -1083,8 +1093,7 @@ def display_wins_challenges_sections(balance_data, income_data):
     if action_items:
         action_items_html = '<div class="action-items-list"><h3>Action Items</h3><ul>'
         for item in action_items:
-            escaped = html.escape(item).replace('\n\n', '<br><br>').replace('\n', '<br>')
-            action_items_html += f'<li>{escaped}</li>'
+            action_items_html += f'<li>{_render_wc_text(item)}</li>'
         action_items_html += '</ul></div>'
         st.markdown(action_items_html, unsafe_allow_html=True)
     else:
