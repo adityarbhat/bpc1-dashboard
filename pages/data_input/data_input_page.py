@@ -256,6 +256,8 @@ def create_data_input_sidebar():
                     st.session_state.is_input_data = {}
                 st.session_state.is_input_data.update(results['is_data'])
                 st.session_state.is_submitted = False  # Re-enable submit button
+                # Increment version so data_editor widgets reinitialize with fresh data
+                st.session_state.is_upload_version = st.session_state.get('is_upload_version', 0) + 1
                 st.success(f"✅ Income Statement: {results['is_matched']} items loaded")
 
             # Update Balance Sheet data
@@ -264,6 +266,8 @@ def create_data_input_sidebar():
                     st.session_state.bs_input_data = {}
                 st.session_state.bs_input_data.update(results['bs_data'])
                 st.session_state.bs_submitted = False  # Re-enable submit button
+                # Increment version so data_editor widgets reinitialize with fresh data
+                st.session_state.bs_upload_version = st.session_state.get('bs_upload_version', 0) + 1
                 st.success(f"✅ Balance Sheet: {results['bs_matched']} items loaded")
 
                 # Check balance
@@ -408,7 +412,7 @@ def create_income_statement_input(company_name, period_name, year):
                 )
             },
             use_container_width=True,
-            key=f"is_{category_key}_{year}"
+            key=f"is_{category_key}_{year}_v{st.session_state.get('is_upload_version', 0)}"
         )
 
         # Update session state with edited values
@@ -539,7 +543,7 @@ def create_income_statement_input(company_name, period_name, year):
             )
         },
         use_container_width=True,
-        key=f"is_labor_{year}"
+        key=f"is_labor_{year}_v{st.session_state.get('is_upload_version', 0)}"
     )
     for idx, row in edited_labor_df.iterrows():
         field_key = row['Field Key']
@@ -652,7 +656,7 @@ def create_balance_sheet_input(company_name, period_name, year):
                 )
             },
             use_container_width=True,
-            key=f"bs_{category_key}_{year}"
+            key=f"bs_{category_key}_{year}_v{st.session_state.get('bs_upload_version', 0)}"
         )
 
         for idx, row in edited_df.iterrows():
