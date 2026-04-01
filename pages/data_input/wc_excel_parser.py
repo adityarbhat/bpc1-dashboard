@@ -3,8 +3,33 @@ W&C (Wins & Challenges) Excel Parser
 Parses the W&C upload template with 3 sheets: Wins, Challenges, Action Items
 """
 
+import re
 import pandas as pd
 from typing import Dict, List, Tuple, Any
+
+
+def _sanitize_text(text: str) -> str:
+    """
+    Strip markdown and LaTeX formatting from Excel cell text so it renders
+    as clean plain text on the dashboard.
+
+    Handles:
+    - **bold** markers
+    - `inline code` backticks (renders as green monospace)
+    - $LaTeX math$ dollar signs (renders as large serif font)
+    - Excess whitespace
+    """
+    # Strip LaTeX math: $...$ → inner content
+    text = re.sub(r'\$([^$]+)\$', r'\1', text)
+    # Strip bold: **text** → text
+    text = re.sub(r'\*\*([^*]*)\*\*', r'\1', text)
+    # Strip remaining lone ** markers
+    text = text.replace('**', '')
+    # Strip inline code backticks: `text` → text
+    text = re.sub(r'`([^`]*)`', r'\1', text)
+    # Collapse multiple spaces/newlines into single space
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
 
 
 def parse_wc_excel(uploaded_file) -> Tuple[Dict[str, Any], List[str]]:
@@ -100,7 +125,7 @@ def _parse_wc_sheet(uploaded_file, sheet_name: str, item_type: str) -> Tuple[Lis
             if pd.isna(text) or str(text).strip() == '':
                 continue
 
-            text = str(text).strip()
+            text = _sanitize_text(str(text))
 
             # Validate text length
             if len(text) > 5000:

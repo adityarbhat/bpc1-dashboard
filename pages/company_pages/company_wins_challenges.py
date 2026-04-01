@@ -4,6 +4,7 @@ Company Wins & Challenges Analysis Page
 Atlas BPC 1 Financial Dashboard - Wins & Challenges focused analysis
 """
 
+import html
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -1060,7 +1061,7 @@ def display_wins_challenges_sections(balance_data, income_data):
         if wins:
             wins_html = '<div class="wins-list"><h3>Wins</h3><ul>'
             for win in wins:
-                wins_html += f'<li>{win}</li>'
+                wins_html += f'<li>{html.escape(win)}</li>'
             wins_html += '</ul></div>'
             st.markdown(wins_html, unsafe_allow_html=True)
         else:
@@ -1070,7 +1071,7 @@ def display_wins_challenges_sections(balance_data, income_data):
         if challenges:
             challenges_html = '<div class="challenges-list"><h3>Challenges</h3><ul>'
             for challenge in challenges:
-                challenges_html += f'<li>{challenge}</li>'
+                challenges_html += f'<li>{html.escape(challenge)}</li>'
             challenges_html += '</ul></div>'
             st.markdown(challenges_html, unsafe_allow_html=True)
         else:
@@ -1080,7 +1081,7 @@ def display_wins_challenges_sections(balance_data, income_data):
     if action_items:
         action_items_html = '<div class="action-items-list"><h3>Action Items</h3><ul>'
         for item in action_items:
-            action_items_html += f'<li>{item}</li>'
+            action_items_html += f'<li>{html.escape(item)}</li>'
         action_items_html += '</ul></div>'
         st.markdown(action_items_html, unsafe_allow_html=True)
     else:
