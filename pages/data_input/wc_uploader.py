@@ -64,8 +64,8 @@ def upload_wc_to_airtable(
         if not period_id:
             return False, f"Period '{period_name}' not found for company '{company_name}'", counts
 
-        # Step 1: Delete existing drafts (overwrite behavior)
-        deleted = _delete_existing_drafts(manager, period_id)
+        # Step 1: Delete all existing records for this period (overwrite behavior)
+        deleted = _delete_existing_records(manager, period_id)
 
         # Step 2: Create new records as drafts
         errors = []
@@ -132,10 +132,11 @@ def upload_wc_to_airtable(
         return False, f"Upload failed: {str(e)}", counts
 
 
-def _delete_existing_drafts(manager: WinsChallengesActionItemsManager, period_id: str) -> Dict[str, int]:
+def _delete_existing_records(manager: WinsChallengesActionItemsManager, period_id: str) -> Dict[str, int]:
     """
-    Hard delete all draft records for a period (to allow overwrite).
-    Only deletes drafts, not published records.
+    Hard delete all active records for a period (both draft and published) to allow clean overwrite.
+    Fetches all active records and filters by period_id in Python — avoids unreliable ARRAYJOIN
+    on linked record fields.
 
     Args:
         manager: WinsChallengesActionItemsManager instance
@@ -154,17 +155,21 @@ def _delete_existing_drafts(manager: WinsChallengesActionItemsManager, period_id
 
     for table_name, count_key in tables:
         try:
-            # Fetch all draft records for this period
+            # Fetch all active records, then filter by period_id in Python
+            # (ARRAYJOIN on linked fields is unreliable — same pattern as airtable_connection.py)
             url = f"{manager.base_url}/{table_name}"
-            safe_period_id = _escape_airtable_value(period_id)
-            filter_formula = f"AND(FIND('{safe_period_id}', ARRAYJOIN({{period}})), {{status}}='draft', {{is_active}}=TRUE())"
-            params = {'filterByFormula': filter_formula}
+            params = {'filterByFormula': '{is_active}=TRUE()'}
 
             response = requests.get(url, headers=manager.headers, params=params)
             if response.status_code != 200:
                 continue
 
-            records = response.json().get('records', [])
+            all_records = response.json().get('records', [])
+            # Filter to only records linked to this period
+            records = [
+                r for r in all_records
+                if period_id in r.get('fields', {}).get('period', [])
+            ]
             if not records:
                 continue
 
@@ -172,16 +177,13 @@ def _delete_existing_drafts(manager: WinsChallengesActionItemsManager, period_id
             record_ids = [r['id'] for r in records]
             for i in range(0, len(record_ids), 10):
                 batch_ids = record_ids[i:i+10]
-                delete_url = f"{manager.base_url}/{table_name}"
-
-                # Airtable DELETE requires records[] query params
-                params = {'records[]': batch_ids}
-                delete_response = requests.delete(delete_url, headers=manager.headers, params=params)
+                delete_params = {'records[]': batch_ids}
+                delete_response = requests.delete(url, headers=manager.headers, params=delete_params)
 
                 if delete_response.status_code == 200:
                     deleted[count_key] += len(batch_ids)
 
-        except Exception as e:
+        except Exception:
             # Log but continue - don't fail the whole upload
             pass
 

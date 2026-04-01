@@ -914,10 +914,12 @@ def display_wins_challenges_sections(balance_data, income_data):
         selected_period_type = 'Mid Year'
 
     # Fetch wins, challenges, and action items from Airtable
+    # Super admins see drafts + published (preview before publish); company users see published only
     airtable = get_airtable_connection()
-    wins_data = airtable.get_wins(company_name, period_name)
-    challenges_data = airtable.get_challenges(company_name, period_name)
-    action_items_data = airtable.get_action_items(company_name, period_name)
+    admin_view = is_super_admin()
+    wins_data = airtable.get_wins(company_name, period_name, include_drafts=admin_view)
+    challenges_data = airtable.get_challenges(company_name, period_name, include_drafts=admin_view)
+    action_items_data = airtable.get_action_items(company_name, period_name, include_drafts=admin_view)
 
     # Extract text from data (get_wins returns list of dicts with 'win_text' field)
     wins = [item['win_text'] for item in wins_data] if wins_data else []
