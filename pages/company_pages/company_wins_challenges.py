@@ -1061,15 +1061,32 @@ def display_wins_challenges_sections(balance_data, income_data):
     def _render_wc_text(text):
         """Render W&C text with proper formatting for existing stored data."""
         t = html.escape(text)
-        # Paragraph breaks
-        t = t.replace('\n\n', '<br><br>').replace('\n', '<br>')
-        # Inline sub-bullets: " -Capital" → line break before the dash
-        t = re.sub(r' -([A-Z])', r'<br>-\1', t)
-        # Add extra spacing between a colon-ending line and the sub-bullets that follow
-        t = re.sub(r'(:<br>)(-)', r'\1<br>\2', t)
-        # Single *emphasis* → italic
+        # Single *emphasis* → italic (before line processing)
         t = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', t)
-        return t
+        # Inline sub-bullets without a newline: " -Capital" → real newline before dash
+        t = re.sub(r' -([A-Z])', r'\n-\1', t)
+
+        # Process line by line to control spacing intelligently
+        lines = t.split('\n')
+        parts = []
+        for i, line in enumerate(lines):
+            if i == 0:
+                parts.append(line)
+                continue
+            prev = lines[i - 1].strip()
+            curr = line.strip()
+            if not curr:
+                # Empty line → paragraph break
+                parts.append('<br><br>')
+            elif curr.startswith('-') and prev and not prev.startswith('-'):
+                # Transition from body/header text into sub-bullets → add gap
+                parts.append('<br><br>' + line)
+            elif prev == '':
+                # Line after a paragraph break — separator already emitted
+                parts.append(line)
+            else:
+                parts.append('<br>' + line)
+        return ''.join(parts)
 
     with col1:
         if wins:
