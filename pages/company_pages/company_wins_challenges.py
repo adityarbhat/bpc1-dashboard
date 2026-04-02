@@ -1079,8 +1079,8 @@ def display_wins_challenges_sections(balance_data, income_data):
                 # Empty line → paragraph break
                 parts.append('<br><br>')
             elif curr.startswith('-') and prev and not prev.startswith('-'):
-                # Transition from body/header text into sub-bullets → add gap
-                parts.append('<br><br>' + line)
+                # Transition from body/header text into sub-bullets → add half-line gap
+                parts.append('<br><span style="display:block;height:0.5em"></span>' + line)
             elif prev == '':
                 # Line after a paragraph break — separator already emitted
                 parts.append(line)
