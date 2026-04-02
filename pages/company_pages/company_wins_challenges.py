@@ -982,8 +982,8 @@ def display_wins_challenges_sections(balance_data, income_data):
     .wins-list li, .challenges-list li {
         padding: 0.35rem 0;
         border-bottom: 1px solid #e2e8f0;
-        font-size: 0.9rem;
-        line-height: 1.4;
+        font-size: 1rem;
+        line-height: 1.6;
     }
     .wins-list li:last-child, .challenges-list li:last-child {
         border-bottom: none;
@@ -1024,8 +1024,8 @@ def display_wins_challenges_sections(balance_data, income_data):
     .action-items-list li {
         padding: 0.35rem 0;
         border-bottom: 1px solid #e2e8f0;
-        font-size: 0.9rem;
-        line-height: 1.4;
+        font-size: 1rem;
+        line-height: 1.6;
     }
     .action-items-list li:last-child {
         border-bottom: none;
@@ -1065,6 +1065,8 @@ def display_wins_challenges_sections(balance_data, income_data):
         t = t.replace('\n\n', '<br><br>').replace('\n', '<br>')
         # Inline sub-bullets: " -Capital" → line break before the dash
         t = re.sub(r' -([A-Z])', r'<br>-\1', t)
+        # Add extra spacing between a colon-ending line and the sub-bullets that follow
+        t = re.sub(r'(:<br>)(-)', r'\1<br>\2', t)
         # Single *emphasis* → italic
         t = re.sub(r'\*([^*]+)\*', r'<em>\1</em>', t)
         return t
