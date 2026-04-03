@@ -623,7 +623,9 @@ def display_ratio_trends_table(balance_data, income_data):
                 # Income Statement metrics
                 trends_data['income_statement']['Gross Profit Margin'][year] = record.get('gpm', '')
                 trends_data['income_statement']['Operating Profit Margin'][year] = record.get('opm', '')
-                trends_data['income_statement']['Net Profit Margin'][year] = record.get('npm', '')
+                _npm_net_profit = record.get('net_profit', 0) or 0
+                _npm_revenue = record.get('total_revenue', 0) or 0
+                trends_data['income_statement']['Net Profit Margin'][year] = (_npm_net_profit / _npm_revenue) if _npm_revenue > 0 else record.get('npm', '')
                 trends_data['income_statement']['Revenue Per Admin Employee'][year] = record.get('rev_admin_employee', '')
                 trends_data['income_statement']['EBITDA/Revenue'][year] = record.get('ebitda_margin', '')
 

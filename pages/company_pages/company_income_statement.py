@@ -450,8 +450,10 @@ def display_key_numbers_section(income_data):
             render_gauge_with_formula(fig2, "opm")
         
         with col3:
-            # Net Profit Margin Gauge (using npm field from Airtable)
-            npm_value = latest_income.get('npm', 0) * 100 if latest_income.get('npm') else 0
+            # Net Profit Margin Gauge (computed from net_profit / total_revenue for accuracy)
+            _npm_net_profit = latest_income.get('net_profit', 0) or 0
+            _npm_revenue = latest_income.get('total_revenue', 0) or 0
+            npm_value = (_npm_net_profit / _npm_revenue * 100) if _npm_revenue > 0 else 0
             fig3 = create_gauge_chart(
                 value=npm_value,
                 title="Net Profit<br>Margin",
@@ -572,19 +574,15 @@ def display_revenue_profitability_chart(company_name, income_historical_data):
             gpm = record.get('gpm', 0) * 100 if record.get('gpm') else 0
             opm = record.get('opm', 0) * 100 if record.get('opm') else 0
 
-            # Check if npm field exists and has a value
-            npm_raw = record.get('npm')
-            if npm_raw is not None and npm_raw != 0:
-                npm = npm_raw * 100
-            else:
-                # If npm is null or 0, set to 0 (no sample data)
-                npm = 0
-
             # Get total revenue data - be flexible with field names
             total_revenue = record.get('total_revenue', 0) or record.get('Total_Revenue', 0) or record.get('totalrevenue', 0)
             if not total_revenue:
                 # Check alternative field names
                 total_revenue = record.get('revenue', 0) or record.get('Revenue', 0) or record.get('total_rev', 0) or record.get('sales', 0)
+
+            # Compute NPM from net_profit / total_revenue for accuracy
+            _npm_net_profit = record.get('net_profit', 0) or 0
+            npm = (_npm_net_profit / total_revenue * 100) if total_revenue > 0 else 0
 
             # Only add data if we have valid values
             if total_revenue and total_revenue != 0:
@@ -2178,8 +2176,10 @@ def display_net_profit_margin_trend(company_name, airtable):
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
-                # Get net profit margin as percentage
-                npm = record.get('npm', 0) * 100 if record.get('npm') else 0
+                # Compute NPM from net_profit / total_revenue for accuracy
+                _npm_net_profit = record.get('net_profit', 0) or 0
+                _npm_revenue = record.get('total_revenue', 0) or 0
+                npm = (_npm_net_profit / _npm_revenue * 100) if _npm_revenue > 0 else 0
                 
                 npm_data['Year'].append(int(year))
                 npm_data['Net Profit Margin'].append(npm)
