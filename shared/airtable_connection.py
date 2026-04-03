@@ -181,6 +181,7 @@ class AirtableConnection:
                         # Additional income statement fields for charts
                         'total_revenue': _parse_percentage_or_float(fields.get('total_revenue', 0)),
                         'total_cost_of_revenue': _parse_percentage_or_float(fields.get('total_cost_of_revenue', 0)),
+                        'gross_profit': _parse_percentage_or_float(fields.get('gross_profit', 0)),
                         'total_operating_expenses': _parse_percentage_or_float(fields.get('total_operating_expenses', 0)),
                         'operating_profit': _parse_percentage_or_float(fields.get('operating_profit', 0)),
                         'profit_before_tax_with_ppp': _parse_percentage_or_float(fields.get('profit_before_tax_with_ppp', 0)),

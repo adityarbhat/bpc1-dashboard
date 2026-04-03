@@ -422,8 +422,10 @@ def display_key_numbers_section(income_data):
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
-            # Gross Profit Margin Gauge (matches ratios page)
-            gpm_value = latest_income.get('gpm', 0) * 100 if latest_income.get('gpm') else 0
+            # Gross Profit Margin Gauge (computed from gross_profit / total_revenue for accuracy)
+            _gpm_gross_profit = latest_income.get('gross_profit', 0) or 0
+            _gpm_revenue = latest_income.get('total_revenue', 0) or 0
+            gpm_value = (_gpm_gross_profit / _gpm_revenue * 100) if _gpm_revenue > 0 else 0
             fig1 = create_gauge_chart(
                 value=gpm_value,
                 title="Gross Profit<br>Margin",
@@ -436,8 +438,10 @@ def display_key_numbers_section(income_data):
             render_gauge_with_formula(fig1, "gpm")
         
         with col2:
-            # Operating Profit Margin Gauge (matches ratios page)
-            opm_value = latest_income.get('opm', 0) * 100 if latest_income.get('opm') else 0
+            # Operating Profit Margin Gauge (computed from operating_profit / total_revenue for accuracy)
+            _opm_op_profit = latest_income.get('operating_profit', 0) or 0
+            _opm_revenue = latest_income.get('total_revenue', 0) or 0
+            opm_value = (_opm_op_profit / _opm_revenue * 100) if _opm_revenue > 0 else 0
             fig2 = create_gauge_chart(
                 value=opm_value,
                 title="Operating Profit<br>Margin",
@@ -570,15 +574,17 @@ def display_revenue_profitability_chart(company_name, income_historical_data):
         if year in income_historical_data and income_historical_data[year]:
             record = income_historical_data[year]
 
-            # Get margin data (convert from decimal to percentage)
-            gpm = record.get('gpm', 0) * 100 if record.get('gpm') else 0
-            opm = record.get('opm', 0) * 100 if record.get('opm') else 0
-
             # Get total revenue data - be flexible with field names
             total_revenue = record.get('total_revenue', 0) or record.get('Total_Revenue', 0) or record.get('totalrevenue', 0)
             if not total_revenue:
                 # Check alternative field names
                 total_revenue = record.get('revenue', 0) or record.get('Revenue', 0) or record.get('total_rev', 0) or record.get('sales', 0)
+
+            # Compute margins from dollar fields for accuracy
+            _gpm_gross = record.get('gross_profit', 0) or 0
+            _opm_op = record.get('operating_profit', 0) or 0
+            gpm = (_gpm_gross / total_revenue * 100) if total_revenue > 0 else 0
+            opm = (_opm_op / total_revenue * 100) if total_revenue > 0 else 0
 
             # Compute NPM from net_profit / total_revenue for accuracy
             _npm_net_profit = record.get('net_profit', 0) or 0
@@ -1936,8 +1942,10 @@ def display_operating_profit_margin_trend(company_name, airtable):
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
-                # Get operating profit margin as percentage
-                opm = record.get('opm', 0) * 100 if record.get('opm') else 0
+                # Compute OPM from operating_profit / total_revenue for accuracy
+                _opm_op = record.get('operating_profit', 0) or 0
+                _opm_rev = record.get('total_revenue', 0) or 0
+                opm = (_opm_op / _opm_rev * 100) if _opm_rev > 0 else 0
                 
                 opm_data['Year'].append(int(year))
                 opm_data['Operating Profit Margin'].append(opm)
@@ -2056,8 +2064,10 @@ def display_gross_profit_margin_trend(company_name, airtable):
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
-                # Get gross profit margin as percentage
-                gpm = record.get('gpm', 0) * 100 if record.get('gpm') else 0
+                # Compute GPM from gross_profit / total_revenue for accuracy
+                _gpm_gross = record.get('gross_profit', 0) or 0
+                _gpm_rev = record.get('total_revenue', 0) or 0
+                gpm = (_gpm_gross / _gpm_rev * 100) if _gpm_rev > 0 else 0
                 
                 gpm_data['Year'].append(int(year))
                 gpm_data['Gross Profit Margin'].append(gpm)
