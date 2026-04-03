@@ -246,49 +246,57 @@ def create_data_input_sidebar():
                 uploaded_file = None
 
         if uploaded_file:
-            from pages.data_input.excel_parser import parse_consolidated_excel
-            with st.spinner("Parsing both Income Statement and Balance Sheet..."):
-                results, warnings = parse_consolidated_excel(uploaded_file)
+            # Only process the file once — the file_uploader widget retains the file
+            # between reruns, so without this guard every rerun (including data_editor
+            # cell edits) would re-parse the file and overwrite manual edits.
+            file_fingerprint = f"{uploaded_file.name}_{uploaded_file.size}"
+            if st.session_state.get('last_processed_upload_file') != file_fingerprint:
+                from pages.data_input.excel_parser import parse_consolidated_excel
+                with st.spinner("Parsing both Income Statement and Balance Sheet..."):
+                    results, warnings = parse_consolidated_excel(uploaded_file)
 
-            # Update Income Statement data
-            if results['is_matched'] > 0:
-                if 'is_input_data' not in st.session_state:
-                    st.session_state.is_input_data = {}
-                st.session_state.is_input_data.update(results['is_data'])
-                st.session_state.is_submitted = False  # Re-enable submit button
-                # Increment version so data_editor widgets reinitialize with fresh data
-                st.session_state.is_upload_version = st.session_state.get('is_upload_version', 0) + 1
-                st.success(f"✅ Income Statement: {results['is_matched']} items loaded")
+                # Update Income Statement data
+                if results['is_matched'] > 0:
+                    if 'is_input_data' not in st.session_state:
+                        st.session_state.is_input_data = {}
+                    st.session_state.is_input_data.update(results['is_data'])
+                    st.session_state.is_submitted = False  # Re-enable submit button
+                    # Increment version so data_editor widgets reinitialize with fresh data
+                    st.session_state.is_upload_version = st.session_state.get('is_upload_version', 0) + 1
+                    st.success(f"✅ Income Statement: {results['is_matched']} items loaded")
 
-            # Update Balance Sheet data
-            if results['bs_matched'] > 0:
-                if 'bs_input_data' not in st.session_state:
-                    st.session_state.bs_input_data = {}
-                st.session_state.bs_input_data.update(results['bs_data'])
-                st.session_state.bs_submitted = False  # Re-enable submit button
-                # Increment version so data_editor widgets reinitialize with fresh data
-                st.session_state.bs_upload_version = st.session_state.get('bs_upload_version', 0) + 1
-                st.success(f"✅ Balance Sheet: {results['bs_matched']} items loaded")
+                # Update Balance Sheet data
+                if results['bs_matched'] > 0:
+                    if 'bs_input_data' not in st.session_state:
+                        st.session_state.bs_input_data = {}
+                    st.session_state.bs_input_data.update(results['bs_data'])
+                    st.session_state.bs_submitted = False  # Re-enable submit button
+                    # Increment version so data_editor widgets reinitialize with fresh data
+                    st.session_state.bs_upload_version = st.session_state.get('bs_upload_version', 0) + 1
+                    st.success(f"✅ Balance Sheet: {results['bs_matched']} items loaded")
 
-                # Check balance
-                if results['is_balanced']:
-                    st.success("✅ Balance Sheet is balanced")
-                else:
-                    st.warning(f"⚠️ Balance Sheet unbalanced by: ${abs(results['balance_difference']):,.2f}")
+                    # Check balance
+                    if results['is_balanced']:
+                        st.success("✅ Balance Sheet is balanced")
+                    else:
+                        st.warning(f"⚠️ Balance Sheet unbalanced by: ${abs(results['balance_difference']):,.2f}")
 
-            # Show warnings (limit to first 3)
-            if warnings:
-                for warning in warnings[:3]:
-                    st.warning(warning)
+                # Show warnings (limit to first 3)
+                if warnings:
+                    for warning in warnings[:3]:
+                        st.warning(warning)
 
-            # Show unmatched items summary
-            total_unmatched = len(results['is_unmatched']) + len(results['bs_unmatched'])
-            if total_unmatched > 0:
-                st.info(f"⚠️ {total_unmatched} unmatched items (IS: {len(results['is_unmatched'])}, BS: {len(results['bs_unmatched'])})")
+                # Show unmatched items summary
+                total_unmatched = len(results['is_unmatched']) + len(results['bs_unmatched'])
+                if total_unmatched > 0:
+                    st.info(f"⚠️ {total_unmatched} unmatched items (IS: {len(results['is_unmatched'])}, BS: {len(results['bs_unmatched'])})")
 
-            # Show success message if both sheets loaded
-            if results['is_matched'] > 0 and results['bs_matched'] > 0:
-                st.success("🎉 Both sheets loaded successfully! Data is now populated in the forms below.")
+                # Show success message if both sheets loaded
+                if results['is_matched'] > 0 and results['bs_matched'] > 0:
+                    st.success("🎉 Both sheets loaded successfully! Data is now populated in the forms below.")
+
+                # Mark this file as processed so reruns don't re-parse it
+                st.session_state.last_processed_upload_file = file_fingerprint
 
 
 def create_income_statement_input(company_name, period_name, year):
