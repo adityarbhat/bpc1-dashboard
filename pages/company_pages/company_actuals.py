@@ -806,7 +806,22 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
                     ]
                     total_direct = sum(income_record.get(field, 0) or 0 for field in direct_expense_fields)
                     table_data[item_name][year] = total_direct
-                elif field_name in ['gross_profit', 'gpm', 'opm', 'npm', 'ebitda', 'net_profit']:
+                elif field_name == 'gpm':
+                    _rev = income_record.get('total_revenue', 0) or 0
+                    _gp = income_record.get('gross_profit', 0) or 0
+                    value = (_gp / _rev) if _rev > 0 else (income_record.get('gpm', 0) or 0)
+                    table_data[item_name][year] = value
+                elif field_name == 'opm':
+                    _rev = income_record.get('total_revenue', 0) or 0
+                    _op = income_record.get('operating_profit', 0) or 0
+                    value = (_op / _rev) if _rev > 0 else (income_record.get('opm', 0) or 0)
+                    table_data[item_name][year] = value
+                elif field_name == 'npm':
+                    _rev = income_record.get('total_revenue', 0) or 0
+                    _np = income_record.get('net_profit', 0) or 0
+                    value = (_np / _rev) if _rev > 0 else (income_record.get('npm', 0) or 0)
+                    table_data[item_name][year] = value
+                elif field_name in ['gross_profit', 'ebitda', 'net_profit']:
                     # Get from income statement data
                     value = income_record.get(field_name, 0) or 0
                     # EBITDA is stored in thousands in Airtable — convert to full dollars
