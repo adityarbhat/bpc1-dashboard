@@ -579,16 +579,22 @@ def display_ratio_trends_table(balance_data, income_data):
     # Fetch data for each year
     for year in years:
         period_filter = f"{year} Annual"
-        
+        _balance_record_for_year = None
+
         # Get balance sheet data for this year
         try:
             balance_historical = airtable.get_balance_sheet_data_by_period(st.session_state.selected_company_name, period_filter, is_admin=is_super_admin())
             if balance_historical:
                 record = balance_historical[0]  # Get first record for this period
+                _balance_record_for_year = record
 
-                # Balance Sheet metrics
-                trends_data['balance_sheet']['Current Ratio (Liquidity)'][year] = record.get('current_ratio', '')
-                trends_data['balance_sheet']['Debt to Equity (Safety)'][year] = record.get('debt_to_equity', '')
+                # Balance Sheet metrics — computed from dollar fields to avoid stale stored ratios
+                _bs_ca = record.get('total_current_assets', 0) or 0
+                _bs_cl = record.get('total_current_liabilities', 0) or 0
+                _bs_liab = record.get('total_liabilities', 0) or 0
+                _bs_eq = record.get('owners_equity', 0) or 0
+                trends_data['balance_sheet']['Current Ratio (Liquidity)'][year] = (_bs_ca / _bs_cl) if _bs_cl > 0 else record.get('current_ratio', '')
+                trends_data['balance_sheet']['Debt to Equity (Safety)'][year] = (_bs_liab / _bs_eq) if _bs_eq > 0 else record.get('debt_to_equity', '')
                 trends_data['balance_sheet']['Working Capital as % of Total Assets'][year] = record.get('working_capital_pct_asset', '')
                 trends_data['balance_sheet']['Survival Score'][year] = record.get('survival_score', '')
                 
@@ -625,15 +631,16 @@ def display_ratio_trends_table(balance_data, income_data):
                 _gpm_gross = record.get('gross_profit', 0) or 0
                 _opm_op = record.get('operating_profit', 0) or 0
                 _npm_net = record.get('net_profit', 0) or 0
-                _ebitda = record.get('ebitda', 0) or 0
+                _ebitda_dep = record.get('depreciation', 0) or 0
                 trends_data['income_statement']['Gross Profit Margin'][year] = (_gpm_gross / _ratio_rev) if _ratio_rev > 0 else record.get('gpm', '')
                 trends_data['income_statement']['Operating Profit Margin'][year] = (_opm_op / _ratio_rev) if _ratio_rev > 0 else record.get('opm', '')
                 trends_data['income_statement']['Net Profit Margin'][year] = (_npm_net / _ratio_rev) if _ratio_rev > 0 else record.get('npm', '')
                 trends_data['income_statement']['Revenue Per Admin Employee'][year] = record.get('rev_admin_employee', '')
-                trends_data['income_statement']['EBITDA/Revenue'][year] = (_ebitda / _ratio_rev) if _ratio_rev > 0 else record.get('ebitda_margin', '')
+                trends_data['income_statement']['EBITDA/Revenue'][year] = ((_opm_op + _ebitda_dep) / _ratio_rev) if _ratio_rev > 0 else record.get('ebitda_margin', '')
 
-                # Sales/Assets metric (from income statement table)
-                trends_data['balance_sheet']['Sales/Assets'][year] = record.get('sales_assets', '')
+                # Sales/Assets: Revenue / Total Assets (cross-referenced with balance sheet record)
+                _sa_total_assets = (_balance_record_for_year.get('total_assets', 0) or 0) if _balance_record_for_year else 0
+                trends_data['balance_sheet']['Sales/Assets'][year] = (_ratio_rev / _sa_total_assets) if _sa_total_assets > 0 else record.get('sales_assets', '')
             else:
                 # Set empty values if no data found
                 for metric in trends_data['income_statement']:
@@ -816,8 +823,11 @@ def display_ratios_sections(balance_data, income_data):
         col1, col2, col3, col4 = st.columns(4)
         
         with col1:
+            _cr_ca = latest_balance.get('total_current_assets', 0) or 0
+            _cr_cl = latest_balance.get('total_current_liabilities', 0) or 0
+            _computed_cr = (_cr_ca / _cr_cl) if _cr_cl > 0 else (latest_balance.get('current_ratio', 0) or 0)
             fig1 = create_gauge_chart(
-                value=latest_balance['current_ratio'],
+                value=_computed_cr,
                 title="Current Ratio<br>(Liquidity)",
                 min_val=0,
                 max_val=3,
@@ -826,10 +836,13 @@ def display_ratios_sections(balance_data, income_data):
                 format_type="ratio"
             )
             render_gauge_with_formula(fig1, "current_ratio")
-        
+
         with col2:
+            _de_liab = latest_balance.get('total_liabilities', 0) or 0
+            _de_eq = latest_balance.get('owners_equity', 0) or 0
+            _computed_de = (_de_liab / _de_eq) if _de_eq > 0 else (latest_balance.get('debt_to_equity', 0) or 0)
             fig2 = create_gauge_chart(
-                value=latest_balance['debt_to_equity'],
+                value=_computed_de,
                 title="Debt-to-Equity<br>(Safety)",
                 min_val=0,
                 max_val=3,
@@ -873,12 +886,21 @@ def display_ratios_sections(balance_data, income_data):
     
     if income_data:
         latest_income = income_data[0]  # Get most recent data
-        
+
+        # Compute margins from dollar fields to avoid stale stored ratios
+        _gi_rev = latest_income.get('total_revenue', 0) or 0
+        _gi_gp = latest_income.get('gross_profit', 0) or 0
+        _gi_op = latest_income.get('operating_profit', 0) or 0
+        _gi_dep = latest_income.get('depreciation', 0) or 0
+        _computed_gpm = (_gi_gp / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('gpm', 0) or 0) * 100
+        _computed_opm = (_gi_op / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('opm', 0) or 0) * 100
+        _computed_ebitda_margin = ((_gi_op + _gi_dep) / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('ebitda_margin', 0) or 0) * 100
+
         col1, col2, col3, col4 = st.columns(4)
-        
+
         with col1:
             fig5 = create_gauge_chart(
-                value=latest_income['gpm']*100,
+                value=_computed_gpm,
                 title="Gross Profit<br>Margin",
                 min_val=0,
                 max_val=50,
@@ -887,10 +909,10 @@ def display_ratios_sections(balance_data, income_data):
                 format_type="percent"
             )
             render_gauge_with_formula(fig5, "gpm")
-        
+
         with col2:
             fig6 = create_gauge_chart(
-                value=latest_income['opm']*100,
+                value=_computed_opm,
                 title="Operating Profit<br>Margin",
                 min_val=0,
                 max_val=15,
@@ -899,7 +921,7 @@ def display_ratios_sections(balance_data, income_data):
                 format_type="percent"
             )
             render_gauge_with_formula(fig6, "opm")
-        
+
         with col3:
             # Convert to hundreds of thousands for display
             rev_per_employee_hundreds = latest_income['rev_admin_employee']  if latest_income['rev_admin_employee'] else 0
@@ -913,10 +935,10 @@ def display_ratios_sections(balance_data, income_data):
                 format_type="currency_k"
             )
             render_gauge_with_formula(fig7, "rev_admin_employee")
-        
+
         with col4:
             fig8 = create_gauge_chart(
-                value=latest_income['ebitda_margin']*100,
+                value=_computed_ebitda_margin,
                 title="EBITDA/<br>Revenue",
                 min_val=0,
                 max_val=10,

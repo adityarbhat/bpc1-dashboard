@@ -432,7 +432,9 @@ def display_key_numbers_section(balance_data):
         
         with col1:
             # Current Ratio Gauge
-            current_ratio = latest_balance.get('current_ratio', 0)
+            _cr_ca = latest_balance.get('total_current_assets', 0) or 0
+            _cr_cl = latest_balance.get('total_current_liabilities', 0) or 0
+            current_ratio = (_cr_ca / _cr_cl) if _cr_cl > 0 else (latest_balance.get('current_ratio', 0) or 0)
             fig1 = create_gauge_chart(
                 value=current_ratio,
                 title="Current Ratio<br>(Liquidity)",
@@ -443,10 +445,12 @@ def display_key_numbers_section(balance_data):
                 format_type="ratio"
             )
             render_gauge_with_formula(fig1, "current_ratio")
-        
+
         with col2:
             # Debt to Equity Gauge
-            debt_to_equity = latest_balance.get('debt_to_equity', 0)
+            _de_liab = latest_balance.get('total_liabilities', 0) or 0
+            _de_eq = latest_balance.get('owners_equity', 0) or 0
+            debt_to_equity = (_de_liab / _de_eq) if _de_eq > 0 else (latest_balance.get('debt_to_equity', 0) or 0)
             fig2 = create_gauge_chart(
                 value=debt_to_equity,
                 title="Debt-to-Equity<br>(Safety)",
@@ -837,8 +841,10 @@ def display_current_ratio_trend_chart(company_name, years, airtable):
             balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
-                current_ratio = record.get('current_ratio', 0) or 0
-                
+                _cr_ca = record.get('total_current_assets', 0) or 0
+                _cr_cl = record.get('total_current_liabilities', 0) or 0
+                current_ratio = (_cr_ca / _cr_cl) if _cr_cl > 0 else (record.get('current_ratio', 0) or 0)
+
                 # Only add data if we have real values
                 if current_ratio:
                     ratio_data['Year'].append(int(year))
@@ -949,8 +955,10 @@ def display_debt_to_equity_trend_chart(company_name, years, airtable):
             balance_historical = airtable.get_balance_sheet_data_by_period(company_name, period_filter, is_admin=is_super_admin())
             if balance_historical and len(balance_historical) > 0:
                 record = balance_historical[0]
-                debt_to_equity = record.get('debt_to_equity', 0) or 0
-                
+                _de_liab = record.get('total_liabilities', 0) or 0
+                _de_eq = record.get('owners_equity', 0) or 0
+                debt_to_equity = (_de_liab / _de_eq) if _de_eq > 0 else (record.get('debt_to_equity', 0) or 0)
+
                 # Only add data if we have real values
                 if debt_to_equity:
                     ratio_data['Year'].append(int(year))

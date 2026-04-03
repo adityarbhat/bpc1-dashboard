@@ -54,11 +54,17 @@ def fetch_group_ratio_data(period):
             ratio_data[company_name] = {}
 
         # Extract balance sheet ratios
+        _grp_total_assets = 0
         if balance_data and len(balance_data) > 0:
             balance_record = balance_data[0]
+            _grp_cr_ca = balance_record.get('total_current_assets', 0) or 0
+            _grp_cr_cl = balance_record.get('total_current_liabilities', 0) or 0
+            _grp_de_liab = balance_record.get('total_liabilities', 0) or 0
+            _grp_de_eq = balance_record.get('owners_equity', 0) or 0
+            _grp_total_assets = balance_record.get('total_assets', 0) or 0
             ratio_data[company_name].update({
-                'current_ratio': balance_record.get('current_ratio', 0),
-                'debt_to_equity': balance_record.get('debt_to_equity', 0),
+                'current_ratio': (_grp_cr_ca / _grp_cr_cl) if _grp_cr_cl > 0 else balance_record.get('current_ratio', 0),
+                'debt_to_equity': (_grp_de_liab / _grp_de_eq) if _grp_de_eq > 0 else balance_record.get('debt_to_equity', 0),
                 'working_capital_pct': balance_record.get('working_capital_pct_asset', 0),
                 'survival_score': balance_record.get('survival_score', 0),
                 'dso': balance_record.get('dso', 0)
@@ -82,8 +88,8 @@ def fetch_group_ratio_data(period):
                 'opm': (income_record.get('operating_profit', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('opm', 0),
                 'npm': (income_record.get('net_profit', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('npm', 0),
                 'rev_per_employee': income_record.get('rev_admin_employee', 0),
-                'ebitda_margin': (income_record.get('ebitda', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('ebitda_margin', 0),
-                'sales_assets': income_record.get('sales_assets', 0) or 0
+                'ebitda_margin': ((income_record.get('operating_profit', 0) or 0) + (income_record.get('depreciation', 0) or 0)) / _grp_rev if _grp_rev > 0 else income_record.get('ebitda_margin', 0),
+                'sales_assets': (_grp_rev / _grp_total_assets) if _grp_total_assets > 0 else income_record.get('sales_assets', 0)
             })
 
     if not ratio_data:
