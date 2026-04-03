@@ -450,9 +450,21 @@ def create_multi_year_table(multi_year_data):
                     <th class="metric-header">Metric</th>
     '''
 
+    # IMAI competition standards for each metric (from Ratios sheet)
+    standards = {
+        'Gross Profit':      '25–45%',
+        'Operating Profit':  '8%',
+        'Net Profit':        '6%',
+        'Total Cost of Revenue': '—',
+        'Operating Expenses':    '—',
+    }
+
     # Add year headers
     for year in years:
         table_html += f'<th>{year}</th>'
+
+    # Standard column header — dark blue background, golden font (matches Group Avg in company_ratios.py)
+    table_html += '<th style="background-color: #025a9a; color: #ffe082; border: 1px solid #ddd; padding: 12px 16px; text-align: center; font-weight: 600; font-size: 14px;">Standard</th>'
 
     table_html += '''
                 </tr>
@@ -470,6 +482,10 @@ def create_multi_year_table(multi_year_data):
             formatted_value = format_percentage(value)
 
             table_html += f'<td style="background-color: white; text-align: center; font-weight: 600;">{formatted_value}</td>'
+
+        # Standard cell — light blue tint to visually separate from year columns
+        standard_value = standards.get(metric, '—')
+        table_html += f'<td style="background-color: #e3f2fd; text-align: center; font-weight: 600; border: 1px solid #ddd;">{standard_value}</td>'
 
         table_html += '</tr>'
 
@@ -1076,8 +1092,9 @@ def display_wins_challenges_sections(balance_data, income_data):
             prev = lines[i - 1].strip()
             curr = line.strip()
             if not curr:
-                # Empty line → paragraph break
-                parts.append('<br><br>')
+                # Empty line → paragraph break with explicit margin so it renders
+                # visually distinct inside <li>, not just two squished line-feeds
+                parts.append('<span style="display:block;margin-top:0.75em"></span>')
             elif curr.startswith('-') and prev and not prev.startswith('-'):
                 # Transition from body/header text into sub-bullets → add half-line gap
                 parts.append('<br><span style="display:block;height:0.5em"></span>' + line)
