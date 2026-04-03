@@ -101,13 +101,14 @@ class AirtableConnection:
             return []
     
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_balance_sheet_data(_self, company_name=None):
+    def get_balance_sheet_data(_self, company_name=None, is_admin=False):
         """Fetch balance sheet data from Airtable for 2024 Annual period"""
         try:
             url = f"{_self.base_url}/balance_sheet_data"
             if company_name:
                 safe_name = _escape_airtable_value(company_name)
-                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual')"
+                pub_filter = _build_publication_filter(is_admin)
+                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual',{pub_filter})"
                 url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -141,13 +142,14 @@ class AirtableConnection:
             return []
     
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
-    def get_income_statement_data(_self, company_name=None):
+    def get_income_statement_data(_self, company_name=None, is_admin=False):
         """Fetch income statement data from Airtable for 2024 Annual period"""
         try:
             url = f"{_self.base_url}/income_statement_data"
             if company_name:
                 safe_name = _escape_airtable_value(company_name)
-                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual')"
+                pub_filter = _build_publication_filter(is_admin)
+                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual',{pub_filter})"
                 url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)

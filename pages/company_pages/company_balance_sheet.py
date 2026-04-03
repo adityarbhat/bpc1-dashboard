@@ -388,7 +388,7 @@ def create_company_balance_sheet_page():
 
         # Get current year data for compatibility (2024 Annual)
         airtable = get_airtable_connection()
-        balance_data = airtable.get_balance_sheet_data(st.session_state.selected_company_name)
+        balance_data = airtable.get_balance_sheet_data(st.session_state.selected_company_name, is_admin=is_super_admin())
 
         # Check if we have any data to display
         has_historical_data = any(balance_historical_data.values()) or any(income_historical_data.values())

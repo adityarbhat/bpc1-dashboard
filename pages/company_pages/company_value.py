@@ -460,8 +460,8 @@ def create_company_value_page():
 
         # Get data for selected company
         with st.spinner(f"Loading {st.session_state.selected_company_name} value trends..."):
-            balance_data = airtable.get_balance_sheet_data(st.session_state.selected_company_name)
-            income_data = airtable.get_income_statement_data(st.session_state.selected_company_name)
+            balance_data = airtable.get_balance_sheet_data(st.session_state.selected_company_name, is_admin=is_super_admin())
+            income_data = airtable.get_income_statement_data(st.session_state.selected_company_name, is_admin=is_super_admin())
         
         # Check if we have any data to display
         if not balance_data and not income_data:
