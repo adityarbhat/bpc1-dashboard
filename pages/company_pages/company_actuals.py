@@ -818,7 +818,7 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
                     table_data[item_name][year] = value
                 elif field_name == 'npm':
                     _rev = income_record.get('total_revenue', 0) or 0
-                    _np = income_record.get('net_profit', 0) or 0
+                    _np = income_record.get('profit_before_tax_with_ppp', 0) or 0
                     value = (_np / _rev) if _rev > 0 else (income_record.get('npm', 0) or 0)
                     table_data[item_name][year] = value
                 elif field_name in ['gross_profit', 'ebitda', 'net_profit']:

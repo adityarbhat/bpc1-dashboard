@@ -86,9 +86,9 @@ def fetch_group_ratio_data(period):
             ratio_data[company_name].update({
                 'gpm': (income_record.get('gross_profit', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('gpm', 0),
                 'opm': (income_record.get('operating_profit', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('opm', 0),
-                'npm': (income_record.get('net_profit', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('npm', 0),
+                'npm': (income_record.get('profit_before_tax_with_ppp', 0) or 0) / _grp_rev if _grp_rev > 0 else income_record.get('npm', 0),
                 'rev_per_employee': income_record.get('rev_admin_employee', 0),
-                'ebitda_margin': ((income_record.get('operating_profit', 0) or 0) + (income_record.get('depreciation', 0) or 0)) / _grp_rev if _grp_rev > 0 else income_record.get('ebitda_margin', 0),
+                'ebitda_margin': (income_record.get('ebitda', 0) or 0) * 1000 / _grp_rev if _grp_rev > 0 else income_record.get('ebitda_margin', 0),
                 'sales_assets': (_grp_rev / _grp_total_assets) if _grp_total_assets > 0 else income_record.get('sales_assets', 0)
             })
 

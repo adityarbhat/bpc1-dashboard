@@ -454,8 +454,8 @@ def display_key_numbers_section(income_data):
             render_gauge_with_formula(fig2, "opm")
         
         with col3:
-            # Net Profit Margin Gauge (computed from net_profit / total_revenue for accuracy)
-            _npm_net_profit = latest_income.get('net_profit', 0) or 0
+            # Net Profit Margin Gauge (profit_before_tax_with_ppp / total_revenue — matches Excel definition)
+            _npm_net_profit = latest_income.get('profit_before_tax_with_ppp', 0) or 0
             _npm_revenue = latest_income.get('total_revenue', 0) or 0
             npm_value = (_npm_net_profit / _npm_revenue * 100) if _npm_revenue > 0 else 0
             fig3 = create_gauge_chart(
@@ -586,8 +586,8 @@ def display_revenue_profitability_chart(company_name, income_historical_data):
             gpm = (_gpm_gross / total_revenue * 100) if total_revenue > 0 else 0
             opm = (_opm_op / total_revenue * 100) if total_revenue > 0 else 0
 
-            # Compute NPM from net_profit / total_revenue for accuracy
-            _npm_net_profit = record.get('net_profit', 0) or 0
+            # Compute NPM from profit_before_tax_with_ppp / total_revenue (matches Excel definition)
+            _npm_net_profit = record.get('profit_before_tax_with_ppp', 0) or 0
             npm = (_npm_net_profit / total_revenue * 100) if total_revenue > 0 else 0
 
             # Only add data if we have valid values
@@ -2186,8 +2186,8 @@ def display_net_profit_margin_trend(company_name, airtable):
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]
                 
-                # Compute NPM from net_profit / total_revenue for accuracy
-                _npm_net_profit = record.get('net_profit', 0) or 0
+                # Compute NPM from profit_before_tax_with_ppp / total_revenue (matches Excel definition)
+                _npm_net_profit = record.get('profit_before_tax_with_ppp', 0) or 0
                 _npm_revenue = record.get('total_revenue', 0) or 0
                 npm = (_npm_net_profit / _npm_revenue * 100) if _npm_revenue > 0 else 0
                 

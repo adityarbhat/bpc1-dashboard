@@ -630,13 +630,13 @@ def display_ratio_trends_table(balance_data, income_data):
                 _ratio_rev = record.get('total_revenue', 0) or 0
                 _gpm_gross = record.get('gross_profit', 0) or 0
                 _opm_op = record.get('operating_profit', 0) or 0
-                _npm_net = record.get('net_profit', 0) or 0
-                _ebitda_dep = record.get('depreciation', 0) or 0
+                _npm_pbt = record.get('profit_before_tax_with_ppp', 0) or 0
+                _ebitda_val = record.get('ebitda', 0) or 0
                 trends_data['income_statement']['Gross Profit Margin'][year] = (_gpm_gross / _ratio_rev) if _ratio_rev > 0 else record.get('gpm', '')
                 trends_data['income_statement']['Operating Profit Margin'][year] = (_opm_op / _ratio_rev) if _ratio_rev > 0 else record.get('opm', '')
-                trends_data['income_statement']['Net Profit Margin'][year] = (_npm_net / _ratio_rev) if _ratio_rev > 0 else record.get('npm', '')
+                trends_data['income_statement']['Net Profit Margin'][year] = (_npm_pbt / _ratio_rev) if _ratio_rev > 0 else record.get('npm', '')
                 trends_data['income_statement']['Revenue Per Admin Employee'][year] = record.get('rev_admin_employee', '')
-                trends_data['income_statement']['EBITDA/Revenue'][year] = ((_opm_op + _ebitda_dep) / _ratio_rev) if _ratio_rev > 0 else record.get('ebitda_margin', '')
+                trends_data['income_statement']['EBITDA/Revenue'][year] = (_ebitda_val * 1000 / _ratio_rev) if _ratio_rev > 0 else record.get('ebitda_margin', '')
 
                 # Sales/Assets: Revenue / Total Assets (cross-referenced with balance sheet record)
                 _sa_total_assets = (_balance_record_for_year.get('total_assets', 0) or 0) if _balance_record_for_year else 0
@@ -891,10 +891,10 @@ def display_ratios_sections(balance_data, income_data):
         _gi_rev = latest_income.get('total_revenue', 0) or 0
         _gi_gp = latest_income.get('gross_profit', 0) or 0
         _gi_op = latest_income.get('operating_profit', 0) or 0
-        _gi_dep = latest_income.get('depreciation', 0) or 0
+        _gi_ebitda = latest_income.get('ebitda', 0) or 0
         _computed_gpm = (_gi_gp / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('gpm', 0) or 0) * 100
         _computed_opm = (_gi_op / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('opm', 0) or 0) * 100
-        _computed_ebitda_margin = ((_gi_op + _gi_dep) / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('ebitda_margin', 0) or 0) * 100
+        _computed_ebitda_margin = (_gi_ebitda * 1000 / _gi_rev * 100) if _gi_rev > 0 else (latest_income.get('ebitda_margin', 0) or 0) * 100
 
         col1, col2, col3, col4 = st.columns(4)
 

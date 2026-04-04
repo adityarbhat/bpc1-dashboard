@@ -57,7 +57,7 @@ def get_group_averages_for_ebitda(years_with_data):
 
         year_ebitda_values = []
         for income_item in all_income_data:
-            ebitda_value = income_item.get('ebitda_000', 0)
+            ebitda_value = income_item.get('ebitda', 0)
 
             # Add EBITDA value to the list
             if ebitda_value is not None and ebitda_value != 0:
@@ -91,7 +91,7 @@ def get_group_value_averages(year=None):
 
     # Calculate derived fields per company (same logic as group_value.py lines 62-84)
     for comp_name, data in company_data.items():
-        ebitda = data.get('ebitda_000', 0) or 0
+        ebitda = data.get('ebitda', 0) or 0
         debt = data.get('interest_bearing_debt', 0) or 0
         equity_dollars = data.get('owners_equity', 0) or 0
         equity_000 = equity_dollars / 1000 if equity_dollars != 0 else 0
@@ -529,12 +529,8 @@ def display_value_trend_table(company_name):
             if income_historical and len(income_historical) > 0:
                 record = income_historical[0]  # Get the first record for this period
 
-                # Look for EBITDA field (try different possible field names)
-                ebitda_value = None
-                for field_name in ['ebitda_000', 'ebitda', 'total_ebitda']:
-                    if field_name in record and record[field_name] is not None and record[field_name] != '':
-                        ebitda_value = record[field_name]
-                        break
+                # Use the ebitda formula field (matches Excel: PBT + interest_addback + dep)
+                ebitda_value = record.get('ebitda', None)
 
                 if ebitda_value is not None and ebitda_value != '':
                     try:
@@ -1065,7 +1061,8 @@ def display_interest_bearing_debt_trend(company_name, table_data, years_with_dat
         ),
         xaxis=dict(
             title="Year",
-            title_font={'size': 12}
+            title_font={'size': 12},
+            type='category'
         ),
         yaxis=dict(
             title="Amount ($000)",
@@ -1243,7 +1240,8 @@ def display_ebitda_trend(company_name, table_data, years_with_data, show_group_a
         ),
         xaxis=dict(
             title="Year",
-            title_font={'size': 12}
+            title_font={'size': 12},
+            type='category'
         ),
         yaxis=dict(
             title="Amount ($000)",

@@ -473,6 +473,10 @@ class AirtableConnection:
                         'ebitda_margin': _parse_percentage_or_float(fields.get('ebitda_margin', 0)),
                         'sales_assets': _parse_percentage_or_float(fields.get('sales_assets', 0)),
                         'ebitda_000': _parse_percentage_or_float(fields.get('ebitda_000', 0)),
+                        'ebitda': _parse_percentage_or_float(fields.get('ebitda', 0)),
+                        'profit_before_tax_with_ppp': _parse_percentage_or_float(fields.get('profit_before_tax_with_ppp', 0)),
+                        'gross_profit': _parse_percentage_or_float(fields.get('gross_profit', 0)),
+                        'operating_profit': _parse_percentage_or_float(fields.get('operating_profit', 0)),
                         'period': fields.get('period', period),
                         # Add fields needed for admin labor calculation
                         'pr_taxes_benefits': _parse_percentage_or_float(fields.get('pr_taxes_benefits', 0)),

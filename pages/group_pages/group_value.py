@@ -30,7 +30,7 @@ def create_value_trends_comparison_table(company_data, period):
     # value_type: 'currency' = dollar amount, 'ratio' = decimal ratio, 'rank' = rank number
     # is_calculated: True if field needs to be calculated from other fields
     value_items = [
-        ('EBITDA (000)', 'ebitda_000', 'currency', False),
+        ('EBITDA (000)', 'ebitda', 'currency', False),
         ('3 x EBITDA (000)', '3x_ebitda', 'currency', True),  # Calculated: EBITDA * 3
         ('Interest Bearing Debt (000)', 'interest_bearing_debt', 'currency', False),
         ('Company Value (000)', 'company_value', 'currency', True),  # Calculated: 3x EBITDA - Debt
@@ -69,7 +69,7 @@ def create_value_trends_comparison_table(company_data, period):
         data['owners_equity'] = equity / 1000 if equity != 0 else 0
 
         # Calculate 3 x EBITDA
-        ebitda = data.get('ebitda_000', 0) or 0
+        ebitda = data.get('ebitda', 0) or 0
         data['3x_ebitda'] = ebitda * 3
 
         # Calculate Company Value (3 x EBITDA - Interest Bearing Debt)
@@ -428,7 +428,7 @@ def extract_value_data_for_export(period):
 
     # Value trends line items (same as in create_value_trends_comparison_table)
     value_items = [
-        ('EBITDA (000)', 'ebitda_000', 'currency', False),
+        ('EBITDA (000)', 'ebitda', 'currency', False),
         ('3 x EBITDA (000)', '3x_ebitda', 'currency', True),
         ('Interest Bearing Debt (000)', 'interest_bearing_debt', 'currency', False),
         ('Company Value (000)', 'company_value', 'currency', True),
@@ -462,7 +462,7 @@ def extract_value_data_for_export(period):
         data['owners_equity'] = equity / 1000 if equity != 0 else 0
 
         # Calculate 3 x EBITDA
-        ebitda = data.get('ebitda_000', 0) or 0
+        ebitda = data.get('ebitda', 0) or 0
         data['3x_ebitda'] = ebitda * 3
 
         # Calculate Company Value
