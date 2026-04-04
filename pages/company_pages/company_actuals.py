@@ -737,8 +737,8 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
         ('Other Transportation Expenses', 'other_trans_exp', False, False),
         ('Depreciation/Amortization', 'depreciation', False, False),
         ('Total Direct Expenses', 'calculated_total_direct_expenses', True, False),  # Calculated total with light grey
-        ('Gross Profit Margin', 'gross_profit', True, False),  # From income statement table - light grey
-        ('Gross Profit Margin (%)', 'gpm', True, False),  # From income statement table, percentage - light grey
+        ('Gross Profit $', 'gross_profit', True, False),  # From income statement table - light grey
+        ('Gross Profit Margin %', 'gpm', True, False),  # From income statement table, percentage - light grey
         ('Operating Expenses', 'header_operating_expenses', True, True),  # Header row with dark grey
         ('Lease Expense Rev Equip', 'lease_expense_rev_equip', False, False),
         ('Rent', 'rent', False, False),
@@ -767,8 +767,8 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
         ('Travel & Entertainment', 'travel_ent', False, False),
         ('Vehicle Expense - Administrative', 'vehicle_expense_admin', False, False),
         ('Total Operating Expenses', 'total_operating_expenses', True, False),
-        ('Operating Profit Margin', 'operating_profit', True, False),
-        ('Operating Profit Margin (%)', 'opm', True, False),  # Light grey background like rows above
+        ('Operating Profit $', 'operating_profit', True, False),
+        ('Operating Profit Margin %', 'opm', True, False),  # Light grey background like rows above
         ('Other Income & Expense', 'header_other_income_expense', True, True),  # Header row with dark grey
         
         # Non-Operating Section
@@ -778,8 +778,8 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
         ('Interest Expense (-)', 'interest_expense', False, False),
         ('Total Other Income & Expense', 'total_nonoperating_income', True, False),
         ('Profit Before Tax With PPP', 'profit_before_tax_with_ppp', True, False),
-        ('Net Profit Margin', 'net_profit', True, False),  # From income statement table - light grey
-        ('Net Profit Margin (%)', 'npm', True, False),  # From income statement table, percentage - light grey
+        ('Net Profit $', 'net_profit', True, False),  # From income statement table - light grey
+        ('Net Profit Margin %', 'npm', True, False),  # From income statement table, percentage - light grey
         ('EBITDA', 'ebitda', True, False)  # From income statement table - light grey
     ]
     
