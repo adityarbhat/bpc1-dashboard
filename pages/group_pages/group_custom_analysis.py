@@ -152,9 +152,9 @@ METRIC_DEFINITIONS = {
         'field': 'ebitda',
         'type': 'currency',
         'category': 'Value Metrics',
-        'description': 'EBITDA multiplied by 3',
+        'description': 'EBITDA multiplied by 3 (000s)',
         'format': '${:,.0f}',
-        'multiplier': 3000
+        'multiplier': 3
     },
     'Value to Equity': {
         'fields': ['ebitda', 'interest_bearing_debt', 'equity'],
@@ -191,9 +191,8 @@ METRIC_DEFINITIONS = {
         'field': 'ebitda',
         'type': 'currency',
         'category': 'Revenue ($)',
-        'description': 'Earnings Before Interest, Taxes, Depreciation, and Amortization',
-        'format': '${:,.0f}',
-        'multiplier': 1000
+        'description': 'Earnings Before Interest, Taxes, Depreciation, and Amortization (000s)',
+        'format': '${:,.0f}'
     },
     'Gross Profit': {
         'field': 'gross_profit',
@@ -331,16 +330,16 @@ def fetch_metric_data(metric_name, company_list, period):
                 value = value * metric_def['multiplier']
 
         elif metric_def['type'] == 'calculated_currency':
-            # Special calculations
+            # Special calculations — ebitda and interest_bearing_debt are both stored in thousands
             if metric_def['calculation'] == 'company_value':
-                ebitda = (record.get('ebitda', 0) or 0) * 1000  # ebitda stored in thousands
+                ebitda = record.get('ebitda', 0) or 0
                 debt = record.get('interest_bearing_debt', 0) or 0
                 value = (3 * ebitda) - debt
 
         elif metric_def['type'] == 'calculated_ratio':
-            # Special calculations
+            # Special calculations — ebitda and interest_bearing_debt are both stored in thousands
             if metric_def['calculation'] == 'value_to_equity':
-                ebitda = (record.get('ebitda', 0) or 0) * 1000  # ebitda stored in thousands
+                ebitda = record.get('ebitda', 0) or 0
                 debt = record.get('interest_bearing_debt', 0) or 0
                 equity = record.get('equity', 0) or 0
                 company_value = (3 * ebitda) - debt
