@@ -58,18 +58,18 @@ METRIC_DEFINITIONS = {
         'format': '{:.1f}%'
     },
     'EBITDA / Revenue %': {
-        'field': 'ebitda_pct_rev',
-        'type': 'percentage',
+        'type': 'calculated_percentage',
         'category': 'Profitability',
         'description': 'EBITDA as % of revenue',
-        'format': '{:.1f}%'
+        'format': '{:.1f}%',
+        'calculation': 'ebitda_margin_pct'
     },
     'Net Profit Margin': {
-        'field': 'net_income_pct',
-        'type': 'percentage',
+        'type': 'calculated_percentage',
         'category': 'Profitability',
-        'description': 'Net income as % of revenue',
-        'format': '{:.1f}%'
+        'description': 'Profit Before Tax (with PPP) as % of revenue — matches competition Excel definition',
+        'format': '{:.1f}%',
+        'calculation': 'npm_pbt'
     },
 
     # Balance Sheet Ratios
@@ -154,7 +154,7 @@ METRIC_DEFINITIONS = {
         'category': 'Value Metrics',
         'description': 'EBITDA multiplied by 3',
         'format': '${:,.0f}',
-        'multiplier': 3
+        'multiplier': 3000
     },
     'Value to Equity': {
         'fields': ['ebitda', 'interest_bearing_debt', 'equity'],
@@ -192,7 +192,8 @@ METRIC_DEFINITIONS = {
         'type': 'currency',
         'category': 'Revenue ($)',
         'description': 'Earnings Before Interest, Taxes, Depreciation, and Amortization',
-        'format': '${:,.0f}'
+        'format': '${:,.0f}',
+        'multiplier': 1000
     },
     'Gross Profit': {
         'field': 'gross_profit',
@@ -295,18 +296,27 @@ def fetch_metric_data(metric_name, company_list, period):
         value = None
 
         if metric_def['type'] == 'calculated_percentage':
-            # Sum specified fields and calculate percentage of total revenue
+            total_revenue = record.get('total_revenue', 0) or 0
             if metric_def['calculation'] == 'sum_fields_pct_of_total_revenue':
-                total_revenue = record.get('total_revenue', 0) or 0
                 if total_revenue > 0:
                     sum_value = sum([record.get(field, 0) or 0 for field in metric_def['fields']])
                     value = (sum_value / total_revenue) * 100
+            elif metric_def['calculation'] == 'npm_pbt':
+                # Net Profit Margin = Profit Before Tax (with PPP) / Revenue — matches competition Excel definition
+                pbt = record.get('profit_before_tax_with_ppp', 0) or 0
+                if total_revenue > 0:
+                    value = (pbt / total_revenue) * 100
+            elif metric_def['calculation'] == 'ebitda_margin_pct':
+                # EBITDA % = ebitda field (stored in thousands) * 1000 / revenue
+                ebitda = record.get('ebitda', 0) or 0
+                if total_revenue > 0:
+                    value = (ebitda * 1000 / total_revenue) * 100
 
         elif metric_def['type'] == 'percentage':
             # Direct percentage field
             value = record.get(metric_def['field'], 0) or 0
-            # Convert to percentage if stored as decimal
-            if 0 < value < 1:
+            # Convert to percentage if stored as decimal (handles both positive and negative values)
+            if value != 0 and abs(value) < 1:
                 value = value * 100
 
         elif metric_def['type'] == 'ratio':
@@ -323,14 +333,14 @@ def fetch_metric_data(metric_name, company_list, period):
         elif metric_def['type'] == 'calculated_currency':
             # Special calculations
             if metric_def['calculation'] == 'company_value':
-                ebitda = record.get('ebitda', 0) or 0
+                ebitda = (record.get('ebitda', 0) or 0) * 1000  # ebitda stored in thousands
                 debt = record.get('interest_bearing_debt', 0) or 0
                 value = (3 * ebitda) - debt
 
         elif metric_def['type'] == 'calculated_ratio':
             # Special calculations
             if metric_def['calculation'] == 'value_to_equity':
-                ebitda = record.get('ebitda', 0) or 0
+                ebitda = (record.get('ebitda', 0) or 0) * 1000  # ebitda stored in thousands
                 debt = record.get('interest_bearing_debt', 0) or 0
                 equity = record.get('equity', 0) or 0
                 company_value = (3 * ebitda) - debt
