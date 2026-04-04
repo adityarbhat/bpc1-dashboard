@@ -90,7 +90,7 @@ def create_income_statement_comparison_table(company_data, period):
         ('Other Expense (-)', 'other_expense', False, False),
         ('Interest Expense (-)', 'interest_expense', False, False),
         ('Total Other Income / Expense', 'total_nonoperating_income', True, False),
-        ('Net Profit Margin', 'net_profit', True, False)
+        ('Net Profit Margin', 'profit_before_tax_with_ppp', True, False)
     ]
 
     # Get sorted list of companies (excluding companies with no data)
@@ -587,7 +587,7 @@ def extract_income_statement_data_for_export(period):
         ('Other Expense (-)', 'other_expense', False, False),
         ('Interest Expense (-)', 'interest_expense', False, False),
         ('Total Other Income / Expense', 'total_nonoperating_income', True, False),
-        ('Net Profit Margin', 'net_profit', True, False)
+        ('Net Profit Margin', 'profit_before_tax_with_ppp', True, False)
     ]
 
     # Filter companies with data
