@@ -1405,7 +1405,7 @@ def display_income_statement_trend_table(company_name):
         ('Other Expense (-)', 'other_expense', False, False),
         ('Interest Expense (-)', 'interest_expense', False, False),
         ('Total Other Income / Expense (% of Revenue)', 'total_nonoperating_income', True, False),
-        ('Net Profit Margin', 'net_profit', True, False)
+        ('Net Profit Margin', 'profit_before_tax_with_ppp', True, False)
     ]
     
     # Collect data for all years
@@ -1441,7 +1441,7 @@ def display_income_statement_trend_table(company_name):
         for item_name, field_name, is_total, is_major_total in income_statement_items:
             if avg_total_revenue > 0 and field_name != 'total_revenue':
                 avg_field_value = averages_data.get(field_name, 0)
-                if field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit']:
+                if field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit', 'profit_before_tax_with_ppp']:
                     # These are aggregate dollar amounts that need to be calculated as percentage of revenue
                     avg_percentages[field_name] = (avg_field_value / avg_total_revenue) * 100
                 else:
@@ -1472,7 +1472,7 @@ def display_income_statement_trend_table(company_name):
         ]
         
         # Define profit/revenue items (higher is better)
-        profit_items = ['gross_profit', 'operating_profit', 'net_profit']
+        profit_items = ['gross_profit', 'operating_profit', 'net_profit', 'profit_before_tax_with_ppp']
         
         # Check if this is an expense item
         is_expense = (field_name in expense_items or 
@@ -1616,7 +1616,7 @@ def display_income_statement_trend_table(company_name):
             elif field_name == 'total_revenue' and item_name == 'Total Revenue':
                 # Total Revenue row shows 100% (always 100% of itself)
                 formatted_avg = "100%"
-            elif field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit']:
+            elif field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit', 'profit_before_tax_with_ppp']:
                 # These are aggregate dollar amounts that need to be calculated as percentage of average revenue
                 avg_field_value = averages_data.get(field_name, 0)
                 if avg_total_revenue > 0:
@@ -1665,7 +1665,7 @@ def display_income_statement_trend_table(company_name):
                         formatted_value = str(int(rank_value))
                     else:
                         formatted_value = "-"
-                elif field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit']:
+                elif field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit', 'profit_before_tax_with_ppp']:
                     # These are aggregate dollar amounts that need to be calculated as percentage of revenue
                     field_value = record.get(field_name, 0) or 0
                     if total_revenue > 0:
@@ -1702,7 +1702,7 @@ def display_income_statement_trend_table(company_name):
                 if total_revenue > 0:
                     field_value = record.get(field_name, 0) or 0
                     
-                    if field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit']:
+                    if field_name in ['total_cost_of_revenue', 'total_operating_expenses', 'total_nonoperating_income', 'gross_profit', 'operating_profit', 'net_profit', 'profit_before_tax_with_ppp']:
                         # These are aggregate dollar amounts
                         current_pct = (field_value / total_revenue) * 100
                     else:
