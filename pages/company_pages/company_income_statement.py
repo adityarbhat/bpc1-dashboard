@@ -447,8 +447,8 @@ def display_key_numbers_section(income_data):
                 title="Operating Profit<br>Margin",
                 min_val=0,
                 max_val=15,
-                threshold_red=4,
-                threshold_yellow=6.5,
+                threshold_red=3,
+                threshold_yellow=5.5,
                 format_type="percent"
             )
             render_gauge_with_formula(fig2, "opm")
@@ -478,7 +478,7 @@ def display_key_numbers_section(income_data):
                 min_val=0,
                 max_val=800,
                 threshold_red=325,
-                threshold_yellow=580,
+                threshold_yellow=550,
                 format_type="currency_k"
             )
             render_gauge_with_formula(fig4, "rev_admin_employee")

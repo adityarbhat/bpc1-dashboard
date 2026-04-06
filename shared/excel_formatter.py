@@ -45,18 +45,18 @@ THIN_BORDER = Border(
 # ===== RATIO COLOR THRESHOLDS =====
 # Matches group_ratios.py get_cell_color() function (lines 307-319)
 RATIO_THRESHOLDS = {
-    'Current Ratio': {'great': 2.4, 'caution': [1.5, 2.3], 'reverse': False},
-    'Debt to Equity': {'great': 1.1, 'caution': [1.2, 1.7], 'reverse': True},
-    'Working Capital %': {'great': 0.35, 'caution': [0.20, 0.35], 'reverse': False},
+    'Current Ratio': {'great': 2.0, 'caution': [1.2, 2.0], 'reverse': False},
+    'Debt to Equity': {'great': 1.4, 'caution': [1.5, 2.9], 'reverse': True},
+    'Working Capital %': {'great': 0.30, 'caution': [0.15, 0.29], 'reverse': False},
     'Survival Score': {'great': 3.0, 'caution': [2.0, 3.0], 'reverse': False},
     'Sales/Assets': {'great': 3.7, 'caution': [2.0, 3.6], 'reverse': False},
-    'Gross Profit Margin': {'great': 0.25, 'caution': [0.20, 0.2499], 'reverse': False},
-    'Operating Profit Margin': {'great': 0.065, 'caution': [0.04, 0.0649], 'reverse': False},
+    'Gross Profit Margin': {'great': 0.25, 'caution': [0.20, 0.25], 'reverse': False},
+    'Operating Profit Margin': {'great': 0.055, 'caution': [0.03, 0.054], 'reverse': False},
     'Net Profit Margin': {'great': 0.05, 'caution': [0.03, 0.0499], 'reverse': False},
-    'Revenue Per Employee': {'great': 550, 'caution': [325, 549], 'reverse': False},
-    'EBITDA/Revenue': {'great': 0.05, 'caution': [0.03, 0.0499], 'reverse': False},
-    'Days Sales Outstanding (DSO)': {'great': 40, 'caution': [40, 60], 'reverse': True},
-    'OCF/Revenue': {'great': 0.005, 'caution': [-0.005, 0.005], 'reverse': False},
+    'Revenue Per Employee': {'great': 550, 'caution': [325, 550], 'reverse': False},
+    'EBITDA/Revenue': {'great': 0.05, 'caution': [0.025, 0.05], 'reverse': False},
+    'Days Sales Outstanding (DSO)': {'great': 30, 'caution': [30, 60], 'reverse': True},
+    'OCF/Revenue': {'great': 0.0, 'caution': [-0.03, 0.0], 'reverse': False},
     'FCF/Revenue': {'great': 0.005, 'caution': [-0.005, 0.005], 'reverse': False},
     'NCF/Revenue': {'great': 0.005, 'caution': [-0.005, 0.005], 'reverse': False},
 }

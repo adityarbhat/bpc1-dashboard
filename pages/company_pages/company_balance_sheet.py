@@ -440,8 +440,8 @@ def display_key_numbers_section(balance_data):
                 title="Current Ratio<br>(Liquidity)",
                 min_val=0,
                 max_val=8,
-                threshold_red=1.5,
-                threshold_yellow=2.2,
+                threshold_red=1.2,
+                threshold_yellow=2.0,
                 format_type="ratio"
             )
             render_gauge_with_formula(fig1, "current_ratio")
@@ -456,8 +456,8 @@ def display_key_numbers_section(balance_data):
                 title="Debt-to-Equity<br>(Safety)",
                 min_val=0,
                 max_val=3,
-                threshold_red=1.1,
-                threshold_yellow=1.7,
+                threshold_red=1.4,
+                threshold_yellow=2.9,
                 format_type="ratio",
                 reverse_colors=True
             )
@@ -471,8 +471,8 @@ def display_key_numbers_section(balance_data):
                 title="Working Capital<br>% of Assets",
                 min_val=0,
                 max_val=50,
-                threshold_red=20,
-                threshold_yellow=35,
+                threshold_red=15,
+                threshold_yellow=30,
                 format_type="percent"
             )
             render_gauge_with_formula(fig3, "working_capital_pct")

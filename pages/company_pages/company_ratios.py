@@ -406,16 +406,16 @@ def get_cell_color(value, metric_name):
     # NOTE: Percentage metrics (working_capital_pct, gpm, opm, ebitda_margin) use decimal values
     # because Airtable stores them as decimals (e.g., 0.53 for 53%)
     thresholds = {
-        'current_ratio': {'great': 2.3, 'caution': [1.5, 2.2], 'improve': 1.5},
-        'debt_to_equity': {'great': 1.1, 'caution': [1.2, 1.7], 'improve': 1.7, 'reverse': True},  # Lower is better
-        'working_capital_pct': {'great': 0.35, 'caution': [0.20, 0.35], 'improve': 0.20},  # Decimal (0.35 = 35%)
+        'current_ratio': {'great': 2.0, 'caution': [1.2, 2.0], 'improve': 1.3},
+        'debt_to_equity': {'great': 1.4, 'caution': [1.5, 2.9], 'improve': 3.0, 'reverse': True},  # Lower is better
+        'working_capital_pct': {'great': 0.30, 'caution': [0.15, 0.29], 'improve': 0.15},  # Decimal (0.30 = 30%)
         'survival_score': {'great': 3.0, 'caution': [2.0, 3.0], 'improve': 2.0},
         'gpm': {'great': 0.25, 'caution': [0.20, 0.25], 'improve': 0.20},  # Decimal (0.25 = 25%)
-        'opm': {'great': 0.065, 'caution': [0.04, 0.065], 'improve': 0.04},  # Decimal (0.065 = 6.5%)
-        'rev_per_employee': {'great': 580, 'caution': [325, 580], 'improve': 325},  # In thousands
-        'ebitda_margin': {'great': 0.05, 'caution': [0.03, 0.05], 'improve': 0.03},  # Decimal (0.05 = 5%)
-        'dso': {'great': 40, 'caution': [40, 60], 'improve': 60, 'reverse': True},  # Lower is better
-        'ocf_rev': {'great': 0.005, 'caution': [-0.005, 0.005], 'improve': -0.005},  # Decimal (0.005 = 0.5%)
+        'opm': {'great': 0.055, 'caution': [0.03, 0.054], 'improve': 0.03},  # Decimal (0.055 = 5.5%)
+        'rev_per_employee': {'great': 550, 'caution': [325, 550], 'improve': 325},  # In thousands
+        'ebitda_margin': {'great': 0.05, 'caution': [0.025, 0.05], 'improve': 0.025},  # Decimal (0.05 = 5%)
+        'dso': {'great': 30, 'caution': [30, 60], 'improve': 60, 'reverse': True},  # Lower is better
+        'ocf_rev': {'great': 0.0, 'caution': [-0.03, 0.0], 'improve': -0.03},  # Positive = green, 0 to neg 3% = yellow
     }
     
     if metric_name not in thresholds:
@@ -831,8 +831,8 @@ def display_ratios_sections(balance_data, income_data):
                 title="Current Ratio<br>(Liquidity)",
                 min_val=0,
                 max_val=3,
-                threshold_red=1.5,
-                threshold_yellow=2.2,
+                threshold_red=1.2,
+                threshold_yellow=2.0,
                 format_type="ratio"
             )
             render_gauge_with_formula(fig1, "current_ratio")
@@ -846,8 +846,8 @@ def display_ratios_sections(balance_data, income_data):
                 title="Debt-to-Equity<br>(Safety)",
                 min_val=0,
                 max_val=3,
-                threshold_red=1.1,
-                threshold_yellow=1.7,
+                threshold_red=1.4,
+                threshold_yellow=2.9,
                 format_type="ratio",
                 reverse_colors=True
             )
@@ -859,8 +859,8 @@ def display_ratios_sections(balance_data, income_data):
                 title="Working Capital<br>% of Total Assets",
                 min_val=0,
                 max_val=50,
-                threshold_red=20,
-                threshold_yellow=35,
+                threshold_red=15,
+                threshold_yellow=30,
                 format_type="percent"
             )
             render_gauge_with_formula(fig3, "working_capital_pct")
@@ -916,8 +916,8 @@ def display_ratios_sections(balance_data, income_data):
                 title="Operating Profit<br>Margin",
                 min_val=0,
                 max_val=15,
-                threshold_red=4,
-                threshold_yellow=6.5,
+                threshold_red=3,
+                threshold_yellow=5.5,
                 format_type="percent"
             )
             render_gauge_with_formula(fig6, "opm")
@@ -931,7 +931,7 @@ def display_ratios_sections(balance_data, income_data):
                 min_val=0,
                 max_val=800,
                 threshold_red=325,
-                threshold_yellow=580,
+                threshold_yellow=550,
                 format_type="currency_k"
             )
             render_gauge_with_formula(fig7, "rev_admin_employee")
@@ -942,7 +942,7 @@ def display_ratios_sections(balance_data, income_data):
                 title="EBITDA/<br>Revenue",
                 min_val=0,
                 max_val=10,
-                threshold_red=3,
+                threshold_red=2.5,
                 threshold_yellow=5,
                 format_type="percent"
             )
@@ -971,21 +971,21 @@ def display_ratios_sections(balance_data, income_data):
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Current Ratio (Liquidity)</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">2.3</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">1.5 to 2.2</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 1.5</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Above 2.0</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">1.2 to 2.0</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 1.3</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Debt to Equity (Safety)</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">0 to 1.1</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">1.2 to 1.7</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Above 1.7</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">0 to 1.4</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">1.5 to 2.9</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Above 3.0</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Working Capital as % of Total Assets</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Above 35%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">20% to 35%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 20%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">30% & above</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">15% to 29%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 15%</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Survival Score</td>
@@ -1010,9 +1010,9 @@ def display_ratios_sections(balance_data, income_data):
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Operating Profit Margin</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Above 6.5%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">4% to 6.5%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 4%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">5.5% & above</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">3% to 5.4%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 3%</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Net Profit Margin</td>
@@ -1022,30 +1022,30 @@ def display_ratios_sections(balance_data, income_data):
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Revenue Per Admin Employee</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Above $580</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">$325 to $580</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Above $550</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">$325 to $550</td>
                         <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below $325</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">EBITDA/Revenue</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Above 5%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">3% to 5%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 3%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">5% & above</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">2.5% to 5%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 2.5%</td>
                     </tr>
                     <tr style="background-color: #2c3e50; color: white;">
                         <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="4">Cash Flows</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Days Sales Outstanding (DSO)</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Below 40</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">40 to 60</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">30 & Below</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">30 to 60</td>
                         <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Above 60</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Operating Cash Flow (OCF)/Revenue</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Greater than 0.5%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">-0.5% to 0.5%</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Less than -0.5%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Positive</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">0 to neg 3%</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Negative</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Financing Cash Flow (FCF)/Revenue</td>
