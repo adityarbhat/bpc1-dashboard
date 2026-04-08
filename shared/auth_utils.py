@@ -153,6 +153,17 @@ def attempt_session_recovery():
         # Get cookie manager first
         cookies = get_cookies()
 
+        # If login just completed, skip strict cookie/session validation.
+        # CookieManager queues cookie writes for the next render, so cookies
+        # won't be in the browser yet on the immediate rerun after login.
+        # Without this bypass, Case 3 below fires (session exists, no cookie)
+        # and clears the freshly-authenticated session — forcing 3-4 retries.
+        if st.session_state.get('_login_just_completed'):
+            st.session_state._login_just_completed = False
+            if st.session_state.authenticated and st.session_state.user:
+                logger.debug("VALIDATION CHECK - Skipped (login just completed, cookies still propagating)")
+                return True
+
         # STRICT VALIDATION: Clear session on ANY cookie/session inconsistency
         cookie_user_id = cookies.get('user_id')
         session_user_id = getattr(st.session_state.user, 'id', None) if st.session_state.user else None
@@ -466,6 +477,12 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
             }
 
         logger.info(f"Final verification passed - Session state correctly set for ID: ...{str(response.user.id)[-8:]}")
+
+        # Set flag so attempt_session_recovery() skips strict cookie/session
+        # validation on the immediate rerun. Cookie writes via CookieManager are
+        # queued for the next render and may not be in the browser yet, which
+        # would otherwise trigger false-positive session-hijacking detection.
+        st.session_state._login_just_completed = True
 
         return {
             'success': True,
