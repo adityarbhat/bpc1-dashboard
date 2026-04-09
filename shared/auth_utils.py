@@ -153,46 +153,21 @@ def attempt_session_recovery():
         # Get cookie manager first
         cookies = get_cookies()
 
-        # If login just completed, skip strict cookie/session validation.
-        # CookieManager queues cookie writes for the next render, so cookies
-        # won't be in the browser yet on the immediate rerun after login.
-        # Without this bypass, Case 3 below fires (session exists, no cookie)
-        # and clears the freshly-authenticated session — forcing 3-4 retries.
-        if st.session_state.get('_login_just_completed'):
-            st.session_state._login_just_completed = False
-            if st.session_state.authenticated and st.session_state.user:
-                logger.debug("VALIDATION CHECK - Skipped (login just completed, cookies still propagating)")
-                return True
-
-        # STRICT VALIDATION: Clear session on ANY cookie/session inconsistency
+        # VALIDATION: Only check for cookie/session user ID mismatch.
+        # Supabase token validation (below) is the real security layer.
         cookie_user_id = cookies.get('user_id')
         session_user_id = getattr(st.session_state.user, 'id', None) if st.session_state.user else None
 
-        # DEBUG: Log validation check on every request
         logger.debug(f"VALIDATION CHECK - Cookie: {cookie_user_id}, Session: {session_user_id}")
 
-        # Case 1: Cookie exists but session doesn't match (session mismatch)
+        # If cookie and session both have a user but they differ, clear everything
         if cookie_user_id and session_user_id and cookie_user_id != session_user_id:
             logger.error(f"SECURITY: User ID mismatch - cookie={cookie_user_id}, session={session_user_id}")
             clear_session()
             clear_cookies()
             return False
 
-        # Case 2: Cookie exists but no session user (suspicious - possible session hijacking)
-        if cookie_user_id and not session_user_id:
-            logger.warning(f"SECURITY: Cookie exists but no session user - cookie={cookie_user_id}")
-            clear_session()
-            clear_cookies()
-            return False
-
-        # Case 3: Session exists but no cookie (session hijacking attempt?)
-        if session_user_id and not cookie_user_id:
-            logger.warning(f"SECURITY: Session exists but no cookie - session_user={session_user_id}")
-            clear_session()
-            clear_cookies()
-            return False
-
-        # If already authenticated and all validations passed, skip recovery
+        # If already authenticated, skip recovery
         if st.session_state.authenticated and st.session_state.user:
             return True  # Skip if already authenticated and user matches
 
@@ -478,12 +453,6 @@ def login_user(email: str, password: str) -> Dict[str, Any]:
 
         logger.info(f"Final verification passed - Session state correctly set for ID: ...{str(response.user.id)[-8:]}")
 
-        # Set flag so attempt_session_recovery() skips strict cookie/session
-        # validation on the immediate rerun. Cookie writes via CookieManager are
-        # queued for the next render and may not be in the browser yet, which
-        # would otherwise trigger false-positive session-hijacking detection.
-        st.session_state._login_just_completed = True
-
         return {
             'success': True,
             'message': f"Welcome back, {st.session_state.user_profile['full_name']}!",
@@ -686,9 +655,7 @@ def require_auth():
     # Initialize session state
     init_session_state()
 
-    # SECURITY: ALWAYS validate cookie/session consistency on every request
-    # This runs whether user is logged in or out to detect session hijacking
-    # If validation fails (cookie/session mismatch), it will clear session and force re-login
+    # Attempt to recover session from cookies (also validates user ID consistency)
     attempt_session_recovery()
 
     # Clear any login transition flags if user is authenticated
