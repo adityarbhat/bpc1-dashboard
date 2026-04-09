@@ -133,6 +133,19 @@ def clean_numeric_value(value) -> float:
     return float(s)
 
 
+# Fields that must always be stored as negative (or zero) values
+MUST_BE_NEGATIVE_FIELDS = {'ceo_comp', 'other_expense', 'interest_expense'}
+
+
+def enforce_negative(field_key: str, value: float) -> float:
+    """Ensure fields that represent deductions are stored as negative values.
+    If a positive value is entered for ceo_comp, other_expense, or interest_expense,
+    automatically convert it to negative."""
+    if field_key in MUST_BE_NEGATIVE_FIELDS and value > 0:
+        return -value
+    return value
+
+
 def normalize_field_name(name: str) -> str:
     """
     Normalize a field name for matching by removing spaces, special characters, and converting to lowercase.
@@ -239,6 +252,7 @@ def parse_income_statement_excel(uploaded_file) -> Tuple[Dict[str, float], int, 
                 # Convert amount to float
                 try:
                     numeric_amount = clean_numeric_value(amount)
+                    numeric_amount = enforce_negative(field_key, numeric_amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -249,6 +263,7 @@ def parse_income_statement_excel(uploaded_file) -> Tuple[Dict[str, float], int, 
                     field_key = INCOME_STATEMENT_MAPPING[str(line_item)]
                     try:
                         numeric_amount = clean_numeric_value(amount)
+                        numeric_amount = enforce_negative(field_key, numeric_amount)
                         data_dict[field_key] = numeric_amount
                         matched_count += 1
                     except (ValueError, TypeError):
@@ -520,6 +535,8 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
                 # Convert amount to float
                 try:
                     numeric_amount = clean_numeric_value(amount)
+                    if statement_type == 'IS':
+                        numeric_amount = enforce_negative(field_key, numeric_amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -536,6 +553,8 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
                 # Convert amount to float
                 try:
                     numeric_amount = clean_numeric_value(amount)
+                    if statement_type == 'IS':
+                        numeric_amount = enforce_negative(field_key, numeric_amount)
                     data_dict[field_key] = numeric_amount
                     matched_count += 1
                 except (ValueError, TypeError):
@@ -546,6 +565,8 @@ def parse_sheet_with_description(uploaded_file, sheet_name: str, mapping: Dict, 
                     field_key = mapping[str(line_item)]
                     try:
                         numeric_amount = clean_numeric_value(amount)
+                        if statement_type == 'IS':
+                            numeric_amount = enforce_negative(field_key, numeric_amount)
                         data_dict[field_key] = numeric_amount
                         matched_count += 1
                     except (ValueError, TypeError):

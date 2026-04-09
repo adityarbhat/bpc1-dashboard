@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from data_transformation_bs import BALANCE_SHEET_MAPPING
 from data_transformation_is import INCOME_STATEMENT_MAPPING
 from description_mappings import BALANCE_SHEET_DESCRIPTIONS, INCOME_STATEMENT_DESCRIPTIONS
+from pages.data_input.excel_parser import enforce_negative
 
 
 def _wrap_description(text, width=55):
@@ -427,6 +428,8 @@ def create_income_statement_input(company_name, period_name, year):
         for idx, row in edited_df.iterrows():
             field_key = row['Field Key']
             new_val = row[f'{year} Amount']
+            # Ensure deduction fields (ceo_comp, other_expense, interest_expense) are negative
+            new_val = enforce_negative(field_key, new_val)
             old_val = st.session_state.is_input_data.get(field_key, 0.0)
             if new_val != old_val:
                 st.session_state.is_submitted = False  # Re-enable submit on edit
