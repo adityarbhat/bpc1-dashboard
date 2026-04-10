@@ -165,7 +165,7 @@ def get_company_rank(company_name, period):
         return None
 
 
-def calculate_yoy_percentages(company_name, current_year='2024'):
+def calculate_yoy_percentages(company_name, current_year=None):
     """
     Calculate year-over-year percentage changes for key income statement metrics
     Compares current year Annual vs previous year Annual
@@ -181,6 +181,8 @@ def calculate_yoy_percentages(company_name, current_year='2024'):
     - Operating Profit
     - Net Profit
     """
+    if current_year is None:
+        current_year = str(CURRENT_YEAR)
     airtable = get_airtable_connection()
 
     # Calculate previous year
@@ -314,8 +316,12 @@ def calculate_multi_year_yoy(company_name):
     return results if results else None
 
 
-def create_yoy_chart(yoy_data, current_year='2024', previous_year='2023'):
+def create_yoy_chart(yoy_data, current_year=None, previous_year=None):
     """Create horizontal bar chart for margin analysis showing each metric as % of revenue"""
+    if current_year is None:
+        current_year = str(CURRENT_YEAR)
+    if previous_year is None:
+        previous_year = str(CURRENT_YEAR - 1)
     if not yoy_data:
         return None
 
@@ -868,18 +874,19 @@ def create_company_wins_challenges_page():
     # Add year selector on the right side
     # Initialize session state for year
     if 'wins_challenges_year' not in st.session_state:
-        st.session_state.wins_challenges_year = '2024'
+        st.session_state.wins_challenges_year = str(CURRENT_YEAR)
 
     col1, col2 = st.columns([8.5, 1])
 
     with col1:
         pass  # Empty space
 
+    year_options = [str(y) for y in range(CURRENT_YEAR - 1, CURRENT_YEAR + 2)]
     with col2:
         selected_year = st.selectbox(
             "**Year**",
-            options=['2024', '2025', '2026'],
-            index=['2024', '2025', '2026'].index(st.session_state.wins_challenges_year),
+            options=year_options,
+            index=year_options.index(st.session_state.wins_challenges_year) if st.session_state.wins_challenges_year in year_options else 0,
             key="wins_challenges_year_selector"
         )
         st.session_state.wins_challenges_year = selected_year
@@ -944,8 +951,8 @@ def display_wins_challenges_sections(balance_data, income_data):
     challenges = [item['challenge_text'] for item in challenges_data] if challenges_data else []
     action_items = [item['action_item_text'] for item in action_items_data] if action_items_data else []
 
-    # Get company rank for 2024 Annual (most recent)
-    period_for_rank = "2024 Annual"
+    # Get company rank for current year Annual (most recent)
+    period_for_rank = f"{CURRENT_YEAR} Annual"
     company_rank = get_company_rank(company_name, period_for_rank)
 
     # Add CSS for the analysis section - compact layout

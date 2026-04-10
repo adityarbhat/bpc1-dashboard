@@ -1011,10 +1011,11 @@ def display_cash_flow_table(calculated_cash_flow_data, group_averages=None, avg_
 
 
 def display_key_metrics(calculated_cash_flow_data, period_text):
-    """Display key cash flow metrics for 2024"""
+    """Display key cash flow metrics for current year"""
+    from shared.year_config import CURRENT_YEAR
 
-    # Get 2024 data (most recent year)
-    data_2024 = calculated_cash_flow_data.get('2024', {})
+    # Get current year data (most recent year)
+    data_2024 = calculated_cash_flow_data.get(str(CURRENT_YEAR), {})
 
     # Extract key metrics
     ocf = data_2024.get('operating_cash_flow', None)

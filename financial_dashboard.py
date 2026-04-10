@@ -703,16 +703,16 @@ def create_group_overview_page(companies):
     </style>
     """, unsafe_allow_html=True)
 
-    # Hardcoded rankings from 2024 Annual data (avoids slow API calls on homepage load)
+    # Hardcoded rankings from 2025 Annual data (avoids slow API calls on homepage load)
     hardcoded_rankings = [
-        (1, 'Ace Worldwide', 34.0),
-        (2, 'Smith Dray', 35.0),
-        (3, 'Apex', 48.5),
-        (4, 'Guardian', 51.0),
-        (5, 'Ace Relo', 56.0),
-        (6, "Alexander's", 58.0),
-        (7, 'Weleski', 65.5),
-        (8, 'InterWest', 72.0),
+        (1, 'Ace Worldwide', 27.0),
+        (2, 'Guardian', 42.5),
+        (3, 'Alexanders', 45.0),
+        (4, 'Smith Dray', 46.5),
+        (5, 'Ace Relo', 47.0),
+        (6, 'Apex', 52.5),
+        (7, 'Weleski', 57.5),
+        (8, 'InterWest', 60.0),
     ]
 
     table_html = '<div style="display: flex; justify-content: center; margin: 1rem auto; max-width: 600px;"><table style="width: 100%; border-collapse: collapse; font-family: Montserrat, sans-serif; font-size: 0.9rem; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);"><thead><tr style="background-color: #025a9a;"><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Rank</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Company</th><th style="background-color: #025a9a; color: white; font-weight: 700; padding: 0.8rem; text-align: center; border: none;">Total Score</th></tr></thead><tbody>'

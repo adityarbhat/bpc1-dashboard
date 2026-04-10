@@ -333,7 +333,8 @@ def create_company_ratios_page():
         if 'period' not in st.session_state:
             st.session_state.period = 'year_end'
         
-        period_filter = "2024 Annual" if st.session_state.period == 'year_end' else "June 2024"
+        from shared.year_config import CURRENT_YEAR
+        period_filter = f"{CURRENT_YEAR} Annual" if st.session_state.period == 'year_end' else f"June {CURRENT_YEAR}"
 
         # Get data for selected company for the selected period
         with st.spinner(f"Loading {st.session_state.selected_company_name} ratios..."):
@@ -342,7 +343,7 @@ def create_company_ratios_page():
         
         # Check if we have any data to display
         if not balance_data and not income_data:
-            st.info(f"⚠️ No financial data found for {st.session_state.selected_company_name} for the 2024 Annual period.")
+            st.info(f"⚠️ No financial data found for {st.session_state.selected_company_name} for the {period_filter} period.")
             st.info("💡 This might be because the data hasn't been uploaded yet or the company name doesn't match exactly.")
         
         # Display ratios sections

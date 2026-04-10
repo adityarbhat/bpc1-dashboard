@@ -508,7 +508,8 @@ def create_company_labor_cost_page():
         if 'period' not in st.session_state:
             st.session_state.period = 'year_end'
         
-        period_filter = "2024 Annual" if st.session_state.period == 'year_end' else "June 2024"
+        from shared.year_config import CURRENT_YEAR
+        period_filter = f"{CURRENT_YEAR} Annual" if st.session_state.period == 'year_end' else f"June {CURRENT_YEAR}"
 
         # Main Labor Cost Content
 

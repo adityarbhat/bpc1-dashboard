@@ -26,7 +26,7 @@ INSERT INTO public.companies (airtable_company_name, display_name) VALUES
   ('Ace Relo', 'Ace Relo'),
   ('Ace Worldwide', 'Ace Worldwide'),
   ('Alexanders', 'Alexanders'),
-  ('AMJ(Toronto)', 'AMJ(Toronto)'),
+  ('AMJ', 'AMJ'),
   ('Apex', 'Apex'),
   ('Guardian', 'Guardian'),
   ('InterWest', 'InterWest'),
