@@ -72,7 +72,7 @@ def fetch_group_ratio_data(period):
 
             # Calculate cash flow ratios using centralized function (replaces Airtable values)
             year = period.split()[0]  # Extract year from "2024 Annual"
-            cf_ratios = get_cash_flow_ratios(airtable, company_name, year)
+            cf_ratios = get_cash_flow_ratios(airtable, company_name, year, is_admin=is_super_admin())
             ratio_data[company_name].update({
                 'ocf_rev': cf_ratios.get('ocf_rev') or 0,
                 'fcf_rev': cf_ratios.get('fcf_rev') or 0,
@@ -662,9 +662,11 @@ def create_group_ratio_table(ratio_data):
     # First calculate overall rankings to display at top
     sorted_total_scores_preview = sorted(total_scores_calc.items(), key=lambda x: x[1])
     overall_rankings_preview = {}
-    for rank, (company, score) in enumerate(sorted_total_scores_preview, start=1):
+    rank = 1
+    for company, score in sorted_total_scores_preview:
         if score > 0:
             overall_rankings_preview[company] = rank
+            rank += 1
 
     table_html += '<tr class="rank-row overall-rank-row sticky-rank"><td class="row-label">🏆 Overall Rank</td>'
     for company in companies:

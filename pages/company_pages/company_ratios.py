@@ -603,7 +603,7 @@ def display_ratio_trends_table(balance_data, income_data):
                 trends_data['cash_flow']['Days Sales Outstanding (DSO)'][year] = record.get('dso', '')
 
                 # Calculate cash flow ratios using centralized function (replaces Airtable values)
-                cf_ratios = get_cash_flow_ratios(airtable, st.session_state.selected_company_name, year)
+                cf_ratios = get_cash_flow_ratios(airtable, st.session_state.selected_company_name, year, is_admin=is_super_admin())
                 trends_data['cash_flow']['Operating Cash Flow (OCF)/Revenue'][year] = cf_ratios.get('ocf_rev', '')
                 trends_data['cash_flow']['Financing Cash Flow (FCF)/Revenue'][year] = cf_ratios.get('fcf_rev', '')
                 trends_data['cash_flow']['Net Cash Flow (NCF)/Revenue'][year] = cf_ratios.get('ncf_rev', '')
