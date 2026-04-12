@@ -98,6 +98,10 @@ Run the app and verify:
 - Admin pages must call `create_page_header()` BEFORE `apply_all_styles()`
 - Export utils are lazy-loaded - don't import at module level
 - Cookie validation runs on EVERY request for security
+- Homepage rankings are **hardcoded** in `financial_dashboard.py` for performance — must be manually updated when companies submit new data
+- `CURRENT_YEAR` in `shared/year_config.py` controls which period all pages fetch — update it when rolling to a new competition year
+- `get_balance_sheet_data()` and `get_income_statement_data()` in `airtable_connection.py` use `CURRENT_YEAR` for their period filter (not hardcoded year)
+- Companies without prior year data (e.g., AMJ missing 2024) will have cash flow ratios unavailable since CF calculation requires YoY balance sheet changes
 
 ---
 *See `docs/CHANGELOG.md` for detailed implementation history.*
