@@ -14,7 +14,7 @@ import re
 from shared.airtable_connection import get_airtable_connection
 from shared.page_components import get_period_display_text
 from shared.auth_utils import require_auth, logout_user, get_current_user_name, get_current_user_email, is_super_admin
-from shared.year_config import get_selected_years
+from shared.year_config import get_selected_years, CURRENT_YEAR
 
 @st.cache_data(ttl=900, show_spinner=False)  # Cache for 15 minutes for better performance
 def get_group_averages_for_debt(years_with_data):
@@ -465,7 +465,7 @@ def create_company_value_page():
         
         # Check if we have any data to display
         if not balance_data and not income_data:
-            st.info(f"⚠️ No financial data found for {st.session_state.selected_company_name} for the 2024 Annual period.")
+            st.info(f"⚠️ No financial data found for {st.session_state.selected_company_name} for the {CURRENT_YEAR} Annual period.")
             st.info("💡 This might be because the data hasn't been uploaded yet or the company name doesn't match exactly.")
         
         # Display value sections

@@ -905,7 +905,7 @@ def create_company_wins_challenges_page():
         
         # Check if we have any data to display
         if not balance_data and not income_data:
-            st.info(f"⚠️ No financial data found for {st.session_state.selected_company_name} for the 2024 Annual period.")
+            st.info(f"⚠️ No financial data found for {st.session_state.selected_company_name}.")
             st.info("💡 This might be because the data hasn't been uploaded yet or the company name doesn't match exactly.")
         
         # Display wins & challenges sections

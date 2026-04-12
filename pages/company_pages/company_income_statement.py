@@ -377,7 +377,7 @@ def create_company_income_statement_page():
         with st.spinner(f"Loading {st.session_state.selected_company_name} income data..."):
             income_historical_data = get_all_income_statement_data_cached(st.session_state.selected_company_name, tuple(years))
 
-        # Get current year data for compatibility (2024 Annual)
+        # Get current year data for compatibility
         airtable = get_airtable_connection()
         income_data = airtable.get_income_statement_data(st.session_state.selected_company_name, is_admin=is_super_admin())
 

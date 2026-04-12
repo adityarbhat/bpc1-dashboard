@@ -102,13 +102,14 @@ class AirtableConnection:
     
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
     def get_balance_sheet_data(_self, company_name=None, is_admin=False):
-        """Fetch balance sheet data from Airtable for 2024 Annual period"""
+        """Fetch balance sheet data from Airtable for current Annual period"""
         try:
+            from shared.year_config import CURRENT_YEAR
             url = f"{_self.base_url}/balance_sheet_data"
             if company_name:
                 safe_name = _escape_airtable_value(company_name)
                 pub_filter = _build_publication_filter(is_admin)
-                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual',{pub_filter})"
+                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{CURRENT_YEAR} Annual',{pub_filter})"
                 url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -124,7 +125,7 @@ class AirtableConnection:
                         'debt_to_equity': _parse_percentage_or_float(fields.get('debt_to_equity', 0)),
                         'working_capital_pct_asset': _parse_percentage_or_float(fields.get('working_capital_pct_asset', 0)),
                         'survival_score': _parse_percentage_or_float(fields.get('survival_score', 0)),
-                        'period': fields.get('period', '2024 Annual'),
+                        'period': fields.get('period', f'{CURRENT_YEAR} Annual'),
                         # Balance sheet amounts for charts
                         'total_current_assets': _parse_percentage_or_float(fields.get('total_current_assets', 0)),
                         'total_current_liabilities': _parse_percentage_or_float(fields.get('total_current_liabilities', 0)),
@@ -143,13 +144,14 @@ class AirtableConnection:
     
     @st.cache_data(ttl=1800, show_spinner=False)  # 30 minutes for better performance
     def get_income_statement_data(_self, company_name=None, is_admin=False):
-        """Fetch income statement data from Airtable for 2024 Annual period"""
+        """Fetch income statement data from Airtable for current Annual period"""
         try:
+            from shared.year_config import CURRENT_YEAR
             url = f"{_self.base_url}/income_statement_data"
             if company_name:
                 safe_name = _escape_airtable_value(company_name)
                 pub_filter = _build_publication_filter(is_admin)
-                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='2024 Annual',{pub_filter})"
+                filter_formula = f"AND({{company}}='{safe_name}',{{period}}='{CURRENT_YEAR} Annual',{pub_filter})"
                 url += f"?filterByFormula={filter_formula}"
 
             response = requests.get(url, headers=_self.headers)
@@ -169,7 +171,7 @@ class AirtableConnection:
                         'ebitda_000': _parse_percentage_or_float(fields.get('ebitda_000', 0)),
                         'net_profit': _parse_percentage_or_float(fields.get('net_profit', 0)),
                         'sales_assets': _parse_percentage_or_float(fields.get('sales_assets', 0)),
-                        'period': fields.get('period', '2024 Annual'),
+                        'period': fields.get('period', f'{CURRENT_YEAR} Annual'),
                         # Labor cost fields for labor cost table
                         'admin_labor_cost': _parse_percentage_or_float(fields.get('admin_labor_cost', 0)),
                         'admin_labor_cost_pct_rev': _parse_percentage_or_float(fields.get('admin_labor_cost_pct_rev', 0)),

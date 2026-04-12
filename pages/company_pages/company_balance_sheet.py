@@ -386,7 +386,7 @@ def create_company_balance_sheet_page():
         with st.spinner(f"Loading {st.session_state.selected_company_name} balance sheet..."):
             balance_historical_data, income_historical_data = get_all_balance_sheet_data_cached(st.session_state.selected_company_name, tuple(years))
 
-        # Get current year data for compatibility (2024 Annual)
+        # Get current year data for compatibility
         airtable = get_airtable_connection()
         balance_data = airtable.get_balance_sheet_data(st.session_state.selected_company_name, is_admin=is_super_admin())
 
