@@ -332,6 +332,7 @@ def get_cell_color(value, metric_name):
         'ebitda_margin': {'great': 0.05, 'caution': [0.025, 0.05], 'improve': 0.025},
         'dso': {'great': 30, 'caution': [30, 60], 'improve': 60, 'reverse': True},
         'ocf_rev': {'great': 0.0, 'caution': [-0.03, 0.0], 'improve': -0.03},  # Positive = green, 0 to neg 3% = yellow, Negative = red
+        'npm': {'great': 0.001, 'caution': [-0.001, 0.001], 'improve': -0.001},  # Positive = green, negative = red
     }
 
     if metric_name not in thresholds:
