@@ -990,9 +990,9 @@ def create_group_ratio_table(ratio_data):
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Net Profit Margin</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa; font-size: 0.95rem;">No Range</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa; font-size: 0.95rem;">No Range</td>
-                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa; font-size: 0.95rem;">No Range</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #d4edda; font-size: 0.95rem;">Positive</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa; font-size: 0.95rem;">-</td>
+                        <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Negative</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">Revenue Per Admin Employee</td>
