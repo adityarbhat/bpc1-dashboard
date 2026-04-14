@@ -653,6 +653,9 @@ def create_group_ratio_table(ratio_data):
         background-color: white;
         font-size: 0.95rem;
     }
+    .group-ratio-table tbody tr:hover:not(.section-header):not(.main-header):not(.orange-header):not(.overall-rank-row) td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
     """, unsafe_allow_html=True)
 

@@ -664,6 +664,9 @@ def create_labor_cost_table(table_data, years, group_averages=None, avg_year=Non
         font-weight: 600;
         border: 1px solid #025a9a;
     }
+    .labor-cost-table tbody tr:hover td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
     
     <table class="labor-cost-table">

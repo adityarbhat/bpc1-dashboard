@@ -317,10 +317,7 @@ def create_income_statement_comparison_table(company_data, period):
         text-align: left;
     }
     .income-statement-table tr:hover:not(.header-row) td {
-        background-color: #edf2f7;
-    }
-    .income-statement-table tr:hover:not(.header-row) td.average-cell {
-        background-color: #d0efff;
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
     }
     .income-statement-table td.winner-cell {
         background-color: #c6f6d5 !important;

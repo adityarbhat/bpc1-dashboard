@@ -536,6 +536,9 @@ def display_actuals_sections(balance_data, income_data, balance_historical_data,
         color: #6c757d;
         font-style: italic;
     }
+    .actuals-table tbody tr:hover td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
     """, unsafe_allow_html=True)
 

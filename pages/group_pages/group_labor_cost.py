@@ -217,10 +217,7 @@ def create_labor_cost_comparison_table(company_data, period):
         text-align: left;
     }
     .labor-cost-table tr:hover td {
-        background-color: #edf2f7;
-    }
-    .labor-cost-table tr:hover td.average-cell {
-        background-color: #d0efff;
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
     }
     .labor-cost-table td.winner-cell {
         background-color: #c6f6d5 !important;

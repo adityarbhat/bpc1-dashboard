@@ -766,6 +766,9 @@ def create_value_trend_table(table_data, years, group_averages=None, avg_year=No
         color: #c2002f !important;
         font-weight: 600;
     }
+    .value-trend-table tbody tr:hover td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
 
     <table class="value-trend-table">

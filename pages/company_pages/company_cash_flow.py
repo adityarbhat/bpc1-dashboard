@@ -1215,6 +1215,9 @@ def display_cash_flow_sections(calculated_cash_flow_data):
         color: #6c757d;
         font-style: italic;
     }
+    .cash-flow-table tbody tr:hover td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
     """, unsafe_allow_html=True)
 

@@ -238,10 +238,7 @@ def create_cash_flow_comparison_table(company_data, period):
         text-align: left;
     }
     .cash-flow-table tr:hover:not(.section-header-row) td {
-        background-color: #f7fafc;
-    }
-    .cash-flow-table tr:hover:not(.section-header-row) td.average-cell {
-        background-color: #e0f2ff;
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
     }
     .cash-flow-table td.winner-cell {
         background-color: #c6f6d5 !important;

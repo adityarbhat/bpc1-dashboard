@@ -1866,6 +1866,9 @@ def create_balance_sheet_trend_html_table(table_data, years, balance_sheet_items
     .balance-sheet-trend-table .accumulated-depreciation {
         color: #c2002f !important;
     }
+    .balance-sheet-trend-table tbody tr:hover td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
     
     <table class="balance-sheet-trend-table">

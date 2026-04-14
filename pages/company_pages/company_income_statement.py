@@ -1539,6 +1539,9 @@ def display_income_statement_trend_table(company_name):
         top: 0;
         z-index: 10;
     }
+    .income-statement-trend-table tbody tr:hover td {
+        box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+    }
     </style>
     """, unsafe_allow_html=True)
 
