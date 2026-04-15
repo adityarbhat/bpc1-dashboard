@@ -195,6 +195,12 @@ def create_income_statement_comparison_table(company_data, period):
             <div style="color: #1a202c; font-family: 'Montserrat', sans-serif;">
                 <strong>Above Group Average</strong> - Expense percentage exceeds group average for all cost and expense items
             </div>
+            <div style="padding: 0.4rem 0.8rem; font-weight: 600; text-align: center;">
+                Note
+            </div>
+            <div style="color: #1a202c; font-family: 'Montserrat', sans-serif;">
+                <strong>Gross Profit Margin</strong> and <strong>Operating Profit Margin</strong> rows are color-coded using the Range Key thresholds shown below the table.
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -327,6 +333,21 @@ def create_income_statement_comparison_table(company_data, period):
         background-color: #ffe082 !important;
         font-weight: 700 !important;
     }
+    .income-statement-table tr.total-row td.margin-green,
+    .income-statement-table td.margin-green {
+        background-color: #c8e6c9 !important;
+        font-weight: 700 !important;
+    }
+    .income-statement-table tr.total-row td.margin-yellow,
+    .income-statement-table td.margin-yellow {
+        background-color: #fff3c4 !important;
+        font-weight: 700 !important;
+    }
+    .income-statement-table tr.total-row td.margin-red,
+    .income-statement-table td.margin-red {
+        background-color: #ffcdd2 !important;
+        font-weight: 700 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -388,6 +409,14 @@ def create_income_statement_comparison_table(company_data, period):
         'PPP Funds Received (forgiven)', 'Other Income'
     ]
 
+    # Profit margin rows use the threshold-based coloring from the group ratios Range Key
+    profit_margin_line_items = {
+        'Gross Profit Margin': 'gpm',
+        'Operating Profit Margin': 'opm',
+        'Net Profit Margin': 'npm',
+    }
+    from pages.group_pages.group_ratios import get_cell_color as get_margin_color
+
     # Data rows
     for item_name, field_name, is_total, is_major_total in income_statement_items:
         # Determine row class based on item type
@@ -441,8 +470,20 @@ def create_income_statement_comparison_table(company_data, period):
             # Determine cell class
             cell_class = ''
 
+            # Profit margin rows use threshold-based coloring (Range Key)
+            if item_name in profit_margin_line_items:
+                if total_revenue > 0 and value != 0:
+                    pct_decimal = value / total_revenue  # decimal, matches get_cell_color scale
+                    bg = get_margin_color(pct_decimal, profit_margin_line_items[item_name])
+                    if bg == '#c8e6c9':
+                        cell_class = 'margin-green'
+                    elif bg == '#fff3c4':
+                        cell_class = 'margin-yellow'
+                    elif bg == '#ffcdd2':
+                        cell_class = 'margin-red'
+
             # Apply winner-cell class if this is the winner for a revenue line item
-            if item_name in revenue_line_items and company_name == winner_company:
+            elif item_name in revenue_line_items and company_name == winner_company:
                 cell_class = 'winner-cell'
 
             # Apply winner-cell class if this is the winner for an other income line item
@@ -476,6 +517,45 @@ def create_income_statement_comparison_table(company_data, period):
 
     # Display table
     st.markdown(table_html, unsafe_allow_html=True)
+
+    # Range Key reference for profit margin coloring
+    st.markdown("""
+    <div style="margin-top: 2rem; margin-bottom: 1rem;">
+        <h4 style="color: #1a202c; font-family: 'Montserrat', sans-serif; font-weight: 600; margin-bottom: 0.5rem;">
+            Range Key - Profit Margins
+        </h4>
+        <table style="width: 100%; border-collapse: collapse; font-family: 'Montserrat', sans-serif; font-size: 0.95rem;">
+            <thead>
+                <tr style="background-color: #025a9a; color: white;">
+                    <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left;">Metric</th>
+                    <th style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">Green</th>
+                    <th style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">Yellow</th>
+                    <th style="border: 1px solid #dee2e6; padding: 10px; text-align: center;">Red</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; font-weight: 500;">Gross Profit Margin</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #c8e6c9;">Above 25%</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3c4;">20% to 25%</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #ffcdd2;">Below 20%</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; font-weight: 500;">Operating Profit Margin</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #c8e6c9;">5.5% & above</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3c4;">3% to 5.4%</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #ffcdd2;">Below 3%</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; font-weight: 500;">Net Profit Margin</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #c8e6c9;">Positive</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa;">-</td>
+                    <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #ffcdd2;">Negative</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 @st.cache_data(ttl=900, show_spinner=False)  # Cache for 15 minutes
