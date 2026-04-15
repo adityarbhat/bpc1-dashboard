@@ -81,6 +81,7 @@ Atlas Van Lines branding:
 |------|---------|
 | `company_ratios.py` | Gauge charts with red/yellow/green thresholds |
 | `group_ratios.py:307-319` | Ratio threshold definitions |
+| `group_income_statement.py` | Profit margin rows color-coded via `get_cell_color` from `group_ratios` (Range Key thresholds) |
 | `excel_formatter.py` | Export color coding (matches web display) |
 | `pages/data_input/excel_parser.py` | Upload template parsing |
 
