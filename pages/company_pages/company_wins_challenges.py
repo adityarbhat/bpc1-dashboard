@@ -59,28 +59,20 @@ def calculate_yoy_percentages(company_name, current_year=None):
         current_year = str(CURRENT_YEAR)
     airtable = get_airtable_connection()
 
-    # Calculate previous year
-    previous_year = str(int(current_year) - 1)
-
-    # Fetch current and previous year data
+    # Fetch current year data
     data_current = airtable.get_income_statement_data_by_period(company_name, f"{current_year} Annual", is_admin=is_super_admin())
-    data_previous = airtable.get_income_statement_data_by_period(company_name, f"{previous_year} Annual", is_admin=is_super_admin())
 
-    if not data_current or not data_previous:
+    if not data_current:
         return None
 
-    # Get first record from each year
     record_current = data_current[0] if len(data_current) > 0 else {}
-    record_previous = data_previous[0] if len(data_previous) > 0 else {}
 
     # Get revenue for margin calculations
     rev_current = record_current.get('total_revenue', 0) or 0
-    rev_previous = record_previous.get('total_revenue', 0) or 0
 
-    if rev_current == 0 or rev_previous == 0:
+    if rev_current == 0:
         return None
 
-    # Calculate margin percentages for both years
     results = {}
 
     # Direct Expenses - calculate from individual fields (all fields that make up Total Cost of Revenue)
@@ -91,14 +83,12 @@ def calculate_yoy_percentages(company_name, current_year=None):
         'rent', 'other_direct_expenses'
     ]
     dir_exp_current = sum(record_current.get(field, 0) or 0 for field in direct_expense_fields)
-    dir_exp_previous = sum(record_previous.get(field, 0) or 0 for field in direct_expense_fields)
 
     # Total Cost of Revenue - sum of all direct expense fields (per Excel definition)
     results['Total Cost of Revenue'] = (dir_exp_current / rev_current) * 100
 
     # Operating Expenses - use total_operating_expenses field
     op_exp_current = record_current.get('total_operating_expenses', 0) or 0
-    op_exp_previous = record_previous.get('total_operating_expenses', 0) or 0
     results['Operating Expenses'] = (op_exp_current / rev_current) * 100
 
     # Gross Profit Margin %
