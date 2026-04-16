@@ -101,7 +101,7 @@ def create_instructions_sheet(wb):
         ws[f'B{row}'].value = text
         ws[f'B{row}'].font = body_font
         ws[f'B{row}'].alignment = wrap_top
-        ws.row_dimensions[row].height = 42
+        ws.row_dimensions[row].height = 58 if len(text) > 150 else 42
         row += 1
 
     # Spacer
