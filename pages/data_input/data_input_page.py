@@ -212,18 +212,34 @@ def create_data_input_sidebar():
 
         # Download Template Section
         st.markdown("#### 📥 Download Template")
-        try:
-            with open('bpc_upload_template/BPC1_Upload_Template.xlsx', 'rb') as template_file:
+        xlsx_mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+        new_template_path = 'bpc_upload_template/BPC1_Upload_Template_NEW_With_Subtotals.xlsx'
+        old_template_path = 'bpc_upload_template/BPC1_Upload_Template_OLD.xlsx'
+
+        if os.path.exists(new_template_path):
+            with open(new_template_path, 'rb') as template_file:
                 st.download_button(
-                    label="📥 Download Excel Template",
+                    label="📥 Download NEW Template (with live subtotals)",
                     data=template_file,
-                    file_name="BPC1_Upload_Template.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                    help="Download the Excel template with both IS and BS sheets",
+                    file_name="BPC1_Upload_Template_NEW_With_Subtotals.xlsx",
+                    mime=xlsx_mime,
+                    help="New template — subtotals calculate automatically as you type",
                     use_container_width=True
                 )
-        except FileNotFoundError:
-            st.error("⚠️ Template not found. Run create_upload_template.py to generate it.")
+        else:
+            st.error("⚠️ New template not found. Run create_upload_template.py to generate it.")
+
+        if os.path.exists(old_template_path):
+            with open(old_template_path, 'rb') as template_file:
+                st.download_button(
+                    label="📥 Download OLD Template (no subtotals)",
+                    data=template_file,
+                    file_name="BPC1_Upload_Template_OLD.xlsx",
+                    mime=xlsx_mime,
+                    help="Old template — still uploads successfully, kept for backward compatibility",
+                    use_container_width=True
+                )
 
         st.markdown('<div style="border-bottom: 1px solid #e2e8f0; margin: 1rem 0;"></div>', unsafe_allow_html=True)
 

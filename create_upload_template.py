@@ -32,7 +32,7 @@ def create_excel_template():
     create_balance_sheet_sheet(wb)
 
     # Save the file
-    output_path = 'bpc_upload_template/BPC1_Upload_Template.xlsx'
+    output_path = 'bpc_upload_template/BPC1_Upload_Template_NEW_With_Subtotals.xlsx'
     wb.save(output_path)
     print(f"✅ Template created successfully: {output_path}")
 
@@ -89,7 +89,7 @@ def create_instructions_sheet(wb):
         ("4.", "Enter negative values with a minus sign (e.g., -5000 for accumulated depreciation)."),
         ("5.", "Enter 0 for any line item that does not apply to your company. Do not leave cells blank."),
         ("6.", "Do NOT modify the line item names in Column A or the descriptions in Column B. The system uses these names to match your data."),
-        ("7.", "Do NOT fill in any rows labeled as totals (e.g., Total Revenue, Total Assets). These are calculated automatically by the dashboard."),
+        ("7.", "Subtotal rows (e.g., Total Revenue, Gross Profit, Total Assets) are calculated for you automatically as you enter values. You cannot edit these rows — they contain live formulas so you can sanity-check your numbers before uploading."),
     ]
 
     row = 4
@@ -180,162 +180,185 @@ def create_instructions_sheet(wb):
     ws.sheet_properties.tabColor = atlas_blue
 
 
+def _h(label):
+    return {'kind': 'header', 'label': label}
+
+
+def _blank():
+    return {'kind': 'blank'}
+
+
+def _d(key, label, group=None):
+    row = {'kind': 'data', 'key': key, 'label': label}
+    if group:
+        row['group'] = group
+    return row
+
+
+def _sum(name, label, group):
+    return {'kind': 'subtotal_sum', 'name': name, 'label': label, 'group': group}
+
+
+def _f(name, label, formula):
+    return {'kind': 'subtotal_formula', 'name': name, 'label': label, 'formula': formula}
+
+
 def create_income_statement_sheet(wb):
-    """Create Income Statement sheet with all line items"""
+    """Create Income Statement sheet with all line items and live subtotal formulas."""
 
     ws = wb.create_sheet("Income Statement", 1)
 
-    # Define all Income Statement line items in order
     is_line_items = [
-        # Revenue
-        ('REVENUE', '', True),  # Header row
-        ('intra_state_hhg', 'Intra State HHG', False),
-        ('local_hhg', 'Local HHG', False),
-        ('inter_state_hhg', 'Inter State HHG', False),
-        ('office_industrial', 'Office & Industrial', False),
-        ('warehouse', 'Warehouse (Non-commercial)', False),
-        ('warehouse_handling', 'Warehouse Handling (Non-commercial)', False),
-        ('international', 'International', False),
-        ('packing_unpacking', 'Packing & Unpacking', False),
-        ('booking_royalties', 'Booking & Royalties', False),
-        ('special_products', 'Special Products', False),
-        ('records_storage', 'Records Storage', False),
-        ('military_dpm_contracts', 'Military DPM Contracts', False),
-        ('distribution', 'Distribution', False),
-        ('hotel_deliveries', 'Hotel Deliveries', False),
-        ('other_revenue', 'Other Revenue', False),
+        _h('REVENUE'),
+        _d('intra_state_hhg', 'Intra State HHG', 'rev'),
+        _d('local_hhg', 'Local HHG', 'rev'),
+        _d('inter_state_hhg', 'Inter State HHG', 'rev'),
+        _d('office_industrial', 'Office & Industrial', 'rev'),
+        _d('warehouse', 'Warehouse (Non-commercial)', 'rev'),
+        _d('warehouse_handling', 'Warehouse Handling (Non-commercial)', 'rev'),
+        _d('international', 'International', 'rev'),
+        _d('packing_unpacking', 'Packing & Unpacking', 'rev'),
+        _d('booking_royalties', 'Booking & Royalties', 'rev'),
+        _d('special_products', 'Special Products', 'rev'),
+        _d('records_storage', 'Records Storage', 'rev'),
+        _d('military_dpm_contracts', 'Military DPM Contracts', 'rev'),
+        _d('distribution', 'Distribution', 'rev'),
+        _d('hotel_deliveries', 'Hotel Deliveries', 'rev'),
+        _d('other_revenue', 'Other Revenue', 'rev'),
+        _sum('TotalRev', 'Total Revenue', 'rev'),
 
-        # Direct Expenses
-        ('', '', False),  # Blank row
-        ('DIRECT EXPENSES (COST OF REVENUE)', '', True),  # Header row
-        ('direct_wages', 'Direct Wages', False),
-        ('vehicle_operating_expenses', 'Vehicle Operating Expense', False),
-        ('packing_warehouse_supplies', 'Packing/Warehouse Supplies', False),
-        ('oo_exp_intra_state', 'OO Exp Intra State', False),
-        ('oo_inter_state', 'OO Inter State', False),
-        ('oo_oi', 'OO O&I', False),
-        ('oo_packing', 'OO Packing', False),
-        ('oo_other', 'OO Other', False),
-        ('claims', 'Claims', False),
-        ('other_trans_exp', 'Other Trans Exp', False),
-        ('depreciation', 'Depreciation', False),
-        ('lease_expense_rev_equip', 'Lease Expense Rev Equip', False),
-        ('rent', 'Rent', False),
-        ('other_direct_expenses', 'Other Direct Expenses', False),
+        _blank(),
+        _h('DIRECT EXPENSES (COST OF REVENUE)'),
+        _d('direct_wages', 'Direct Wages', 'cor'),
+        _d('vehicle_operating_expenses', 'Vehicle Operating Expense', 'cor'),
+        _d('packing_warehouse_supplies', 'Packing/Warehouse Supplies', 'cor'),
+        _d('oo_exp_intra_state', 'OO Exp Intra State', 'cor'),
+        _d('oo_inter_state', 'OO Inter State', 'cor'),
+        _d('oo_oi', 'OO O&I', 'cor'),
+        _d('oo_packing', 'OO Packing', 'cor'),
+        _d('oo_other', 'OO Other', 'cor'),
+        _d('claims', 'Claims', 'cor'),
+        _d('other_trans_exp', 'Other Trans Exp', 'cor'),
+        _d('depreciation', 'Depreciation', 'cor'),
+        _d('lease_expense_rev_equip', 'Lease Expense Rev Equip', 'cor'),
+        _d('rent', 'Rent', 'cor'),
+        _d('other_direct_expenses', 'Other Direct Expenses', 'cor'),
+        _sum('TotalCOR', 'Total Cost of Revenue', 'cor'),
+        _f('GrossProfit', 'Gross Profit', '=C{TotalRev}-C{TotalCOR}'),
 
-        # Operating Expenses
-        ('', '', False),  # Blank row
-        ('OPERATING EXPENSES', '', True),  # Header row
-        ('advertising_marketing', 'Advertising/Marketing', False),
-        ('bad_debts', 'Bad Debts', False),
-        ('sales_commissions', 'Sales Commissions', False),
-        ('contributions', 'Contributions', False),
-        ('computer_support', 'Computer Support', False),
-        ('dues_sub', 'Dues & Subscriptions', False),
-        ('pr_taxes_benefits', 'PR Taxes & Benefits', False),
-        ('equipment_leases_office_equip', 'Equipment Leases Office Equip', False),
-        ('workmans_comp_insurance', "Workman's Comp Insurance", False),
-        ('insurance', 'Insurance', False),
-        ('legal_accounting', 'Legal & Accounting', False),
-        ('office_expense', 'Office Expense', False),
-        ('other_admin', 'Other Admin', False),
-        ('pension_profit_sharing_401k', 'Pension/Profit Sharing/401k', False),
-        ('prof_fees', 'Professional Fees', False),
-        ('repairs_maint', 'Repairs & Maintenance', False),
-        ('salaries_admin', 'Salaries Admin', False),
-        ('taxes_licenses', 'Taxes & Licenses', False),
-        ('tel_fax_utilities_internet', 'Tel/Fax/Utilities/Internet', False),
-        ('travel_ent', 'Travel & Entertainment', False),
-        ('vehicle_expense_admin', 'Vehicle Expense Admin', False),
+        _blank(),
+        _h('OPERATING EXPENSES'),
+        _d('advertising_marketing', 'Advertising/Marketing', 'opex'),
+        _d('bad_debts', 'Bad Debts', 'opex'),
+        _d('sales_commissions', 'Sales Commissions', 'opex'),
+        _d('contributions', 'Contributions', 'opex'),
+        _d('computer_support', 'Computer Support', 'opex'),
+        _d('dues_sub', 'Dues & Subscriptions', 'opex'),
+        _d('pr_taxes_benefits', 'PR Taxes & Benefits', 'opex'),
+        _d('equipment_leases_office_equip', 'Equipment Leases Office Equip', 'opex'),
+        _d('workmans_comp_insurance', "Workman's Comp Insurance", 'opex'),
+        _d('insurance', 'Insurance', 'opex'),
+        _d('legal_accounting', 'Legal & Accounting', 'opex'),
+        _d('office_expense', 'Office Expense', 'opex'),
+        _d('other_admin', 'Other Admin', 'opex'),
+        _d('pension_profit_sharing_401k', 'Pension/Profit Sharing/401k', 'opex'),
+        _d('prof_fees', 'Professional Fees', 'opex'),
+        _d('repairs_maint', 'Repairs & Maintenance', 'opex'),
+        _d('salaries_admin', 'Salaries Admin', 'opex'),
+        _d('taxes_licenses', 'Taxes & Licenses', 'opex'),
+        _d('tel_fax_utilities_internet', 'Tel/Fax/Utilities/Internet', 'opex'),
+        _d('travel_ent', 'Travel & Entertainment', 'opex'),
+        _d('vehicle_expense_admin', 'Vehicle Expense Admin', 'opex'),
+        _sum('TotalOpEx', 'Total Operating Expenses', 'opex'),
+        _f('OpProfit', 'Operating Profit', '=C{GrossProfit}-C{TotalOpEx}'),
 
-        # Other Income/Expenses
-        ('', '', False),  # Blank row
-        ('OTHER INCOME/EXPENSES', '', True),  # Header row
-        ('other_income', 'Other Income', False),
-        ('ceo_comp', 'CEO Comp', False),
-        ('other_expense', 'Other Expense', False),
-        ('interest_expense', 'Interest Expense', False),
+        _blank(),
+        _h('OTHER INCOME/EXPENSES'),
+        _d('other_income', 'Other Income', 'nonop'),
+        _d('ceo_comp', 'CEO Comp', 'nonop'),
+        _d('other_expense', 'Other Expense', 'nonop'),
+        _d('interest_expense', 'Interest Expense', 'nonop'),
+        _sum('TotalNonOp', 'Total Non-Operating', 'nonop'),
+        _f('PBT', 'Profit Before Tax', '=C{OpProfit}+C{TotalNonOp}'),
 
-        # Labor Analysis
-        ('', '', False),  # Blank row
-        ('LABOR ANALYSIS', '', True),  # Header row
-        ('administrative_employees', 'Administrative Employees', False),
-        ('number_of_branches', 'Number of Branches', False),
+        _blank(),
+        _h('LABOR ANALYSIS'),
+        _d('administrative_employees', 'Administrative Employees'),
+        _d('number_of_branches', 'Number of Branches'),
     ]
 
-    # Add header row
     add_header_row(ws, "Income Statement Data Entry")
-
-    # Add data rows
     add_data_rows(ws, is_line_items, INCOME_STATEMENT_DESCRIPTIONS)
-
-    # Format the sheet
     format_sheet(ws)
 
 
 def create_balance_sheet_sheet(wb):
-    """Create Balance Sheet sheet with all line items"""
+    """Create Balance Sheet sheet with all line items and live subtotal formulas."""
 
     ws = wb.create_sheet("Balance Sheet", 2)
 
-    # Define all Balance Sheet line items in order
     bs_line_items = [
-        # Current Assets
-        ('CURRENT ASSETS', '', True),  # Header row
-        ('cash_and_cash_equivalents', 'Cash & Cash Equivalents', False),
-        ('trade_accounts_receivable', 'Trade Accounts Receivable', False),
-        ('receivables', 'Receivables', False),
-        ('other_receivables', 'Other Receivables', False),
-        ('prepaid_expenses', 'Prepaid Expenses', False),
-        ('related_company_receivables', 'Related Company Receivables', False),
-        ('owner_receivables', 'Owner Receivables', False),
-        ('other_current_assets', 'Other Current Assets', False),
+        _h('CURRENT ASSETS'),
+        _d('cash_and_cash_equivalents', 'Cash & Cash Equivalents', 'ca'),
+        _d('trade_accounts_receivable', 'Trade Accounts Receivable', 'ca'),
+        _d('receivables', 'Receivables', 'ca'),
+        _d('other_receivables', 'Other Receivables', 'ca'),
+        _d('prepaid_expenses', 'Prepaid Expenses', 'ca'),
+        _d('related_company_receivables', 'Related Company Receivables', 'ca'),
+        _d('owner_receivables', 'Owner Receivables', 'ca'),
+        _d('other_current_assets', 'Other Current Assets', 'ca'),
+        _sum('TCA', 'Total Current Assets', 'ca'),
 
-        # Fixed Assets
-        ('', '', False),  # Blank row
-        ('FIXED ASSETS', '', True),  # Header row
-        ('gross_fixed_assets', 'Gross Fixed Assets', False),
-        ('accumulated_depreciation', 'Accumulated Depreciation', False),
+        _blank(),
+        _h('FIXED ASSETS'),
+        _d('gross_fixed_assets', 'Gross Fixed Assets'),
+        _d('accumulated_depreciation', 'Accumulated Depreciation'),
+        _f('NFA', 'Net Fixed Assets', '=C{GrossFA}+C{AccumDep}'),
 
-        # Other Assets
-        ('', '', False),  # Blank row
-        ('OTHER ASSETS', '', True),  # Header row
-        ('inter_company_receivable', 'Inter Company Receivable', False),
-        ('other_assets', 'Other Assets', False),
+        _blank(),
+        _h('OTHER ASSETS'),
+        _d('inter_company_receivable', 'Inter Company Receivable', 'oa'),
+        _d('other_assets', 'Other Assets', 'oa'),
+        _sum('TOA', 'Total Other Assets', 'oa'),
+        _f('TA', 'Total Assets', '=C{TCA}+C{NFA}+C{TOA}'),
 
-        # Current Liabilities
-        ('', '', False),  # Blank row
-        ('CURRENT LIABILITIES', '', True),  # Header row
-        ('notes_payable_bank', 'Notes Payable/Bank', False),
-        ('notes_payable_owners', 'Notes Payable/Owners', False),
-        ('trade_accounts_payable', 'Trade Accounts Payable', False),
-        ('accrued_expenses', 'Accrued Expenses', False),
-        ('current_portion_ltd', 'Current Portion LTD', False),
-        ('inter_company_payable', 'Inter Company Payable', False),
-        ('other_current_liabilities', 'Other Current Liabilities', False),
+        _blank(),
+        _h('CURRENT LIABILITIES'),
+        _d('notes_payable_bank', 'Notes Payable/Bank', 'cl'),
+        _d('notes_payable_owners', 'Notes Payable/Owners', 'cl'),
+        _d('trade_accounts_payable', 'Trade Accounts Payable', 'cl'),
+        _d('accrued_expenses', 'Accrued Expenses', 'cl'),
+        _d('current_portion_ltd', 'Current Portion LTD', 'cl'),
+        _d('inter_company_payable', 'Inter Company Payable', 'cl'),
+        _d('other_current_liabilities', 'Other Current Liabilities', 'cl'),
+        _sum('TCL', 'Total Current Liabilities', 'cl'),
 
-        # Long-term Liabilities
-        ('', '', False),  # Blank row
-        ('LONG-TERM LIABILITIES', '', True),  # Header row
-        ('eid_loan', 'EID Loan', False),
-        ('long_term_debt', 'Long-term Debt', False),
-        ('notes_payable_owners_lt', 'Notes Payable Owners (LT)', False),
-        ('inter_company_debt', 'Inter Company Debt', False),
-        ('other_lt_liabilities', 'Other LT Liabilities', False),
+        _blank(),
+        _h('LONG-TERM LIABILITIES'),
+        _d('eid_loan', 'EID Loan', 'ltl'),
+        _d('long_term_debt', 'Long-term Debt', 'ltl'),
+        _d('notes_payable_owners_lt', 'Notes Payable Owners (LT)', 'ltl'),
+        _d('inter_company_debt', 'Inter Company Debt', 'ltl'),
+        _d('other_lt_liabilities', 'Other LT Liabilities', 'ltl'),
+        _sum('TLTL', 'Total Long-term Liabilities', 'ltl'),
 
-        # Equity
-        ('', '', False),  # Blank row
-        ('EQUITY', '', True),  # Header row
-        ('owners_equity', "Owner's Equity", False),
+        _blank(),
+        _h('EQUITY'),
+        _d('owners_equity', "Owner's Equity"),
+
+        _blank(),
+        _f('TLE', 'Total Liabilities & Equity', '=C{TCL}+C{TLTL}+C{OwnersEquity}'),
+        _f('BalanceCheck', 'Total Balance Check (Assets - Liab & Equity)', '=C{TA}-C{TLE}'),
     ]
 
-    # Add header row
     add_header_row(ws, "Balance Sheet Data Entry")
-
-    # Add data rows
-    add_data_rows(ws, bs_line_items, BALANCE_SHEET_DESCRIPTIONS)
-
-    # Format the sheet
+    # Balance sheet needs extra anchors for items not in a SUM group
+    extra_anchors = {
+        'gross_fixed_assets': 'GrossFA',
+        'accumulated_depreciation': 'AccumDep',
+        'owners_equity': 'OwnersEquity',
+    }
+    add_data_rows(ws, bs_line_items, BALANCE_SHEET_DESCRIPTIONS, extra_anchors=extra_anchors)
     format_sheet(ws)
 
 
@@ -371,8 +394,13 @@ def add_header_row(ws, sheet_title):
     ws.row_dimensions[2].height = 28
 
 
-def add_data_rows(ws, line_items, description_dict):
-    """Add data rows with line items, descriptions, and date column"""
+def add_data_rows(ws, line_items, description_dict, extra_anchors=None):
+    """Add data rows with line items, descriptions, and amount column.
+
+    Two-pass:
+      Pass 1: assign row numbers, collect group first/last rows and subtotal anchors.
+      Pass 2: write cells, resolving subtotal formulas against the anchor map.
+    """
 
     thin_border = Border(
         left=Side(style='thin'),
@@ -380,12 +408,16 @@ def add_data_rows(ws, line_items, description_dict):
         top=Side(style='thin'),
         bottom=Side(style='thin')
     )
-
-    # Data validation: only allow numbers in column C (no text or special characters)
-    number_validation = DataValidation(
-        type="decimal",
-        allow_blank=True
+    subtotal_fill = PatternFill(start_color="E8F4FD", end_color="E8F4FD", fill_type="solid")
+    subtotal_font = Font(name="Montserrat", size=12, bold=True, color="025A9A")
+    subtotal_top_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='medium', color="025A9A"),
+        bottom=Side(style='thin')
     )
+
+    number_validation = DataValidation(type="decimal", allow_blank=True)
     number_validation.error = "Please enter a number only. No dollar signs, commas, or text."
     number_validation.errorTitle = "Invalid Entry"
     number_validation.prompt = "Enter the dollar amount as a number (e.g., 150000 or -5000)"
@@ -394,35 +426,56 @@ def add_data_rows(ws, line_items, description_dict):
     number_validation.showInputMessage = True
     ws.add_data_validation(number_validation)
 
-    row_num = 3  # Start after header rows
+    # ---- Pass 1: assign row numbers and collect anchors ----
+    start_row = 3
+    group_first = {}
+    group_last = {}
+    anchors = {}
+    extra_anchors = extra_anchors or {}
 
-    for field_key, field_label, is_header in line_items:
-        if is_header:
-            # Category header row
+    for i, item in enumerate(line_items):
+        r = start_row + i
+        item['_row'] = r
+        kind = item['kind']
+        if kind == 'data':
+            grp = item.get('group')
+            if grp:
+                group_first.setdefault(grp, r)
+                group_last[grp] = r
+            # Allow anchoring individual data cells (e.g., Gross Fixed Assets)
+            key = item.get('key')
+            if key in extra_anchors:
+                anchors[extra_anchors[key]] = r
+        elif kind in ('subtotal_sum', 'subtotal_formula'):
+            anchors[item['name']] = r
+
+    # ---- Pass 2: write cells ----
+    for item in line_items:
+        row_num = item['_row']
+        kind = item['kind']
+
+        if kind == 'header':
             cell_a = ws.cell(row=row_num, column=1)
-            cell_a.value = field_key
+            cell_a.value = item['label']
             cell_a.font = Font(name="Montserrat", bold=True, size=12, color="FFFFFF")
             cell_a.fill = PatternFill(start_color="4a5568", end_color="4a5568", fill_type="solid")
             cell_a.alignment = Alignment(horizontal='left', vertical='center')
-
-            # Merge across all columns for category headers
             ws.merge_cells(f'A{row_num}:C{row_num}')
             ws.row_dimensions[row_num].height = 25
 
-        elif field_key == '' and field_label == '':
-            # Blank row for spacing
+        elif kind == 'blank':
             ws.row_dimensions[row_num].height = 8
 
-        else:
-            # Regular data row
-            # Column A: Line Item
+        elif kind == 'data':
+            field_key = item['key']
+            field_label = item['label']
+
             cell_a = ws.cell(row=row_num, column=1)
             cell_a.value = field_label
             cell_a.font = Font(name="Montserrat", size=12, bold=True, color="333333")
             cell_a.alignment = Alignment(horizontal='left', vertical='center')
             cell_a.border = thin_border
 
-            # Column B: Description
             description = description_dict.get(field_key, '')
             cell_b = ws.cell(row=row_num, column=2)
             cell_b.value = description
@@ -430,17 +483,15 @@ def add_data_rows(ws, line_items, description_dict):
             cell_b.font = Font(name="Montserrat", size=11.5, color="4a5568")
             cell_b.border = thin_border
 
-            # Column C: Amount (editable by user, numbers only)
             cell_c = ws.cell(row=row_num, column=3)
             cell_c.value = None
             cell_c.font = Font(name="Montserrat", size=12)
             cell_c.alignment = Alignment(horizontal='right', vertical='center')
             cell_c.border = thin_border
             cell_c.number_format = '#,##0'
+            cell_c.protection = Protection(locked=False)
             number_validation.add(cell_c)
 
-            # Dynamic row height based on description length
-            # ~70 chars per line at column width 70, each line ~16px
             desc_len = len(description) if description else 0
             if desc_len > 140:
                 ws.row_dimensions[row_num].height = 56
@@ -449,7 +500,36 @@ def add_data_rows(ws, line_items, description_dict):
             else:
                 ws.row_dimensions[row_num].height = 28
 
-        row_num += 1
+        elif kind in ('subtotal_sum', 'subtotal_formula'):
+            label = item['label']
+
+            cell_a = ws.cell(row=row_num, column=1)
+            cell_a.value = label
+            cell_a.font = subtotal_font
+            cell_a.fill = subtotal_fill
+            cell_a.alignment = Alignment(horizontal='left', vertical='center')
+            cell_a.border = subtotal_top_border
+
+            cell_b = ws.cell(row=row_num, column=2)
+            cell_b.value = None
+            cell_b.fill = subtotal_fill
+            cell_b.border = subtotal_top_border
+
+            cell_c = ws.cell(row=row_num, column=3)
+            if kind == 'subtotal_sum':
+                grp = item['group']
+                cell_c.value = f"=SUM(C{group_first[grp]}:C{group_last[grp]})"
+            else:
+                cell_c.value = item['formula'].format(**anchors)
+            cell_c.font = subtotal_font
+            cell_c.fill = subtotal_fill
+            cell_c.alignment = Alignment(horizontal='right', vertical='center')
+            cell_c.border = subtotal_top_border
+            cell_c.number_format = '#,##0;(#,##0);"-"'
+            # Subtotal cell stays locked (default) so the formula can't be overwritten
+            cell_c.protection = Protection(locked=True)
+
+            ws.row_dimensions[row_num].height = 28
 
 
 def format_sheet(ws):
@@ -464,11 +544,8 @@ def format_sheet(ws):
     # This allows users to scroll horizontally while keeping the line item labels visible
     ws.freeze_panes = 'C3'
 
-    # Protect columns A and B from accidental editing while keeping column C editable
-    # By default, all cells are locked. We unlock column C (Amount) so users can edit it.
-    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=3, max_col=3):
-        for cell in row:
-            cell.protection = Protection(locked=False)
+    # Columns A and B stay locked by default. Column C data cells are unlocked
+    # inside add_data_rows (subtotal cells stay locked so formulas can't be edited).
 
     # Enable worksheet protection
     # This prevents editing of locked cells (columns A and B) but allows editing of unlocked cells (column C)
