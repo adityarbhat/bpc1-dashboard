@@ -27,132 +27,6 @@ load_dotenv()
 # Do not call st.set_page_config() here as it can only be called once per app
 
 
-# Wins and Challenges Dictionary - Updated annually by moderator
-# Format: "Company Name": {"wins": [...], "challenges": [...]}
-WINS_CHALLENGES_DATA = {
-    "A-1": {
-        "wins": [
-            "Strong liquidity position with Current Ratio above 2.0, indicating excellent ability to meet short-term obligations",
-            "Gross Profit Margin consistently above industry average, demonstrating effective cost management and pricing strategy",
-            "Working Capital as % of Total Assets shows healthy operational efficiency and financial flexibility"
-        ],
-        "challenges": [
-            "Operating Profit Margin below industry benchmark, suggesting need to optimize operating expenses",
-            "Debt-to-Equity ratio trending upward, indicating increasing leverage that requires monitoring",
-            "Revenue growth has plateaued compared to prior year, requiring strategic initiatives to drive top-line expansion"
-        ]
-    },
-    "Ace": {
-        "wins": [
-            "Exceptional Revenue Per Admin Employee ratio, demonstrating superior productivity and operational efficiency",
-            "EBITDA margin shows strong operational performance independent of financing and tax structures",
-            "Consistent improvement in Survival Score over past 3 years, indicating strengthening financial health"
-        ],
-        "challenges": [
-            "Current Ratio below optimal range, suggesting potential liquidity constraints that need addressing",
-            "Days Sales Outstanding (DSO) increasing, indicating slower collection cycles and potential cash flow pressure",
-            "Net Profit Margin remains below industry peers, requiring focus on bottom-line profitability improvement"
-        ]
-    },
-    "Bisson": {
-        "wins": [
-            "Debt-to-Equity ratio well within safe range, demonstrating conservative capital structure and low financial risk",
-            "Strong Sales-to-Assets ratio indicating efficient asset utilization and productivity",
-            "Operating Cash Flow positive and improving, showing strong cash generation from core operations"
-        ],
-        "challenges": [
-            "Gross Profit Margin declining year-over-year, requiring analysis of cost structure and pricing strategy",
-            "Working Capital percentage below industry standard, potentially limiting operational flexibility",
-            "Operating Profit Margin volatility suggests inconsistent cost control and operational efficiency"
-        ]
-    },
-    "Coastal": {
-        "wins": [
-            "Ranked #1 in overall group rankings, demonstrating superior performance across multiple financial metrics",
-            "Exceptional Survival Score above 3.5, indicating excellent overall financial health and resilience",
-            "Industry-leading Current Ratio provides strong buffer for economic downturns and opportunities for growth investment"
-        ],
-        "challenges": [
-            "Revenue growth rate modest compared to expansion opportunities in current market",
-            "Administrative expense ratio slightly elevated, suggesting potential for operational efficiency gains",
-            "Capital expenditure needs increasing as fixed assets age, requiring planned investment strategy"
-        ]
-    },
-    "Hopkins": {
-        "wins": [
-            "Significant improvement in Working Capital management, with percentage of assets increasing year-over-year",
-            "Gross Profit Margin expansion demonstrates successful pricing strategies and cost optimization",
-            "Strong EBITDA generation provides flexibility for debt service and strategic investments"
-        ],
-        "challenges": [
-            "Debt-to-Equity ratio above comfort zone, requiring focus on deleveraging or equity strengthening",
-            "Operating Profit Margin compressed due to rising operating expenses outpacing revenue growth",
-            "Days Sales Outstanding elevated, indicating collection challenges and potential receivables quality issues"
-        ]
-    },
-    "Kaster": {
-        "wins": [
-            "Revenue Per Admin Employee among highest in peer group, reflecting strong productivity and lean operations",
-            "Sales-to-Assets ratio indicates efficient capital deployment and strong return on assets",
-            "Positive trajectory in key profitability metrics showing improving operational performance"
-        ],
-        "challenges": [
-            "Lowest overall group ranking (#10), indicating significant performance gaps across multiple dimensions",
-            "Current Ratio below safe threshold, creating liquidity concerns and limiting financial flexibility",
-            "Survival Score in caution range, requiring immediate attention to fundamental financial health metrics"
-        ]
-    },
-    "Mabeys": {
-        "wins": [
-            "Balanced capital structure with appropriate mix of debt and equity financing",
-            "Operating Cash Flow generation strong relative to revenue, supporting ongoing operations and growth",
-            "Working Capital percentage improving, providing increased operational cushion"
-        ],
-        "challenges": [
-            "Gross Profit Margin trending downward, requiring review of pricing strategy and cost structure",
-            "Operating Profit Margin under pressure from rising SG&A expenses",
-            "Revenue growth lagging industry peers, necessitating market share analysis and growth strategy development"
-        ]
-    },
-    "RC Mason": {
-        "wins": [
-            "Strong EBITDA margins demonstrate effective operational management and core business profitability",
-            "Debt levels well-managed with Debt-to-Equity ratio in healthy range",
-            "Consistent Revenue Per Employee metrics showing stable productivity"
-        ],
-        "challenges": [
-            "Current Ratio declining over past 2 years, indicating tightening liquidity position",
-            "Working Capital as % of Assets below peer average, limiting operational flexibility",
-            "Days Sales Outstanding increasing, suggesting need for enhanced credit and collection practices"
-        ]
-    },
-    "Spirit": {
-        "wins": [
-            "Top-tier ranking (#3 overall), reflecting strong performance across balanced scorecard of metrics",
-            "Excellent Debt-to-Equity ratio demonstrating financial strength and low leverage risk",
-            "Operating Cash Flow generation robust, providing strong foundation for growth and investment"
-        ],
-        "challenges": [
-            "Operating Profit Margin compressed compared to historical levels, requiring cost structure review",
-            "Revenue growth rate below market potential, suggesting opportunity for market share expansion",
-            "Capital intensity increasing, requiring strategic evaluation of asset efficiency and ROI"
-        ]
-    },
-    "Winter": {
-        "wins": [
-            "Second-best overall group ranking (#2), demonstrating comprehensive financial strength",
-            "Superior Survival Score indicates exceptional resilience and multi-faceted financial health",
-            "Gross Profit Margin among highest in peer group, showing strong value capture and cost management"
-        ],
-        "challenges": [
-            "Operating expenses growing faster than revenue, creating margin pressure that needs addressing",
-            "Days Sales Outstanding elevated, suggesting opportunities to improve working capital through better A/R management",
-            "Fixed asset base aging, requiring capital planning for equipment refreshment and technology upgrades"
-        ]
-    }
-}
-
-
 def get_company_rank(company_name, period):
     """Get the overall group rank for a company in the selected period"""
     try:
@@ -1164,11 +1038,13 @@ def display_wins_challenges_sections(balance_data, income_data):
     # Add spacing before multi-year table
     st.markdown('<div style="margin: 1.5rem 0 0.5rem 0;"></div>', unsafe_allow_html=True)
 
-    # Add section title for multi-year trends
-    st.markdown("""
+    # Add section title for multi-year trends (dynamic based on sidebar year selection)
+    selected_years = get_selected_years()
+    year_range_label = f"{selected_years[0]}-{selected_years[-1]}" if selected_years else ""
+    st.markdown(f"""
     <div style="margin-bottom: 0.5rem;">
         <h2 style="font-size: 1.25rem; font-weight: 600; color: #1a202c; font-family: 'Montserrat', sans-serif; margin-bottom: 0.25rem;">
-            Historical Margin Analysis (2020-2024)
+            Historical Margin Analysis ({year_range_label})
         </h2>
         <p style="font-size: 0.85rem; color: #718096; font-family: 'Montserrat', sans-serif; margin-top: 0.25rem;">
             All metrics shown as percentage of revenue (margin %)
@@ -1176,7 +1052,7 @@ def display_wins_challenges_sections(balance_data, income_data):
     </div>
     """, unsafe_allow_html=True)
 
-    # Calculate and display multi-year margin analysis (2020-2024)
+    # Calculate and display multi-year margin analysis for selected year range
     multi_year_data = calculate_multi_year_yoy(company_name)
 
     if multi_year_data and len(multi_year_data) > 0:
@@ -1185,7 +1061,7 @@ def display_wins_challenges_sections(balance_data, income_data):
         if table_html:
             st.markdown(table_html, unsafe_allow_html=True)
     else:
-        st.info("📊 Historical margin data not available for 2020-2024.")
+        st.info(f"📊 Historical margin data not available for {year_range_label}.")
 
 
 if __name__ == "__main__":
