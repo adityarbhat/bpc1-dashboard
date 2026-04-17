@@ -659,8 +659,13 @@ def display_ratio_trends_table(balance_data, income_data):
 
     # Build the HTML table with enhanced font sizes for senior readability
     table_html = """
+    <style>
+        .company-ratios-table tbody tr:not(.section-header-row):hover td {
+            box-shadow: inset 0 2px 0 #025a9a, inset 0 -2px 0 #025a9a;
+        }
+    </style>
     <div style="overflow-x: auto; margin: 1rem 0;">
-        <table style="width: 100%; border-collapse: collapse; font-family: 'Montserrat', sans-serif; font-size: 1.0rem;">
+        <table class="company-ratios-table" style="width: 100%; border-collapse: collapse; font-family: 'Montserrat', sans-serif; font-size: 1.0rem;">
             <thead>
                 <tr style="background-color: #f8f9fa;">
                     <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left; font-weight: 600; font-size: 1.0rem;"></th>
@@ -680,7 +685,7 @@ def display_ratio_trends_table(balance_data, income_data):
     """
     
     # Add Balance Sheet section with enhanced font size
-    table_html += '<tr style="background-color: #2c3e50; color: white;"><td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="7">Balance Sheet</td></tr>'
+    table_html += '<tr class="section-header-row" style="background-color: #2c3e50; color: white;"><td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="7">Balance Sheet</td></tr>'
     
     for metric, values in trends_data['balance_sheet'].items():
         table_html += '<tr><td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">' + metric + '</td>'
@@ -718,7 +723,7 @@ def display_ratio_trends_table(balance_data, income_data):
         table_html += '</tr>'
 
     # Add Income Statement section with enhanced font size
-    table_html += '<tr style="background-color: #2c3e50; color: white;"><td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="7">Income Statement</td></tr>'
+    table_html += '<tr class="section-header-row" style="background-color: #2c3e50; color: white;"><td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="7">Income Statement</td></tr>'
     
     for metric, values in trends_data['income_statement'].items():
         table_html += '<tr><td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">' + metric + '</td>'
@@ -756,7 +761,7 @@ def display_ratio_trends_table(balance_data, income_data):
         table_html += '</tr>'
 
     # Add Cash Flow section with enhanced font size
-    table_html += '<tr style="background-color: #2c3e50; color: white;"><td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="7">Cash Flow</td></tr>'
+    table_html += '<tr class="section-header-row" style="background-color: #2c3e50; color: white;"><td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="7">Cash Flow</td></tr>'
     
     for metric, values in trends_data['cash_flow'].items():
         table_html += '<tr><td style="border: 1px solid #dee2e6; padding: 8px; font-size: 0.95rem;">' + metric + '</td>'
@@ -957,7 +962,7 @@ def display_ratios_sections(balance_data, income_data):
     <div class="ratios-section" style="margin-top: 2rem;">
         <h3 class="section-title" style="font-size: 1.4rem; margin-bottom: 1rem;">Range Key</h3>
         <div style="overflow-x: auto; margin: 0.5rem 0;">
-            <table style="width: 100%; border-collapse: collapse; font-family: 'Montserrat', sans-serif; font-size: 1.0rem;">
+            <table class="company-ratios-table" style="width: 100%; border-collapse: collapse; font-family: 'Montserrat', sans-serif; font-size: 1.0rem;">
                 <thead>
                     <tr style="background-color: #f8f9fa;">
                         <th style="border: 1px solid #dee2e6; padding: 10px; text-align: left; font-weight: 600; font-size: 1.0rem;"></th>
@@ -967,7 +972,7 @@ def display_ratios_sections(balance_data, income_data):
                     </tr>
                 </thead>
                 <tbody>
-                    <tr style="background-color: #2c3e50; color: white;">
+                    <tr class="section-header-row" style="background-color: #2c3e50; color: white;">
                         <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="4">Balance Sheet</td>
                     </tr>
                     <tr>
@@ -1000,7 +1005,7 @@ def display_ratios_sections(balance_data, income_data):
                         <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa; font-size: 0.95rem;">No Range</td>
                         <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8f9fa; font-size: 0.95rem;">No Range</td>
                     </tr>
-                    <tr style="background-color: #2c3e50; color: white;">
+                    <tr class="section-header-row" style="background-color: #2c3e50; color: white;">
                         <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="4">Income Statement</td>
                     </tr>
                     <tr>
@@ -1033,7 +1038,7 @@ def display_ratios_sections(balance_data, income_data):
                         <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #fff3cd; font-size: 0.95rem;">2.5% to 5%</td>
                         <td style="border: 1px solid #dee2e6; padding: 8px; text-align: center; background-color: #f8d7da; font-size: 0.95rem;">Below 2.5%</td>
                     </tr>
-                    <tr style="background-color: #2c3e50; color: white;">
+                    <tr class="section-header-row" style="background-color: #2c3e50; color: white;">
                         <td style="border: 1px solid #dee2e6; padding: 10px; font-weight: 600; font-size: 1.0rem;" colspan="4">Cash Flows</td>
                     </tr>
                     <tr>
