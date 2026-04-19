@@ -47,11 +47,11 @@ THIN_BORDER = Border(
 RATIO_THRESHOLDS = {
     'Current Ratio': {'great': 2.0, 'caution': [1.2, 2.0], 'reverse': False},
     'Debt to Equity': {'great': 1.4, 'caution': [1.5, 2.9], 'reverse': True},
-    'Working Capital %': {'great': 0.30, 'caution': [0.15, 0.29], 'reverse': False},
+    'Working Capital %': {'great': 0.30, 'caution': [0.15, 0.2999], 'reverse': False},
     'Survival Score': {'great': 3.0, 'caution': [2.0, 3.0], 'reverse': False},
     'Sales/Assets': {'great': 3.7, 'caution': [2.0, 3.6], 'reverse': False},
     'Gross Profit Margin': {'great': 0.25, 'caution': [0.20, 0.25], 'reverse': False},
-    'Operating Profit Margin': {'great': 0.055, 'caution': [0.03, 0.054], 'reverse': False},
+    'Operating Profit Margin': {'great': 0.055, 'caution': [0.03, 0.0549], 'reverse': False},
     'Net Profit Margin': {'great': 0.05, 'caution': [0.03, 0.0499], 'reverse': False},
     'Revenue Per Employee': {'great': 550, 'caution': [325, 550], 'reverse': False},
     'EBITDA/Revenue': {'great': 0.05, 'caution': [0.025, 0.05], 'reverse': False},
