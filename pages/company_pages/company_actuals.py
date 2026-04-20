@@ -739,13 +739,13 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
         ('Claims', 'claims', False, False),
         ('Other Transportation Expenses', 'other_trans_exp', False, False),
         ('Depreciation/Amortization', 'depreciation', False, False),
+        ('Lease Expense Rev Equip', 'lease_expense_rev_equip', False, False),
+        ('Rent', 'rent', False, False),
+        ('Other Direct Expenses', 'other_direct_expenses', False, False),
         ('Total Direct Expenses', 'calculated_total_direct_expenses', True, False),  # Calculated total with light grey
         ('Gross Profit $', 'gross_profit', True, False),  # From income statement table - light grey
         ('Gross Profit Margin %', 'gpm', True, False),  # From income statement table, percentage - light grey
         ('Operating Expenses', 'header_operating_expenses', True, True),  # Header row with dark grey
-        ('Lease Expense Rev Equip', 'lease_expense_rev_equip', False, False),
-        ('Rent', 'rent', False, False),
-        ('Other Direct Expenses', 'other_direct_expenses', False, False),
         
         # Operating Expenses Section
         ('Advertising Marketing', 'advertising_marketing', False, False),
@@ -805,7 +805,8 @@ def display_income_statement_actuals_table(company_name, income_historical_data)
                     direct_expense_fields = [
                         'direct_wages', 'vehicle_operating_expenses', 'packing_warehouse_supplies',
                         'oo_exp_intra_state', 'oo_inter_state', 'oo_oi', 'oo_packing', 'oo_other',
-                        'claims', 'other_trans_exp', 'depreciation'
+                        'claims', 'other_trans_exp', 'depreciation',
+                        'lease_expense_rev_equip', 'rent', 'other_direct_expenses'
                     ]
                     total_direct = sum(income_record.get(field, 0) or 0 for field in direct_expense_fields)
                     table_data[item_name][year] = total_direct
