@@ -409,10 +409,10 @@ def get_cell_color(value, metric_name):
     thresholds = {
         'current_ratio': {'great': 2.0, 'caution': [1.2, 2.0], 'improve': 1.3},
         'debt_to_equity': {'great': 1.4, 'caution': [1.5, 2.9], 'improve': 3.0, 'reverse': True},  # Lower is better
-        'working_capital_pct': {'great': 0.30, 'caution': [0.15, 0.29], 'improve': 0.15},  # Decimal (0.30 = 30%)
+        'working_capital_pct': {'great': 0.30, 'caution': [0.15, 0.2999], 'improve': 0.15},  # Decimal (0.30 = 30%)
         'survival_score': {'great': 3.0, 'caution': [2.0, 3.0], 'improve': 2.0},
         'gpm': {'great': 0.25, 'caution': [0.20, 0.25], 'improve': 0.20},  # Decimal (0.25 = 25%)
-        'opm': {'great': 0.055, 'caution': [0.03, 0.054], 'improve': 0.03},  # Decimal (0.055 = 5.5%)
+        'opm': {'great': 0.055, 'caution': [0.03, 0.0549], 'improve': 0.03},  # Decimal (0.055 = 5.5%)
         'rev_per_employee': {'great': 550, 'caution': [325, 550], 'improve': 325},  # In thousands
         'ebitda_margin': {'great': 0.05, 'caution': [0.025, 0.05], 'improve': 0.025},  # Decimal (0.05 = 5%)
         'dso': {'great': 30, 'caution': [30, 60], 'improve': 60, 'reverse': True},  # Lower is better
