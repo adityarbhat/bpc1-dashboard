@@ -706,7 +706,7 @@ def create_group_overview_page(companies):
     # Hardcoded rankings from 2025 Annual data (avoids slow API calls on homepage load)
     hardcoded_rankings = [
         (1, 'Ace Worldwide', 37.5),
-        (2, 'AMJ', 46.5),
+        (2, 'AMJ', 44.0),
         (3, 'Guardian', 54.0),
         (4, 'Ace Relo', 55.0),
         (5, 'Alexanders', 58.5),
