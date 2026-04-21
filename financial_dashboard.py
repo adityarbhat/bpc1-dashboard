@@ -713,7 +713,7 @@ def create_group_overview_page(companies):
         (6, 'Smith Dray', 60.0),
         (7, 'Apex', 64.0),
         (8, 'Weleski', 68.0),
-        (9, 'InterWest', 74.0),
+        (9, 'InterWest', 72.5),
     ]
 
     # Companies that are part of the group but have not submitted data yet
