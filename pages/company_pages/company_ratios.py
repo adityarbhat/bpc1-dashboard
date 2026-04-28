@@ -16,6 +16,7 @@ from shared.page_components import get_period_display_text
 from shared.auth_utils import require_auth, logout_user, get_current_user_name, get_current_user_email, is_super_admin
 from shared.cash_flow_utils import get_cash_flow_ratios
 from shared.year_config import get_selected_years
+from shared.ratio_thresholds import THRESHOLDS, PCT_METRICS
 
 # Load environment variables from .env file for local development
 load_dotenv()
@@ -399,53 +400,33 @@ def create_company_ratios_page():
             display_ratios_sections(sample_balance, sample_income)
 
 def get_cell_color(value, metric_name):
-    """Get background color for table cell based on metric value and thresholds"""
     if value is None or value == '':
-        return '#f8f9fa'  # Light gray for missing data
-    
-    # Define thresholds for each metric
-    # NOTE: Percentage metrics (working_capital_pct, gpm, opm, ebitda_margin) use decimal values
-    # because Airtable stores them as decimals (e.g., 0.53 for 53%)
-    thresholds = {
-        'current_ratio': {'great': 2.0, 'caution': [1.2, 2.0], 'improve': 1.3},
-        'debt_to_equity': {'great': 1.4, 'caution': [1.5, 2.9], 'improve': 3.0, 'reverse': True},  # Lower is better
-        'working_capital_pct': {'great': 0.30, 'caution': [0.15, 0.2999], 'improve': 0.15},  # Decimal (0.30 = 30%)
-        'survival_score': {'great': 3.0, 'caution': [2.0, 3.0], 'improve': 2.0},
-        'gpm': {'great': 0.25, 'caution': [0.20, 0.25], 'improve': 0.20},  # Decimal (0.25 = 25%)
-        'opm': {'great': 0.055, 'caution': [0.03, 0.0549], 'improve': 0.03},  # Decimal (0.055 = 5.5%)
-        'rev_per_employee': {'great': 550, 'caution': [325, 550], 'improve': 325},  # In thousands
-        'ebitda_margin': {'great': 0.05, 'caution': [0.025, 0.05], 'improve': 0.025},  # Decimal (0.05 = 5%)
-        'dso': {'great': 30, 'caution': [30, 60], 'improve': 60, 'reverse': True},  # Lower is better
-        'ocf_rev': {'great': 0.0, 'caution': [-0.03, 0.0], 'improve': -0.03},  # Positive = green, 0 to neg 3% = yellow
-    }
-    
-    if metric_name not in thresholds:
-        return '#f8f9fa'  # Default light gray
-    
-    threshold = thresholds[metric_name]
-    is_reverse = threshold.get('reverse', False)  # For metrics where lower is better
-    
+        return '#f8f9fa'
+    if metric_name not in THRESHOLDS:
+        return '#f8f9fa'
+    threshold = THRESHOLDS[metric_name]
+    is_reverse = threshold.get('reverse', False)
     try:
         val = float(value)
-        
+        if metric_name in PCT_METRICS and val > 1:
+            val = val / 100
         if is_reverse:
-            # For reverse metrics (like debt_to_equity, dso), lower values are better
             if val <= threshold['great']:
-                return '#c8e6c9'  # Muted light green
+                return '#c8e6c9'
             elif isinstance(threshold['caution'], list) and threshold['caution'][0] <= val <= threshold['caution'][1]:
-                return '#fff3c4'  # Muted light yellow
+                return '#fff3c4'
             else:
-                return '#ffcdd2'  # Muted light red
+                return '#ffcdd2'
         else:
-            # For normal metrics, higher values are better
             if val >= threshold['great']:
-                return '#c8e6c9'  # Muted light green
+                return '#c8e6c9'
             elif isinstance(threshold['caution'], list) and threshold['caution'][0] <= val <= threshold['caution'][1]:
-                return '#fff3c4'  # Muted light yellow  
+                return '#fff3c4'
             else:
-                return '#ffcdd2'  # Muted light red
+                return '#ffcdd2'
     except (ValueError, TypeError):
-        return '#f8f9fa'  # Light gray for invalid values
+        return '#f8f9fa'
+
 
 def format_metric_value(value, metric_name):
     """Format metric values for display in the trends table"""

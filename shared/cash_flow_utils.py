@@ -35,14 +35,6 @@ def _calculate_cash_flow_for_year(current_balance, prior_balance, current_income
         'ncf_rev': None
     }
 
-    # Special hardcoded values for Hopkins 2024 (no prior year data available)
-    if company_name == 'Hopkins' and year == '2024':
-        return {
-            'ocf_rev': -0.274,  # -27.4%
-            'fcf_rev': 0.449,   # 44.9%
-            'ncf_rev': 0.176    # 17.6%
-        }
-
     # Need prior year data to calculate YoY changes
     if not prior_balance or not current_balance or not current_income:
         return result
